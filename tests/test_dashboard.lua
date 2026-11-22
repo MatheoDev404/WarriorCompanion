@@ -104,15 +104,23 @@ assert(WC.questPlanMode=="talents")
 assert(WC.dashboardTalentHeader:IsShown() and
        not WC.dashboardQuestDetail:IsShown(),"vue talents distincte")
 assert(WC.dashboardTalentCurrent.text:find("Niv. 33",1,true))
-assert(WC.dashboardTalentUpcoming.text:find("Niv. 34",1,true))
+assert(#WC.dashboardTalentGrid==28,"arbre graphique de 7 lignes x 4 colonnes")
+local enrage=WC.dashboardTalentGrid[12]
+assert(enrage.name.text:find("Enrager",1,true) and
+       enrage.rank.text:find("5/5",1,true),"talent actuel visible dans l'arbre")
 WC.dashboardGuideNext.handlers.OnClick()
 assert(WC.talentPlanSelection==34)
 assert(WC.dashboardTalentCurrent.text:find("Niv. 34",1,true))
+local swings=WC.dashboardTalentGrid[14]
+assert(swings.name.text:find("Coups imprudents",1,true) and
+       swings.rank.text:find("1/1",1,true),
+       "mise a jour du talent visible en changeant de niveau")
 WC.dashboardGuidePrev.handlers.OnClick()
 assert(WC.talentPlanSelection==33)
 WC.dashboardQuestButtons.guide.handlers.OnClick()
-assert(not WC.dashboardTalentHeader:IsShown()
-  and WC.dashboardQuestDetail:IsShown(),"retour aux etapes")
+assert(not WC.dashboardTalentHeader:IsShown() and
+  not WC.dashboardTalentGrid[12]:IsShown()
+  and WC.dashboardQuestDetail:IsShown(),"retour aux etapes sans arbre superpose")
 WC.dashboardTabs.combat.handlers.OnClick()
 assert(WC.dashboardPage=="combat" and WC.dashboardPages.combat:IsShown())
 assert(WC.dashboardCombatDetail.text:find("Combats",1,true))
