@@ -57,10 +57,13 @@ end
 function WC:AdviceLines() return "Verifier les talents du guerrier." end
 function WC:UpdateAdvice() notices=notices+1 end
 function WC:Print() end
+function UnitLevel() return 33 end
+assert(loadfile("Addon/WarriorCompanion/TalentPlan.lua"))("WarriorCompanion",WC)
 function WC:SelectQuestPlan(mode)
   self.questPlanMode=mode
   self.dashboardQuestTitle:SetText("Guide de leveling")
   self.dashboardQuestDetail:SetText("Pas de parcours verifie")
+  if self.RefreshTalentGuidePanel then self:RefreshTalentGuidePanel() end
 end
 assert(loadfile("Addon/WarriorCompanion/Dashboard.lua"))("WarriorCompanion",WC)
 
@@ -95,6 +98,21 @@ assert(WC.dashboard:IsShown() and notices==0)
 assert(WC.dashboardQuestButtons.guide and WC.dashboardQuestButtons.journal
   and WC.dashboardQuestButtons.discover and not WC.dashboardQuestButtons.route)
 assert(WC.dashboardGuidePrev and WC.dashboardGuideNext)
+assert(WC.dashboardQuestButtons.talents,"vue talents dans le guide")
+WC.dashboardQuestButtons.talents.handlers.OnClick()
+assert(WC.questPlanMode=="talents")
+assert(WC.dashboardTalentHeader:IsShown() and
+       not WC.dashboardQuestDetail:IsShown(),"vue talents distincte")
+assert(WC.dashboardTalentCurrent.text:find("Niv. 33",1,true))
+assert(WC.dashboardTalentUpcoming.text:find("Niv. 34",1,true))
+WC.dashboardGuideNext.handlers.OnClick()
+assert(WC.talentPlanSelection==34)
+assert(WC.dashboardTalentCurrent.text:find("Niv. 34",1,true))
+WC.dashboardGuidePrev.handlers.OnClick()
+assert(WC.talentPlanSelection==33)
+WC.dashboardQuestButtons.guide.handlers.OnClick()
+assert(not WC.dashboardTalentHeader:IsShown()
+  and WC.dashboardQuestDetail:IsShown(),"retour aux etapes")
 WC.dashboardTabs.combat.handlers.OnClick()
 assert(WC.dashboardPage=="combat" and WC.dashboardPages.combat:IsShown())
 assert(WC.dashboardCombatDetail.text:find("Combats",1,true))
