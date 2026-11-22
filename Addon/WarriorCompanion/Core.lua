@@ -7,11 +7,11 @@ WC.inCombat = false
 WC.ready = false
 
 function WC:Profile()
-  WC_DB = WC_DB or {}
-  WC_DB.options = WC_DB.options or {}
+  if type(WC_DB) ~= "table" then WC_DB = {} end
+  if type(WC_DB.options) ~= "table" then WC_DB.options = {} end
   local options = WC_DB.options
-  if options.debug == nil then options.debug = false end
-  if options.showAlerts == nil then options.showAlerts = true end
+  if type(options.debug) ~= "boolean" then options.debug = false end
+  if type(options.showAlerts) ~= "boolean" then options.showAlerts = true end
   return options
 end
 

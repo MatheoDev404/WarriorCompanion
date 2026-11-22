@@ -44,8 +44,13 @@ local function event(name, ...)
   assert(WC.eventFrame.registered[name], "Evenement non enregistre : " .. name)
   WC.eventFrame.scripts.OnEvent(WC.eventFrame, name, ...)
 end
+WC_DB = { options = "invalide", other = "conserver" }
+event("PLAYER_DEAD")
+assert(WC.metrics.deaths == 0)
 talents = 1
 event("PLAYER_LOGIN")
+assert(WC_DB.other == "conserver")
+assert(WC:Profile().debug == false and WC:Profile().showAlerts == true)
 assert(WC.inCombat and #messages == 0, "rechargement en combat")
 talents, locked = 0, false
 event("PLAYER_REGEN_ENABLED")
@@ -202,4 +207,53 @@ SlashCmdList.WARRIORCOMPANION("")
 assert(WC.dashboardAdvice.text:find("Aucune XP", 1, true), "conseil actualisé à l'ouverture")
 assert(#messages == beforeOpen, "ouvrir le tableau a envoyé une notification")
 SlashCmdList.WARRIORCOMPANION("")
-print("OK: chargement, XP, niveau, morts, argent, talents, combat, cooldown, logs, UI, reset")
+local command = SlashCmdList.WARRIORCOMPANION
+-- Une sauvegarde ancienne ou endommagée ne doit pas activer le journal.
+WC_DB = "invalide"
+assert(WC:Profile().debug == false)
+WC_DB.options = { debug = "false", showAlerts = false, other = 12 }
+assert(WC:Profile().debug == false and WC:Profile().showAlerts == false)
+assert(WC:Profile().other == 12)
+WC_DB.options.showAlerts = "false"
+assert(WC:Profile().showAlerts == true)
+
+command("debug on")
+for i = 1, 115 do WC:Trace("limite", "entree-" .. i) end
+command("status")
+assert(messages[#messages]:match("traces 100$"), "limite de mémoire")
+local start = #messages
+command("logs")
+assert(#messages == start + 15, "limite d'affichage")
+assert(messages[start + 1]:match("entree%-101$") and messages[#messages]:match("entree%-115$"))
+command("clear")
+command("logs")
+assert(messages[#messages]:find("Aucune trace", 1, true))
+WC:Trace("test", "avant désactivation")
+command("debug off")
+WC:Trace("test", "après désactivation")
+command("logs")
+assert(messages[#messages]:find("Aucune trace", 1, true))
+
+command("alerts off")
+start = #messages
+for i = 1, 3 do event("PLAYER_DEAD") end
+assert(#messages == start)
+command("")
+assert(WC.dashboardAdvice.text:find("3 morts", 1, true))
+command("")
+now = now + 300
+command("alerts on")
+assert(messages[#messages]:find("3 point", 1, true))
+start = #messages
+now = now + 299
+event("PLAYER_TALENT_UPDATE")
+assert(#messages == start)
+now = now + 1
+event("PLAYER_TALENT_UPDATE")
+assert(#messages == start + 1, "rappel à cinq minutes")
+C_ClassTalents = nil
+now = now + 300
+start = #messages
+event("PLAYER_TALENT_UPDATE")
+assert(#messages == start, "un conseil informatif est resté dans le tableau")
+print("OK: API Forever simulées, combat, XP, niveaux, alertes, journal, options et tableau")
