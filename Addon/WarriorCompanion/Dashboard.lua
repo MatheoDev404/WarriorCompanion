@@ -238,6 +238,8 @@ function WC:CreateDashboard()
   text(f, "GameFontHighlightSmall", 89, -439, 615, 15,
     tint("/wc help     /wc reset     /wc performance", "C1A08A"))
   self.dashboard = f
+  self.questPlanMode = "guide"
+  if self.SelectQuestPlan then self:SelectQuestPlan("guide") end
   self:ShowDashboardPage("quests")
   f:Hide()
 
@@ -255,6 +257,9 @@ end
 
 function WC:ShowDashboardPage(page)
   if not self.dashboardPages or not self.dashboardPages[page] then return end
+  if page=="quests" and not self.questPlanMode and self.SelectQuestPlan then
+    self:SelectQuestPlan("guide")
+  end
   self.dashboardPage = page
   for key, frame in pairs(self.dashboardPages) do
     if key == page then frame:Show() else frame:Hide() end
@@ -291,40 +296,28 @@ function WC:RefreshDashboard()
     or tint("HORS COMBAT", "75D483")
   self.dashboardCombatDetail:SetText(
     "|cffF0CA90ETAT ACTUEL|r  "..status..
-    "\\n\\nCombats observes : "..fmt(combat.completed,"0")..
-    "\\nCombats interrompus : "..fmt(combat.interrupted,"0")..
-    "\\nDuree moyenne : "..(combat.average and
+    "\n\nCombats observes : "..fmt(combat.completed,"0")..
+    "\nCombats interrompus : "..fmt(combat.interrupted,"0")..
+    "\nDuree moyenne : "..(combat.average and
       tostring(combat.average).." secondes" or "non mesuree")..
-    "\\nMorts en combat : "..fmt(combat.deathsInCombat,"0")..
-    "\\n\\n|cffBAA18FLes intervalles observes ne sont pas des ennemis tues."..
-    "\\nEn guerrier Furie, privilegie des combats prudents et"..
-    "\\nrecupere tes points de vie entre les affrontements.|r")
+    "\nMorts en combat : "..fmt(combat.deathsInCombat,"0")..
+    "\n\n|cffBAA18FLes intervalles observes ne sont pas des ennemis tues."..
+    "\nEn guerrier Furie, privilegie des combats prudents et"..
+    "\nrecupere tes points de vie entre les affrontements.|r")
   local advice=self:AdviceLines(false)
   local gear=self.EquipmentReviewText and self:EquipmentReviewText()
   if advice=="Aucun conseil verifie pour le moment." and gear then advice="" end
   self.dashboardAdviceDetail:SetText(
-    (advice~="" and ("|cffF0CA90PRIORITES|r\\n"..advice.."\\n\\n") or "")..
-    (gear and ("|cffF0CA90EQUIPEMENT A VERIFIER|r\\n"..gear) or
+    (advice~="" and ("|cffF0CA90PRIORITES|r\n"..advice.."\n\n") or "")..
+    (gear and ("|cffF0CA90EQUIPEMENT A VERIFIER|r\n"..gear) or
       "Aucun conseil verifie pour le moment."))
   if self.questPlanMode=="guide" and self.GetGuideView then
     local view=self:GetGuideView()
     self.dashboardQuestTitle:SetText(view and view.title or "Guide Horde")
     self.dashboardQuestDetail:SetText(view and
-      ((view.status or "").."\\n\\n"..(view.steps or "")) or
+      ((view.status or "").."\n\n"..(view.steps or "")) or
       "Aucun parcours charge.")
   end
 end
 
-function WC:ToggleDashboard()
-  if not self.dashboard then
-    self:Print("Interface non initialise.")
-    return
-  end
-  if self.dashboard:IsShown() then
-    self.dashboard:Hide()
-  else
-    self:UpdateAdvice()
-    self.dashboard:Show()
-    self:RefreshDashboard()
-  end
-end
+-- Le basculement compact / complet est porte par CompactDashboard.lua.
