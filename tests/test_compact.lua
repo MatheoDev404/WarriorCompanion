@@ -37,9 +37,9 @@ function CreateFrame()
 end
 UIParent={GetCenter=function()return 500,500 end}
 local options={autoOpen=true}
-local WC={metrics={xpGained=120,deaths=2,questCount=19,xpAvailable=true}}
+local WC={metrics={xpGained=120,deaths=2,questCount=19,xpAvailable=true,started=100}}
 function WC:Profile() return options end
-function WC:XPPerHour() return 3456 end
+function WC:Now() return self.mockTime or 3761 end
 function WC:MoneyDelta() return -12345 end
 function WC:AdviceLines() return "Attention : deux points de talent inutilises." end
 function WC:RefreshDashboard() self.fullRefresh=(self.fullRefresh or 0)+1 end
@@ -50,8 +50,15 @@ assert(WC.compactDashboard.w==304 and WC.compactDashboard.h==88,"HUD vraiment co
 assert(not WC.compactDashboard:IsShown(),"pas de double apparition")
 WC:AutoOpenDashboard()
 assert(WC.compactDashboard:IsShown() and not WC.dashboard:IsShown())
-assert(WC.compactStats[1].text=="120" and WC.compactStats[2].text=="3456")
+assert(WC.compactStats[1].text=="120" and WC.compactStats[2].text=="01:01:01")
 assert(WC.compactStats[3].text=="2")
+WC.mockTime=100+65
+WC:RefreshCompactDashboard()
+assert(WC.compactStats[2].text=="00:01:05", "duree depuis debut de session")
+WC.mockTime=99
+WC:RefreshCompactDashboard()
+assert(WC.compactStats[2].text=="--:--:--", "horloge invalide")
+WC.mockTime=3761
 local function contains(text,fragment) return text:find(fragment,1,true)~=nil end
 assert(contains(WC.compactMoneySign.text,"-"))
 assert(contains(WC.compactMoneyParts[1].text,"01") and
