@@ -86,3 +86,11 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 4. Pendant le combat, aucun rappel de récupération ne doit s'ajouter ; vérifier sa mise à jour après la sortie du combat.
 5. Après une mort ou une résurrection, le conseil ne doit pas inventer un pourcentage si l'API n'est pas lisible.
 6. `/wc health` affiche la mesure ou `indisponibles`. Fournir les erreurs Lua éventuelles et la sortie de cette commande.
+
+## Tests guerrier Furie 0.5.1-rc1
+
+1. Sur guerrier, faire `/wc fury` : la classe doit être reconnue sans prétendre connaître la spécialisation réelle.
+2. Descendre sous 35 % PV hors combat : le conseil doit mentionner les bandages ou la nourriture dans l'onglet Conseils.
+3. Repasser au-dessus du seuil : le conseil doit disparaître.
+4. Après cinq phases de combat dont la durée moyenne dépasse 45 s, un conseil d'efficacité devrait apparaître ; il ne doit pas prétendre connaître le DPS réel.
+5. Vérifier l'absence de notification automatique pour ces conseils.

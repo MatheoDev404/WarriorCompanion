@@ -1,6 +1,6 @@
 local addonName, WC = ...
 _G.WarriorCompanion = WC
-WC.version = "0.5.0-rc1"
+WC.version = "0.5.1-rc1"
 WC.metrics = { xpGained = 0, deaths = 0, started = nil, lastXP = nil, lastXPMax = nil, lastLevel = nil, moneyStart = nil, moneyNow = nil, questCount = nil }
 WC.alerts = {}
 WC.inCombat = false
@@ -98,6 +98,7 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "history" then WC:ShowActivity()
   elseif msg == "combat" then WC:ShowCombatStatus()
   elseif msg == "health" then WC:ShowHealthStatus()
+  elseif msg == "fury" then WC:ShowFuryStatus()
   elseif msg == "performance" then WC:ShowPerformance()
   elseif msg == "clear" then WC:ClearLogs(); WC:Print("Traces effacees.")
   elseif msg == "status" then WC:Status()
@@ -105,6 +106,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end

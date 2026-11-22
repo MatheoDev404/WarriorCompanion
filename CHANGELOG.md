@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.1-rc1 — conseils ciblés guerrier Furie
+
+- Conseils de récupération propres au guerrier Furie lorsqu'il est sous 35 % PV hors combat.
+- Conseil d'efficacité après cinq phases de combat avec durée moyenne d'au moins 45 s ; pas de causalité supposée.
+- Vérification prudente de l'identifiant de classe ; classe et spécialisation non lisibles ne deviennent jamais des affirmations.
+- Commande de diagnostic `/wc fury` et tests Lua 5.1/5.4.
+
 ## 0.5.0-rc1 — conseil de récupération fiable
 
 - Lecture défensive des PV et PV maximum du personnage par l'API WoW.

@@ -48,6 +48,8 @@ function WC:UpdateAdvice()
       message = "Aucune XP mesuree sur la session ; verifie ton activite ou le suivi XP."
     }
   end
+  -- Les conseils Furie sont exclusivement informatifs et demandent une classe verifiee.
+  if self.AddFuryAdvice then self:AddFuryAdvice(alerts) end
   -- Une condition non verifiable ne devient jamais une alerte certaine.
   self.alerts = alerts
 end
