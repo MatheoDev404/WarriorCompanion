@@ -19,7 +19,7 @@ C_ClassTalents = { HasUnspentTalentPoints = function() return talents > 0, talen
 
 local function frame()
   local f = { visible = false, scripts = {} }
-  for _, n in ipairs({"SetSize","SetPoint","SetFrameStrata","EnableMouse","SetMovable","RegisterForDrag","SetAllPoints","SetTexture","SetTexCoord","SetVertexColor","SetWidth","SetHeight","SetJustifyH","SetJustifyV"}) do f[n] = function() end end
+  for _, n in ipairs({"SetSize","SetPoint","SetFrameStrata","EnableMouse","SetMovable","RegisterForDrag","SetAllPoints","SetTexture","SetTexCoord","SetVertexColor","ClearAllPoints","SetWidth","SetHeight","SetJustifyH","SetJustifyV"}) do f[n] = function() end end
   function f:SetText(value) self.text = value end
   function f:RegisterEvent(name) self.registered = self.registered or {}; self.registered[name] = true end
   function f:SetScript(name, fn) self.scripts[name] = fn end
