@@ -57,6 +57,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
     WC:InitWeaponObserver()
     WC:InitTalentObserver()
     WC:UpdateQuestAdvice()
+    if WC.GuideStart then WC:GuideStart() end
     WC:BindQuestie()
     WC:CreateDashboard()
     WC:CreateMinimapButton()
@@ -138,6 +139,7 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "questie" then WC:BindQuestie(); WC:ShowQuestieStatus()
   elseif msg == "discover" then WC:OpenQuestPlan("discover")
   elseif msg == "route" then WC:OpenQuestPlan("route")
+  elseif msg == "guide" then WC:OpenQuestPlan("guide")
   elseif msg == "minimap reset" then WC:ResetMinimapPosition()
   elseif msg == "autostart on" then
     WC:Profile().autoOpen = true; WC:Print("Ouverture automatique activee a la connexion.")
@@ -150,6 +152,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | route | minimap reset | autostart on/off | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | route | guide | minimap reset | autostart on/off | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end
