@@ -66,6 +66,16 @@ C_Traits.GetNodeInfo=function(id,node)
   return {entryIDs={e.entry},ranksPurchased=e.rank}
 end
 assert(WC:ReadLiveFuryTalents().talents["Cruelty"].rank==5)
+-- Certaines versions Forever exposent le configID comme fonction globale.
+local namespaced=C_SpecializationInfo.GetCombatConfigIDForSpecGroup
+C_SpecializationInfo.GetCombatConfigIDForSpecGroup=nil
+GetCombatConfigIDForSpecGroup=function(group)
+  assert(group==1)
+  return 900
+end
+assert(WC:ReadLiveFuryTalents().talents["Cruelty"].rank==5)
+GetCombatConfigIDForSpecGroup=nil
+C_SpecializationInfo.GetCombatConfigIDForSpecGroup=namespaced
 -- Un doublon de nom francais ne doit pas etre suppose fiable.
 nodes[5]=104
 entries[104]={entry=205,spell=305,name="Cruauté",rank=1}
