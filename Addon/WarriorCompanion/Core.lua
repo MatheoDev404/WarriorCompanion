@@ -133,7 +133,11 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "fury" then WC:ShowFuryStatus()
   elseif msg == "spells" then WC:ShowSpellbookStatus()
   elseif msg == "weapons" then WC:ShowWeaponStatus()
-  elseif msg == "gear" then WC:ShowGearQuestStatus()
+  elseif msg == "gear" then
+    if WC.dashboard then
+      if not WC.dashboard:IsShown() then WC.dashboard:Show() end
+      WC:ShowDashboardPage("advice")
+    end
   elseif msg == "talents" then WC:ShowTalentStatus()
   elseif msg == "quests" then WC:OpenQuestPlan("journal")
   elseif msg == "questie" then WC:BindQuestie(); WC:ShowQuestieStatus()
