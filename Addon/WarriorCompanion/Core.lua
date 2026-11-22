@@ -90,6 +90,9 @@ frame:SetScript("OnEvent", function(_, event, ...)
     WC:ObserveGearReviewEvent(event)
     if event == "QUEST_LOG_UPDATE" or event == "PLAYER_LEVEL_UP" then
       WC:UpdateQuestAdvice()
+      if event == "QUEST_LOG_UPDATE" and WC.GuideAdvanceFromJournal then
+        WC:GuideAdvanceFromJournal()
+      end
     end
     if event == "PLAYER_TALENT_UPDATE" or event == "CHARACTER_POINTS_CHANGED" then
       WC:ObserveTalents(true)
