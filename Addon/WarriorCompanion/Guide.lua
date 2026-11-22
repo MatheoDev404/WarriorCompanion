@@ -38,6 +38,44 @@ function WC:GuideMove(delta)
   return true
 end
 
+-- Avancement conservateur : seules les etapes avec action et questID
+-- explicites peuvent etre validees depuis le journal.
+function WC:GuideAdvanceFromJournal()
+  if not self.activeGuide or not self.guideIndex then return false end
+  local step = self.activeGuide.steps[self.guideIndex]
+  if type(step) ~= "table" or type(step.questID) ~= "number"
+      or step.questID ~= math.floor(step.questID) or step.questID < 1 then
+    return false
+  end
+  local action = step.action
+  if action ~= "accept" and action ~= "complete" and action ~= "turnin" then
+    return false
+  end
+  local active = self.questAdvice
+  if type(active) ~= "table" or active.reason
+      or type(active.rows) ~= "table" then return false end
+  local found
+  for _, row in ipairs(active.rows) do
+    if row.id == step.questID then found = row; break end
+  end
+  local confirmed = false
+  if action == "accept" then
+    confirmed = found ~= nil
+  elseif action == "complete" then
+    confirmed = found ~= nil and found.complete == true
+  else
+    local api = C_QuestLog
+    if type(api) ~= "table" or
+        type(api.IsQuestFlaggedCompleted) ~= "function" then return false end
+    local ok, done = pcall(api.IsQuestFlaggedCompleted, step.questID)
+    confirmed = ok and done == true
+  end
+  if not confirmed or self.guideIndex >= #self.activeGuide.steps then
+    return false
+  end
+  return self:GuideMove(1)
+end
+
 function WC:GetGuideView()
   local guide = self.activeGuide
   if not guide then return nil end
