@@ -61,8 +61,8 @@ function WC:BuildQuestPlan(mode)
     lines[#lines+1]="Niveau de quete ~= niveau des ennemis ; confirmer dans Questie."
     return "Mon journal",table.concat(lines,"\n")
   end
-  self:UpdateQuestAdvice()
   if mode=="discover" then
+    self:UpdateQuestAdvice()
     local found,reason=self:DiscoverQuests(7)
     if not found then return "Quetes a prendre","Indisponible : "..tostring(reason) end
     if #found.rows==0 then
