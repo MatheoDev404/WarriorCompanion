@@ -119,3 +119,11 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 3. Relâcher puis cliquer normalement : le tableau s'ouvre et se ferme.
 4. Se déconnecter, se reconnecter : l'icône doit retrouver sa dernière position.
 5. Vérifier que l'ouverture automatique du tableau reste réglable par `/wc autostart on/off`.
+
+## Vérification visuelle V0.5.5 — icône standard WoW
+
+1. Observer l'icône guerrier sur la minimap à côté de celles des autres addons : elle doit avoir la même bordure circulaire dorée, et non un écusson carré.
+2. Vérifier l'effet visuel au survol et au clic, puis glisser le bouton autour du contour circulaire.
+3. Cliquer pour ouvrir/fermer Warrior Companion ; la fenêtre ne doit pas s'ouvrir à la fin d'un glisser-déposer.
+4. Reconnecter le personnage : la position de l'icône doit rester stable ; l'option d'ouverture auto doit être respectée.
+5. Si un addon remplace la minimap par un carré et fournit GetMinimapShape, vérifier le positionnement dans les coins.

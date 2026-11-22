@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.5-rc1 — apparence de minimap WoW standard
+
+- Remplacement de l'écusson carré par une icône guerrier native 20 px à l'intérieur de la bordure circulaire Blizzard.
+- Bouton 31 px, survol Blizzard, fond miniature et bordure de suivi 53 px, visuellement proches des boutons LibDBIcon.
+- Placement circulaire standard 80 px, prise en charge du contour carré en présence de GetMinimapShape.
+- Drag et sauvegarde de position conservés, tests des textures, quadrants et clics.
+
 ## 0.5.4-rc1 — bouton de minimap standard et deplacable
 
 - Bouton librement déplaçable autour du bord de la minimap, par glisser-déposer.
