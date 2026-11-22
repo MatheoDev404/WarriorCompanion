@@ -66,6 +66,11 @@ local function round(parent,x,y,w,h,color)
   handle:SetVertexColor(color[1],color[2],color[3],color[4])
   return handle
 end
+-- Meme skin accessible aux autres pages du Companion.
+function WC:SoftPanel(parent,x,y,w,h,color)
+  return round(parent,x,y,w,h,color or C.card)
+end
+
 local function label(parent,x,y,w,h,sz,color)
   local fs=parent:CreateFontString(nil,"OVERLAY","GameFontHighlight")
   fs:SetPoint("TOPLEFT",parent,"TOPLEFT",x,y)
