@@ -17,6 +17,7 @@ Weapons.lua
 EquipmentReview.lua
 EquipmentTargets.lua
 TalentObserver.lua
+TalentPlan.lua
 QuestAdvisor.lua
 QuestDiscovery.lua
 QuestClusters.lua
