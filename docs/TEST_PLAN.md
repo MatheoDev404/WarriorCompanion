@@ -111,3 +111,11 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 4. `/wc autostart off` puis déconnexion/reconnexion : la fenêtre doit rester fermée mais le bouton de minimap reste visible.
 5. `/wc autostart on` puis déconnexion/reconnexion : la fenêtre doit à nouveau s'ouvrir au lancement.
 6. `/wc` doit continuer à ouvrir/fermer la fenêtre indépendamment de l'option de démarrage.
+
+## Bouton déplaçable V0.5.4-rc1
+
+1. Au lancement, l'icône doit apparaître sur le contour de la minimap.
+2. Maintenir le clic gauche sur l'icône et la glisser sur plusieurs côtés : elle doit suivre le bord circulaire sans se déplacer au centre.
+3. Relâcher puis cliquer normalement : le tableau s'ouvre et se ferme.
+4. Se déconnecter, se reconnecter : l'icône doit retrouver sa dernière position.
+5. Vérifier que l'ouverture automatique du tableau reste réglable par `/wc autostart on/off`.
