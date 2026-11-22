@@ -32,8 +32,8 @@ function WC:UpdateAdvice()
       message = tostring(deaths) .. " morts cette session : envisage des ennemis moins difficiles."
     }
   end
-  if self.metrics.xpAvailable and self.metrics.xpGained == 0
-      and self:Now() - self.metrics.started >= 600 then
+  if self.metrics.xpObservedSince and self.metrics.xpGained == 0
+      and self:Now() - self.metrics.xpObservedSince >= 600 then
     alerts[#alerts + 1] = {
       id = "xp-idle",
       priority = "info",

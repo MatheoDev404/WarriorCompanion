@@ -12,13 +12,19 @@ local function plainNumber(fn)
   return nil
 end
 
+local function recordMoney(m)
+  m.moneyNow = plainNumber(GetMoney)
+  if m.moneyStart == nil then m.moneyStart = m.moneyNow end
+end
+
 function WC:InitObserver()
   local m = self.metrics
   m.started = self:Now()
   m.lastLevel, m.lastXP, m.lastXPMax, m.pendingLevel = nil, nil, nil, nil
+  m.xpObservedSince = nil
   self:RecordXP()
-  m.moneyStart = plainNumber(GetMoney)
-  m.moneyNow = m.moneyStart
+  m.moneyStart = nil
+  recordMoney(m)
   m.questCount = self:ReadQuestCount()
   self:Trace("observer", "session demarree")
 end
@@ -32,6 +38,7 @@ function WC:RecordXP(event, newLevel)
   m.xpAvailable = level ~= nil and level > 0 and xp ~= nil and xp >= 0
       and xpMax ~= nil and xpMax > 0 and xp <= xpMax
   if not m.xpAvailable then
+    m.xpObservedSince = nil
     self:Trace("xp", "lecture indisponible")
     return
   end
@@ -56,6 +63,7 @@ function WC:RecordXP(event, newLevel)
       self:Trace("xp", "+" .. tostring(gain))
     end
   end
+  m.xpObservedSince = m.xpObservedSince or self:Now()
   m.pendingLevel = nil
   m.lastLevel, m.lastXP, m.lastXPMax = level, xp, xpMax
 end
@@ -76,7 +84,7 @@ function WC:OnObservedEvent(event, ...)
     m.deaths = m.deaths + 1
     self:Trace("death", "mort")
   elseif event == "PLAYER_MONEY" then
-    m.moneyNow = plainNumber(GetMoney)
+    recordMoney(m)
     self:Trace("money", "mise a jour")
   elseif event == "QUEST_LOG_UPDATE" then
     local count = self:ReadQuestCount()
@@ -92,6 +100,7 @@ function WC:OnObservedEvent(event, ...)
     self:Trace("skills", "competences actualisees")
   elseif event == "PLAYER_ENTERING_WORLD" then
     self:RecordXP(event)
+    recordMoney(m)
   end
 end
 

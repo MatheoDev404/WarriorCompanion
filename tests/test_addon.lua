@@ -207,6 +207,27 @@ SlashCmdList.WARRIORCOMPANION("")
 assert(WC.dashboardAdvice.text:find("Aucune XP", 1, true), "conseil actualisé à l'ouverture")
 assert(#messages == beforeOpen, "ouvrir le tableau a envoyé une notification")
 SlashCmdList.WARRIORCOMPANION("")
+-- Un premier échantillon tardif ne couvre pas la période avant sa lecture.
+money, xpMax = nil, nil
+SlashCmdList.WARRIORCOMPANION("reset")
+assert(WC:MoneyDelta() == nil)
+now = now + 700
+money, xpMax = 1500, 1000
+event("PLAYER_ENTERING_WORLD")
+assert(WC:MoneyDelta() == 0, "première lecture de monnaie au chargement du monde")
+assert(not WC:AdviceLines():find("Aucune XP", 1, true))
+money = 1430
+event("PLAYER_MONEY")
+assert(WC:MoneyDelta() == -70)
+money = restricted
+event("PLAYER_MONEY")
+assert(WC:MoneyDelta() == nil)
+money = 1460
+event("PLAYER_MONEY")
+assert(WC:MoneyDelta() == -40, "référence conservée après une lecture impossible")
+now = now + 600
+event("PLAYER_ENTERING_WORLD")
+assert(WC:AdviceLines():find("Aucune XP", 1, true))
 local command = SlashCmdList.WARRIORCOMPANION
 -- Une sauvegarde ancienne ou endommagée ne doit pas activer le journal.
 WC_DB = "invalide"
