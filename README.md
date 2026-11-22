@@ -50,13 +50,13 @@ Pour vérifier l'intégration, utiliser `/wc gear` puis ouvrir GearQuest avec `/
 
 Références : [GearQuest Forever](https://github.com/Henrik8210/gear-quest-forever) et [fiche de l'addon](https://www.curseforge.com/wow/addons/gearquest-forever).
 
-## Points de talents (0.6.0-rc1)
+## Points de talents (0.6.1-rc1)
 
 Le module `TalentObserver.lua` utilise `C_ClassTalents.HasUnspentTalentPoints` lorsque disponible pour afficher les points disponibles (classe + spécialisation). Il retient les changements observés après des événements de talents, sans les présenter comme un talent précis dépensé : une respécialisation ou une mise à jour serveur peut aussi expliquer la différence. Si la lecture échoue, aucun chiffre n'est inventé.
 
 Commande `/wc talents` pour vérifier les compteurs et le nombre de changements observés. Le rappel déjà existant des points non dépensés continue de fonctionner. **L'arbre Furie et la recommandation d'un talent précis ne sont pas encore validés dans le client Forever.**
 
-## Conseiller de quêtes Horde Furie (0.6.0-rc1)
+## Conseiller de quêtes Horde Furie (0.6.1-rc1)
 
 Le module `QuestAdvisor.lua` classe **les quêtes déjà acceptées** et présentes dans le journal du personnage guerrier Horde. Il distingue les quêtes prêtes à rendre, les candidates solo en dessous du niveau du joueur, les quêtes proches du niveau nécessitant de la prudence, les quêtes plus hautes, et les marqueurs explicitement signalés groupe/donjon/élite. Si le client ne fournit pas un type fiable, le statut reste **inconnu**, sans être converti en solo.
 
@@ -70,6 +70,18 @@ Commandes : `/wc quests` affiche un classement prudent jusqu'à cinq quêtes ; `
 
 Sources de l'API : [Questie — API publique](https://github.com/Questie/Questie/blob/master/Public/README.md), [Questie — notifications](https://github.com/Questie/Questie/blob/master/Public/RegisterForQuestUpdates.lua).
 
+## Découverte de quêtes non encore acceptées — V0.6.1
+
+Avec **QuestieDB compatible Forever** installé, la commande `/wc discover` cherche *à la demande* des pistes de quêtes qui ne figurent pas déjà dans le journal. Ce n'est pas une promesse d'accessibilité immédiate, ni un itinéraire.
+
+Les filtres vérifient sur le client la classe guerrier, la faction Horde, la race et le niveau, puis utilisent **l'API publique QuestieDB sous contrat 4** pour vérifier les restrictions de race/classe, le niveau requis, un PNJ de départ et l'absence de conditions complexes non évaluées. Les quêtes déjà acceptées et terminées sont écartées. Un fournisseur de données absent, des valeurs incohérentes ou une information indisponible entraînent une exclusion ou un message explicite.
+
+La sortie classe au maximum sept pistes selon la proximité de leur niveau de quête avec *niveau du personnage − 2*. **Le niveau de quête ne garantit pas celui des monstres ni une difficulté solo :** la disponibilité réelle, la localisation, les objectifs, les adversaires, l'XP/h et les récompenses doivent être confirmés dans Questie. Les quêtes à prérequis de chaîne, de réputation, de métier et à indicateurs spéciaux non évalués sont exclues par sécurité ; certaines quêtes intéressantes pourront donc manquer.
+
+La recherche n'a lieu qu'à la demande via `/wc discover`, hors combat : aucun parcours du catalogue à chaque actualisation ou à la connexion. Questie conserve entièrement ses marqueurs.
+
+Sources de contrat : [API QuestieDB](https://github.com/Questie/QuestieDB/blob/main/docs/api.md), [schéma des quêtes](https://github.com/Questie/QuestieDB/blob/main/src/meta/questMeta.lua) et [limites des données Forever](https://github.com/Questie/QuestieDB/blob/main/docs/forever.md).
+
 ## Installation et commandes
 
 Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Forever. Le fichier `WarriorCompanion.toc` doit se trouver directement dans `Interface/AddOns/WarriorCompanion/`. L’interface ciblée est `16001`.
@@ -82,6 +94,7 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 | `/wc reset` | Recommencer les mesures et effacer l'historique de session |
 | `/wc performance` | Comparer XP/h globale et XP/h des dix dernières minutes |
 | `/wc minimap reset` | Replacer le bouton sur le bord de la minimap à sa position par défaut |
+| `/wc discover` | Proposer jusqu'à sept pistes de quêtes non acceptées avec les filtres QuestieDB stricts |
 | `/wc quests` | Classement prudent des quêtes du journal du guerrier Horde |
 | `/wc questie` | Vérifier l'état de l'intégration optionnelle avec Questie |
 | `/wc talents` | Diagnostic des points de talents disponibles et de leurs changements |

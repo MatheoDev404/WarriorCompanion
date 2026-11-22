@@ -172,3 +172,13 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 6. Hors du personnage guerrier Horde, aucun conseil spécifique ne doit être généré.
 7. Sans Questie, le journal du client doit continuer de fonctionner, ou annoncer explicitement une indisponibilité API.
 8. Vérifier que le nouveau conseiller ne déclenche pas d'alertes intrusives pendant le combat.
+
+## Tests V0.6.1 — quêtes non acceptées
+
+1. Installer QuestieDB **compatible Forever** : `/wc discover` doit afficher jusqu'à sept pistes en dehors du combat. En l'absence de QuestieDB, afficher « indisponible » et non inventer une liste.
+2. Vérifier dans Questie que les IDs suggérés existent, que la quête n'est ni déjà acceptée ni terminée, et qu'elle correspond à une race/classe Horde autorisée.
+3. Contrôler les PNJ de départ, la disponibilité sur ce royaume et les difficultés réelles (élite, groupe, donjon, ennemis au-dessus du niveau) : ces faits ne sont **pas** garantis par le nouveau moteur.
+4. Essayer une quête à prérequis : elle doit être exclue tant que son préalable n'est pas évalué.
+5. Changer de niveau et relancer `/wc discover` : la sélection doit être recalculée sur les nouvelles données et rester limitée.
+6. En combat, aucune analyse du catalogue ne doit être déclenchée.
+7. Confirmer que les marqueurs Questie fonctionnent et qu'aucun marqueur Warrior Companion supplémentaire n'a été créé.
