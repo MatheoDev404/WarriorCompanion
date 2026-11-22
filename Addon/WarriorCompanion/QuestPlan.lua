@@ -78,6 +78,8 @@ function WC:BuildQuestPlan(mode)
       return "Parcours / pistes","Aucun regroupement de PNJ confirme par QuestieDB."
     end
     local lines={"DEPARTS REGROUPES - pas encore un itineraire d'objectifs"}
+    local guide=guideNote()
+    if guide then lines[#lines+1]=guide end
     for i=1,math.min(3,#groups) do
       local g=groups[i]
       lines[#lines+1]="Zone #"..tostring(g.zone)..
