@@ -15,13 +15,18 @@ Interface ciblée : `16001`. La compatibilité et le rendu réels doivent être 
 
 **Mini-bilan (304 × 88)** : XP gagnée sur la session, temps écoulé `HH:MM:SS`, morts, solde net avec **icônes or/argent/cuivre** et code couleur vert/rouge/gris, et une ligne de conseil. Il est déplaçable, avec position mémorisée. Bouton `>>` pour la fenêtre complète.
 
-**Fenêtre complète (720 × 460)** : **trois onglets** exclusivement :
+**Fenêtre complète (720 × 460)** : quatre rubriques simples, avec les fonctions regroupées dans des sous-onglets :
 
-- **GUIDE** — étapes du leveling Horde, position lorsqu'elle est documentée, étape suivante, boutons précédent/suivant. Sous-vues : **Étapes**, **Talents**, **Mes quêtes**, **À prendre**.
-- **CONSEILS** — alertes utiles pour le guerrier Furie, points de talent non dépensés, santé, compétences et équipement pertinent lorsque l'information est fiable.
-- **COMBAT** — mesures de phases de combat, interruptions, durée moyenne et morts liées au combat.
+- **GUIDE** — **Étapes**, **Talents**, **Mes quêtes**, **À prendre**. Suivi du parcours Horde, progression sauvegardée et arbre Furie 10–60.
+- **CONSEILS** — **Conseils**, **Équipement**, **Santé**, **Armes**, **Sorts**. Données du personnage accessibles directement sans messages de diagnostic.
+- **COMBAT** — **Combats**, **Performance**. Mesures de combat et taux d'XP sur la session et les dix dernières minutes.
+- **RÉGLAGES** — boutons pour l'ouverture automatique, les notifications et la remise à zéro des compteurs de session.
 
-Les anciens onglets principaux **Bilan** et **Journal** ont été supprimés. La collecte limitée d'événements reste disponible pour les diagnostics, sans page visible. Fermer la grande fenêtre revient au mini-bilan.
+Les anciennes commandes `/wc gear`, `health`, `weapons`, `spells`, `combat`, `performance` ouvrent désormais la sous-vue correspondante, mais ne sont plus nécessaires pour y accéder. `/wc guide`, `talents`, `quests`, `discover` sont également des raccourcis vers les sous-onglets du Guide.
+
+Les commandes **techniques** (`/wc status`, `debug`, `logs`, `questie`, `fury`, `history`) restent disponibles dans le chat pour le développement et le diagnostic.
+
+Les anciens onglets principaux **Bilan** et **Journal** ont été supprimés : ils ne reviennent pas dans les sous-onglets. La collecte limitée d'événements reste disponible pour les diagnostics, sans page visible. Fermer la grande fenêtre revient au mini-bilan.
 
 ## Guide de leveling
 
@@ -60,9 +65,10 @@ Les notifications importantes sont limitées en fréquence et désactivables. Le
 | `/wc reset` | Remettre à zéro la session |
 | `/wc autostart on/off` | Activer ou désactiver l'ouverture au login |
 | `/wc alerts on/off` | Activer ou désactiver les notifications |
+| `/wc advice`, `/wc settings` | Ouvrir Conseils / Réglages |
 | `/wc status`, `/wc help` | Diagnostic général / aide |
 
-Les commandes avancées `/wc combat`, `health`, `fury`, `spells`, `weapons`, `questie`, `performance`, `history`, `debug on/off`, `logs` et `clear` restent disponibles pour le diagnostic, sans onglets supplémentaires.
+Les commandes de debug `/wc status`, `fury`, `questie`, `history`, `debug on/off`, `logs` et `clear` restent disponibles, sans onglet supplémentaire.
 
 ## Développement et tests
 
