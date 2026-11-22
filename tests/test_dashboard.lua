@@ -76,15 +76,17 @@ assert(WC.dashboardPage=="overview")
 assert(WC.dashboardPages.overview:IsShown())
 assert(WC.dashboardPages.overview.w==515 and WC.dashboardPages.overview.h==285,
   "overview fits inside compact window")
-local sky, crest, gold, silver, copper=false,false,false,false,false
+local sky, crest, header, adviceArt, gold, silver, copper=false,false,false,false,false,false,false
 for _, t in ipairs(textures) do
   if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\HordeSky" then sky=true end
   if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\Warcrest" then crest=true end
+  if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\HeaderPlate" then header=true end
+  if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\AdviceArt" then adviceArt=true end
   if t.path=="Interface\\MoneyFrame\\UI-GoldIcon" then gold=true end
   if t.path=="Interface\\MoneyFrame\\UI-SilverIcon" then silver=true end
   if t.path=="Interface\\MoneyFrame\\UI-CopperIcon" then copper=true end
 end
-assert(sky and crest,"assets Horde originaux")
+assert(sky and crest and header and adviceArt,"textures HUD de la maquette")
 assert(gold and silver and copper,"icones monnaie natives")
 assert(#buttons>=9,"five navigation tabs, quest filters and close")
 WC:ToggleDashboard()
