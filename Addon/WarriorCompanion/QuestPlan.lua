@@ -96,6 +96,22 @@ function WC:SelectQuestPlan(mode)
   if self.dashboardQuestTitle then
     self.dashboardQuestTitle:SetText(self.questPlanTitle)
   end
+  -- Affichage etape par etape pour GUIDE, texte libre pour les autres vues.
+  if self.dashboardGuideLocation and self.dashboardGuideNextText then
+    if mode=="guide" and self.GetGuideView then
+      local view=self:GetGuideView()
+      self.dashboardQuestDetail:SetText(view and
+        ("|cffEBC487A FAIRE MAINTENANT|r\n"..(view.actionText or "")) or
+        "Aucun guide disponible.")
+      self.dashboardGuideLocation:SetText(view and
+        ("|cffA0C8EEOU ALLER|r  "..(view.locationText or "")) or "")
+      self.dashboardGuideNextText:SetText(view and
+        ("|cffBAAA91ENSUITE|r  "..(view.nextText or "")) or "")
+    else
+      self.dashboardGuideLocation:SetText("")
+      self.dashboardGuideNextText:SetText("")
+    end
+  end
 end
 
 function WC:OpenQuestPlan(mode)
