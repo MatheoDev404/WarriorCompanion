@@ -87,10 +87,63 @@ function WC:TalentTreeGrid(level)
   return nodes
 end
 
+-- Donnees Forever 1.60.1 (paliers et prerequis), independantes du choix
+-- de leveling. Sources consultees le 22 novembre 2026 :
+-- https://forevertalents.net/talents/warrior/
+-- https://www.wowforevertavern.com/talents/warrior
+local PREREQUISITES={
+  ["Gore Drinker"]={name="Blood Craze",rank=3},
+  ["Bloodthirst"]={name="Death Wish",rank=1},
+}
+local RULES={}
+for _,node in ipairs(FURY_GRID) do
+  local metadata=TALENTS[node[1]]
+  assert(metadata,"Talent absent du parcours : "..node[1])
+  RULES[node[1]]={
+    row=node[3],max=metadata.max,prerequisite=PREREQUISITES[node[1]]
+  }
+end
+local function verify(order)
+  local ranks,counts={},{}
+  for level=10,60 do
+    local point=order[level]
+    if not point then return false,"Point manquant au niveau "..level end
+    local rule=RULES[point.key]
+    if not rule then return false,"Talent inconnu au niveau "..level end
+    if point.level~=level then return false,"Niveau errone : "..level end
+    local previous=ranks[point.key] or 0
+    if previous>=rule.max or point.rank~=previous+1 then
+      return false,"Rang invalide : "..point.key.." au niveau "..level
+    end
+    local earlier=0
+    for row=1,rule.row-1 do earlier=earlier+(counts[row] or 0) end
+    if earlier<(rule.row-1)*5 then
+      return false,"Palier "..rule.row.." verrouille au niveau "..level..
+        " : "..point.key
+    end
+    local required=rule.prerequisite
+    if required and (ranks[required.name] or 0)<required.rank then
+      return false,"Prerequis non atteint au niveau "..level..
+        " : "..required.name.." "..required.rank
+    end
+    ranks[point.key]=previous+1
+    counts[rule.row]=(counts[rule.row] or 0)+1
+  end
+  return true,nil
+end
+function WC:ValidateTalentPlan()
+  return verify(self.talentPlan)
+end
+local VALID_PLAN,PLAN_ERROR=verify(ORDER)
+-- Eviter une instruction trompeuse si un correctif du parcours
+-- provoque plus tard une sequence impossible.
+WC.talentPlanValidationError=PLAN_ERROR
+
 WC.talentPlan=ORDER
 function WC:TalentPlanLevel(level)
   if type(level)~="number" or level~=math.floor(level)
       or level<10 or level>60 then return nil end
+  if not VALID_PLAN then return nil end
   local current=ORDER[level]
   if not current then return nil end
   local ranks,treePoints={}, {arms=0,fury=0,protection=0}
