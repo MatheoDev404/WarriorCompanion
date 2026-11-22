@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0-rc1 — conseil de récupération fiable
+
+- Lecture défensive des PV et PV maximum du personnage par l'API WoW.
+- Conseil informatif de récupération hors combat si la vie mesurée est inférieure à 35 %, sans notification automatique.
+- Aucune conclusion si le personnage est mort, si la lecture est protégée ou si l'API est absente.
+- Commande `/wc health`, tests Lua simulés sous 5.1 et 5.4.
+
 ## 0.4.2-rc1 — direction artistique D illustrée
 
 - Bandeau de bataille rouge illustré et écusson guerrier originaux, embarqués en textures TGA compatibles.
