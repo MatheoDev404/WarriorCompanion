@@ -35,13 +35,13 @@ function WC:CreateDashboard()
 end
 
 function WC:RefreshDashboard()
-  if not self.dashboard then return end
+  if not self.dashboard or not self.dashboard:IsShown() then return end
   local m = self.metrics
   local xp = self:XPPerHour()
   local money = self:MoneyDelta()
   self.dashboardStats:SetText(
     "XP gagnee : " .. tostring(m.xpGained) ..
-    "   |   XP/h : " .. (xp and tostring(xp) or "attente") ..
+    "   |   XP/h : " .. (xp and tostring(xp) or (m.xpAvailable and "attente" or "indisponible")) ..
     "\nMorts : " .. tostring(m.deaths) ..
     "   |   Quetes (journal) : " .. (m.questCount and tostring(m.questCount) or "inconnu") ..
     "\nVariation d'argent : " .. (money and tostring(money) .. " cuivre" or "indisponible"))
@@ -54,5 +54,9 @@ function WC:ToggleDashboard()
     return
   end
   if self.dashboard:IsShown() then self.dashboard:Hide()
-  else self:RefreshDashboard(); self.dashboard:Show() end
+  else
+    self:UpdateAdvice()
+    self.dashboard:Show()
+    self:RefreshDashboard()
+  end
 end

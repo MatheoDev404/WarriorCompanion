@@ -1,18 +1,22 @@
 local addonName, WC = ...
 _G.WarriorCompanion = WC
-WC.version = "0.2.0"
+WC.version = "0.2.1"
 WC.metrics = { xpGained = 0, deaths = 0, started = nil, lastXP = nil, lastXPMax = nil, lastLevel = nil, moneyStart = nil, moneyNow = nil, questCount = nil }
 WC.alerts = {}
 WC.inCombat = false
 WC.ready = false
 
 function WC:Profile()
-  WC_DB = WC_DB or {}
-  WC_DB.options = WC_DB.options or {}
+  if type(WC_DB) ~= "table" then WC_DB = {} end
+  if type(WC_DB.options) ~= "table" then WC_DB.options = {} end
   local options = WC_DB.options
-  if options.debug == nil then options.debug = false end
-  if options.showAlerts == nil then options.showAlerts = true end
+  if type(options.debug) ~= "boolean" then options.debug = false end
+  if type(options.showAlerts) ~= "boolean" then options.showAlerts = true end
   return options
+end
+
+function WC:IsReadableNumber(value)
+  return type(value) == "number" and not (issecretvalue and issecretvalue(value))
 end
 
 function WC:Now()
@@ -23,6 +27,7 @@ end
 function WC:Refresh()
   if not self.ready then return end
   self:UpdateAdvice()
+  self:NotifyImportant()
   self:RefreshDashboard()
 end
 
@@ -40,6 +45,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
   if event == "PLAYER_LOGIN" then
     if WC.ready then return end
     WC:Profile()
+    WC.inCombat = InCombatLockdown()
     WC:InitObserver()
     WC:CreateDashboard()
     WC.ready = true

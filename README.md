@@ -1,24 +1,44 @@
 # Warrior Companion
 
-Addon **autonome** pour WoW Forever : il observe la session et conseille sans imposer d'itineraire.
+Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau ni itinéraire de quêtes. Le tableau de bord reste fermé jusqu’à la commande `/wc`.
 
-## Version 0.2.0 - premiere version a tester
-- Mesure XP de session et XP/h depuis le chargement ou la remise a zero
-- Morts, variation d'argent et nombre d'entrees de quetes
-- Alerte automatique pour les points de talent non depenses (seulement si l'API est disponible), jamais pendant le combat, repetee au maximum toutes les 5 minutes
-- Conseils moins urgents dans un panneau ouvrable avec `/wc`
-- Journal de diagnostic opt-in (maximum 100 entrees en RAM, efface lorsque desactive)
-- Aucun trafic reseau, aucune copie d'un guide tiers
+## Ce que mesure la version 0.2.1
 
-## Installation
-Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/WarriorCompanion` de votre client Forever. Verifier le repertoire effectivement utilise et la version d'interface `16001`.
+| Activité | Comportement |
+| --- | --- |
+| XP | Gain mesuré depuis le chargement ou `/wc reset`. L’XP/h est une moyenne de session affichée après une minute si la barre d’XP est lisible et active. Les transitions ambiguës peuvent retarder le total. Les niveaux intermédiaires manqués ne sont pas estimés. |
+| Morts et combats | Compteur de morts et conseil dans le tableau après trois morts. L’état de combat suspend les notifications. Les dégâts, la durée et le nombre de combats restent hors du suivi actuel. |
+| Quêtes et argent | Nombre de quêtes du journal, en excluant les en-têtes, et variation en cuivre depuis la première lecture disponible de la session. |
+| Talents | Les points libres de classe et de spécialisation déclenchent une alerte hors combat, au plus une fois toutes les cinq minutes par session. Les autres conseils se lisent dans le tableau. |
+| Compétences, métiers et équipement | Le journal de diagnostic peut signaler un changement de compétences ou d’équipement. L’analyse des rangs de métier et la comparaison des pièces restent à développer. |
 
-## Commandes
-`/wc` (ouvrir/fermer), `/wc status`, `/wc reset`,
-`/wc debug on`, `/wc debug off`, `/wc logs`, `/wc clear`,
-`/wc alerts on`, `/wc alerts off`, `/wc help`.
+## Installation et commandes
 
-## Validation
-`python3 tests/check_structure.py` puis `lua5.4 tests/test_addon.lua`, ou GitHub Actions.
+Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Forever. Le fichier `WarriorCompanion.toc` doit se trouver directement dans `Interface/AddOns/WarriorCompanion/`. L’interface ciblée est `16001`.
 
-**Attention :** cette version a des tests automatises simulant les API ; elle n'a pas encore ete confirmee sur le client WoW Forever. Les controles de sorts, Premiers secours, armes et quetes rentables viendront seulement apres verification de leurs API.
+| Commande | Effet |
+| --- | --- |
+| `/wc` | Ouvrir ou fermer le tableau des mesures et conseils |
+| `/wc status` | Afficher la version, les mesures, les options et la présence des fonctions d’API |
+| `/wc reset` | Recommencer les mesures de session |
+| `/wc alerts on`, `/wc alerts off` | Activer ou couper les notifications automatiques |
+| `/wc debug on`, `/wc debug off` | Activer le journal en mémoire ou le désactiver et l’effacer. Il est désactivé par défaut et limité à 100 entrées. |
+| `/wc logs`, `/wc clear` | Afficher les 15 dernières traces ou vider le journal |
+| `/wc help` | Retrouver les commandes en jeu |
+
+## Compatibilité et tests
+
+Les signatures ont été vérifiées dans les sources d’interface de Forever 1.60.1, build 71037. Les essais automatisés chargent les modules dans l’ordre du TOC et simulent les appels du client. La validation en jeu de la version 0.2.1 reste à faire. [Sources consultées et protocole en jeu](docs/TEST_PLAN.md)
+
+Pour reproduire les contrôles de GitHub Actions depuis la racine du dépôt, installer Python 3, Lua 5.1 et Lua 5.4, puis exécuter le bloc dans un shell POSIX.
+
+```sh
+set -e
+python3 tests/check_structure.py
+for version in 5.1 5.4; do
+  for file in Addon/WarriorCompanion/*.lua tests/*.lua; do
+    "luac$version" -p "$file"
+  done
+  "lua$version" tests/test_addon.lua
+done
+```

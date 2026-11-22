@@ -33,11 +33,12 @@ end
 function WC:Status()
   local xp = self:XPPerHour()
   self:Print("v" .. self.version .. " | XP: " .. self.metrics.xpGained ..
-    " | XP/h: " .. (xp and tostring(xp) or "attente") ..
+    " | XP/h: " .. (xp and tostring(xp) or (self.metrics.xpAvailable and "attente" or "indisponible")) ..
     " | morts: " .. self.metrics.deaths)
   local checks = {
-    {"XP", UnitXP}, {"Niveau", UnitLevel},
-    {"Talents", GetUnspentTalentPoints}, {"Quetes", GetNumQuestLogEntries},
+    {"XP", UnitXP}, {"XP maximum", UnitXPMax}, {"Niveau", UnitLevel},
+    {"Talents", C_ClassTalents and C_ClassTalents.HasUnspentTalentPoints},
+    {"Quetes", C_QuestLog and C_QuestLog.GetNumQuestLogEntries},
     {"Argent", GetMoney}
   }
   for _, check in ipairs(checks) do

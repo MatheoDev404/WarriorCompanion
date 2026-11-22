@@ -3,9 +3,13 @@ local lastShown = {}
 local cooldown = 300
 
 local function unspentPoints()
-  if type(GetUnspentTalentPoints) == "function" then
-    local ok, n = pcall(GetUnspentTalentPoints)
-    if ok and type(n) == "number" then return n end
+  local read = C_ClassTalents and C_ClassTalents.HasUnspentTalentPoints
+  if type(read) ~= "function" then return nil end
+  local ok, hasPoints, class, spec = pcall(read)
+  if ok and not (issecretvalue and issecretvalue(hasPoints)) and hasPoints == true
+      and WC:IsReadableNumber(class) and WC:IsReadableNumber(spec)
+      and class >= 0 and spec >= 0 then
+    return class + spec
   end
   return nil
 end
@@ -28,8 +32,8 @@ function WC:UpdateAdvice()
       message = tostring(deaths) .. " morts cette session : envisage des ennemis moins difficiles."
     }
   end
-  local xph = self:XPPerHour()
-  if xph == 0 and self.metrics.started and self:Now() - self.metrics.started >= 600 then
+  if self.metrics.xpObservedSince and self.metrics.xpGained == 0
+      and self:Now() - self.metrics.xpObservedSince >= 600 then
     alerts[#alerts + 1] = {
       id = "xp-idle",
       priority = "info",
@@ -38,7 +42,6 @@ function WC:UpdateAdvice()
   end
   -- Une condition non verifiable ne devient jamais une alerte certaine.
   self.alerts = alerts
-  self:NotifyImportant()
 end
 
 function WC:NotifyImportant()
