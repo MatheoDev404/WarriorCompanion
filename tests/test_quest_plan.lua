@@ -33,7 +33,7 @@ assert(scans==2)
 WC.inCombat=true
 local before=scans
 WC:SelectQuestPlan("route")
-assert(scans==before and bodyValue:find("GUIDE",1,true))
+assert(scans==before and bodyValue:find("hors combat",1,true))
 WC.inCombat=false
 level=50
 WC:SelectQuestPlan("route")
