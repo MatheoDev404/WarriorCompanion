@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.9-rc1 — suivi prudent des talents
+
+- Lecture stricte des points non dépensés avec validation des retours de `C_ClassTalents`.
+- Changements enregistrés dans le journal de session sur les événements de talents ; lecture de base au chargement sans faux historique.
+- Commande `/wc talents` ; aucune déduction d'un talent exact ou d'un arbre Furie sans API vérifiée.
+- Tests Lua 5.1/5.4 sur les états, erreurs API et valeurs protégées.
+
+
+
 ## 0.5.8-rc1 — HUD compact et minimap recalée
 
 - Recomposition de la fenêtre en 600 × 360 unités WoW (contre 710 × 448) ; statistiques et fonctions préservées.

@@ -153,3 +153,11 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 4. Sur la minimap actuelle, exécuter `/wc minimap reset` : l'icône doit toucher l'anneau sans flotter loin du bord.
 5. Faire glisser le bouton sur différents angles ; déconnexion/reconnexion doit conserver l'angle.
 6. Comparer une capture d'écran avec les autres boutons d'addons et relever les éventuels conflits de position.
+
+## Tests talents V0.5.9
+
+1. Faire `/wc talents` au repos : vérifier le total, la ventilation classe/spécialisation et l'absence d'affirmation sur un talent précis.
+2. Gagner un point par niveau puis `/wc talents` : le compteur doit évoluer si Forever transmet les données.
+3. Dépenser un point : un changement du nombre de points doit être consigné dans `/wc history`, sans prétendre connaître le talent choisi.
+4. `/wc reset` efface cet historique de session et reconstruit la photographie de référence.
+5. API indisponible : `/wc talents` indique l'indisponibilité plutôt que d'afficher des données inventées.

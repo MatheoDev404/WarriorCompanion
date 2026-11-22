@@ -50,6 +50,12 @@ Pour vérifier l'intégration, utiliser `/wc gear` puis ouvrir GearQuest avec `/
 
 Références : [GearQuest Forever](https://github.com/Henrik8210/gear-quest-forever) et [fiche de l'addon](https://www.curseforge.com/wow/addons/gearquest-forever).
 
+## Points de talents (0.5.9-rc1)
+
+Le module `TalentObserver.lua` utilise `C_ClassTalents.HasUnspentTalentPoints` lorsque disponible pour afficher les points disponibles (classe + spécialisation). Il retient les changements observés après des événements de talents, sans les présenter comme un talent précis dépensé : une respécialisation ou une mise à jour serveur peut aussi expliquer la différence. Si la lecture échoue, aucun chiffre n'est inventé.
+
+Commande `/wc talents` pour vérifier les compteurs et le nombre de changements observés. Le rappel déjà existant des points non dépensés continue de fonctionner. **L'arbre Furie et la recommandation d'un talent précis ne sont pas encore validés dans le client Forever.**
+
 ## Installation et commandes
 
 Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Forever. Le fichier `WarriorCompanion.toc` doit se trouver directement dans `Interface/AddOns/WarriorCompanion/`. L’interface ciblée est `16001`.
@@ -62,6 +68,7 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 | `/wc reset` | Recommencer les mesures et effacer l'historique de session |
 | `/wc performance` | Comparer XP/h globale et XP/h des dix dernières minutes |
 | `/wc minimap reset` | Replacer le bouton sur le bord de la minimap à sa position par défaut |
+| `/wc talents` | Diagnostic des points de talents disponibles et de leurs changements |
 | `/wc gear` | Diagnostic de présence de GearQuest et explication des données vérifiables |
 | `/wc weapons` | Afficher les identifiants d'équipement et les types lus en mains droite/gauche |
 | `/wc spells` | Afficher le diagnostic du grimoire et la dernière nouveauté observée |
