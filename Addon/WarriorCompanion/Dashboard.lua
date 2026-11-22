@@ -344,7 +344,7 @@ function WC:RefreshDashboard()
     local view = self:GetGuideView()
     self.dashboardQuestTitle:SetText(view and view.title or "Guide : aucun parcours charge")
     self.dashboardQuestDetail:SetText(view and
-      ((view.status or "") .. "\\n\\n" .. (view.steps or "")) or
+      ((view.status or "") .. "\n\n" .. (view.steps or "")) or
       "Les guides existants doivent etre importes puis verifies pour Forever.")
   end
   -- Donnees des quetes mises a jour uniquement au clic explicite.
