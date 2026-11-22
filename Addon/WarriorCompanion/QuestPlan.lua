@@ -34,6 +34,13 @@ end
 
 function WC:BuildQuestPlan(mode)
   if self.inCombat then return "En combat","Preparation du parcours uniquement hors combat." end
+  if mode=="guide" then
+    local view=self.GetGuideView and self:GetGuideView()
+    if not view then
+      return "Guide de leveling", "Aucun guide source verifie n'est encore charge.\\nLes vues Journal et A prendre restent disponibles."
+    end
+    return view.title, (view.status or "").."\\n\\n"..(view.steps or "")
+  end
   if mode=="journal" then
     self:UpdateQuestAdvice()
     local snapshot=self.questAdvice
