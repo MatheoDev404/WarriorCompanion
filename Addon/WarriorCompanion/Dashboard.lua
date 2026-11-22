@@ -256,7 +256,10 @@ function WC:CreateDashboard()
   self.dashboardTalentDistribution = text(questPage, "GameFontHighlightSmall", 24,
     -161, 555, 25)
   self.dashboardTalentRanks = text(questPage, "GameFontHighlight", 32,
-    -190, 544, 108)
+    -190, 286, 110)
+  rectangle(questPage, 312, -190, 1, 109, COLORS.ridge, "ARTWORK")
+  self.dashboardTalentUpcoming = text(questPage, "GameFontHighlight", 328,
+    -190, 255, 110)
   self.dashboardTalentNext = text(questPage, "GameFontHighlight", 264,
     -302, 326, 27)
   self.dashboardTalentNotice = text(questPage, "GameFontHighlightSmall", 24,
@@ -264,7 +267,8 @@ function WC:CreateDashboard()
   self.dashboardTalentWidgets = {
     self.dashboardTalentHeader,self.dashboardTalentCurrent,
     self.dashboardTalentDistribution,self.dashboardTalentRanks,
-    self.dashboardTalentNext,self.dashboardTalentNotice,
+    self.dashboardTalentUpcoming,self.dashboardTalentNext,
+    self.dashboardTalentNotice,
   }
   for _,widget in ipairs(self.dashboardTalentWidgets) do widget:Hide() end
   self.dashboardQuestWidgets = {
@@ -349,7 +353,9 @@ function WC:RefreshTalentGuidePanel()
     "|cff75D38APOINT CONSEILLE|r  "..view.current)
   self.dashboardTalentDistribution:SetText(view.distribution)
   self.dashboardTalentRanks:SetText(
-    "|cffEBC487REPARTITION (RANGS CUMULES)|r\n"..view.recent)
+    "|cffEBC487TALENTS DEJA PLANIFIES|r\n"..view.recent)
+  self.dashboardTalentUpcoming:SetText(
+    "|cffEBC487PROCHAINS NIVEAUX|r\n"..view.upcoming)
   self.dashboardTalentNext:SetText("|cffA9C8E9ENSUITE|r  "..view.next)
   self.dashboardTalentNotice:SetText(
     "|cffB6AA9C"..view.notice.."|r")
