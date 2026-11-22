@@ -1,8 +1,8 @@
 # Warrior Companion
 
-Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau ni itinéraire de quêtes. Le tableau de bord reste fermé jusqu’à la commande `/wc`.
+Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau ni itinéraire de quêtes. Le tableau de bord **s'ouvre automatiquement à la connexion**, et un bouton portant l'écusson du guerrier est disponible sur le bord de la minimap pour le rouvrir ou le fermer.
 
-## Ce que mesure la version 0.5.2-rc1
+## Ce que mesure la version 0.5.3-rc1
 
 | Activité | Comportement |
 | --- | --- |
@@ -19,7 +19,7 @@ L'analyse XP/h récente utilise une fenêtre glissante de 10 minutes, après au 
 
 L'historique d'activité conserve en mémoire vive les 60 derniers événements utiles : XP mesurée, niveaux, morts, modifications d'équipement, mises à jour des compétences et changements du nombre de quêtes. Il ne déduit ni l'objet obtenu ni la quête terminée. Utiliser `/wc history` pour afficher les 12 derniers événements. Un gain mesuré au changement de zone apparaît une seule fois. Pour l’équipement, deux emplacements lisibles distincts peuvent apparaître dans la même seconde. Les répétitions de la même description d’équipement ou de compétences sont filtrées pendant huit secondes parmi les entrées conservées. Le journal des activités est distinct du journal de debug et est effacé à `/wc reset`.
 
-## Tableau de bord — direction artistique D (0.5.2-rc1)
+## Tableau de bord — direction artistique D (0.5.3-rc1)
 
 Cette version reprend la direction **D : HUD WoW moderne, guerrier Horde** au-delà de la simple disposition. Elle embarque deux textures originales (`Textures/HordeSky.tga`, paysage rouge avec silhouettes de forteresse, et `Textures/Warcrest.tga`, bouclier guerrier) dans le ZIP. L'interface possède une armature métallique avec angles et rivets, des cartes cerclées de bronze, un bandeau illustré et une navigation latérale compacte.
 
@@ -27,12 +27,19 @@ Le **Bilan** montre simultanément quatre statistiques, les quêtes, la variatio
 
 Les textures n'utilisent pas de code propriétaire de tiers. Le rendu exact, les proportions et la prise en charge TGA de Forever doivent être vérifiés en jeu : la CI ne teste pas le moteur graphique WoW.
 
+## Démarrage et icône de minimap
+
+Le tableau de bord s'ouvre automatiquement **une fois à la connexion** (pas à chaque changement de zone). Une icône de 33 pixels est fixée au bord supérieur droit de la minimap ; un clic gauche ouvre ou ferme la fenêtre. L'icône est créée au chargement, puis une nouvelle tentative est faite lors de l'entrée dans le monde si la minimap n'était pas encore disponible.
+
+Le démarrage automatique est activé par défaut. L'option est sauvegardée et peut être désactivée avec `/wc autostart off`, puis réactivée avec `/wc autostart on`. La commande `/wc` reste toujours disponible. Décocher l'addon dans l'écran AddOns empêche naturellement son chargement.
+
 ## Installation et commandes
 
 Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Forever. Le fichier `WarriorCompanion.toc` doit se trouver directement dans `Interface/AddOns/WarriorCompanion/`. L’interface ciblée est `16001`.
 
 | Commande | Effet |
 | --- | --- |
+| `/wc autostart on`, `/wc autostart off` | Activer/désactiver l'ouverture automatique à la prochaine connexion |
 | `/wc` | Ouvrir ou fermer le tableau des mesures et conseils |
 | `/wc status` | Afficher la version, les mesures, les options et la présence des fonctions d’API |
 | `/wc reset` | Recommencer les mesures et effacer l'historique de session |
@@ -49,7 +56,7 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 
 ## Compatibilité et tests
 
-Les signatures ont été vérifiées dans les sources d’interface de Forever 1.60.1, build 71037. Les essais automatisés chargent les modules dans l’ordre du TOC et simulent les appels du client. La validation en jeu de la version 0.5.2-rc1 reste à faire. [Sources consultées et protocole en jeu](docs/TEST_PLAN.md)
+Les signatures ont été vérifiées dans les sources d’interface de Forever 1.60.1, build 71037. Les essais automatisés chargent les modules dans l’ordre du TOC et simulent les appels du client. La validation en jeu de la version 0.5.3-rc1 reste à faire. [Sources consultées et protocole en jeu](docs/TEST_PLAN.md)
 
 Pour reproduire les contrôles de GitHub Actions depuis la racine du dépôt, installer Python 3, Lua 5.1 et Lua 5.4, puis exécuter le bloc dans un shell POSIX.
 
