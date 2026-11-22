@@ -35,6 +35,7 @@ jobs:
           lua${{ matrix.lua }} tests/test_weapons.lua
           lua${{ matrix.lua }} tests/test_gearquest.lua
           lua${{ matrix.lua }} tests/test_talents.lua
+          lua${{ matrix.lua }} tests/test_talent_plan.lua
           lua${{ matrix.lua }} tests/test_quests.lua
           lua${{ matrix.lua }} tests/test_discovery.lua
           lua${{ matrix.lua }} tests/test_clusters.lua
