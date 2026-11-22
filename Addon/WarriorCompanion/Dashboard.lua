@@ -12,7 +12,7 @@ end
 function WC:CreateDashboard()
   if self.dashboard then return end
   local f = CreateFrame("Frame", "WarriorCompanionDashboard", UIParent)
-  f:SetSize(350, 270)
+  f:SetSize(350, 290)
   f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   f:SetFrameStrata("DIALOG")
   f:EnableMouse(true)
@@ -25,8 +25,8 @@ function WC:CreateDashboard()
   background:SetTexture("Interface\\Buttons\\WHITE8X8")
   background:SetVertexColor(0.05, 0.07, 0.10, 0.94)
   makeLabel(f, "GameFontNormalLarge", 12, -14, 310, 22):SetText("Warrior Companion")
-  self.dashboardStats = makeLabel(f, "GameFontHighlight", 12, -51, 320, 102)
-  self.dashboardAdvice = makeLabel(f, "GameFontHighlightSmall", 12, -171, 320, 78)
+  self.dashboardStats = makeLabel(f, "GameFontHighlight", 12, -51, 320, 126)
+  self.dashboardAdvice = makeLabel(f, "GameFontHighlightSmall", 12, -192, 320, 78)
   local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
   close:SetScript("OnClick", function() f:Hide() end)
@@ -40,12 +40,14 @@ function WC:RefreshDashboard()
   local xp = self:XPPerHour()
   local money = self:MoneyDelta()
   local combat = self:GetCombatSummary()
+  local recentXP = self:RecentXPPerHour()
   self.dashboardStats:SetText(
     "XP gagnee : " .. tostring(m.xpGained) ..
     "   |   XP/h : " .. (xp and tostring(xp) or (m.xpAvailable and "attente" or "indisponible")) ..
     "\nMorts : " .. tostring(m.deaths) ..
     "   |   Quetes (journal) : " .. (m.questCount and tostring(m.questCount) or "inconnu") ..
     "\nVariation d'argent : " .. (money and tostring(money) .. " cuivre" or "indisponible") ..
+    "\nXP/h (10 min) : " .. (recentXP and tostring(recentXP) or "attente") ..
     "\nCombats : " .. tostring(combat.completed) .. " | Duree moyenne : " .. (combat.average and tostring(combat.average) .. " s" or "indisponible") ..
     " | Interrompus : " .. tostring(combat.interrupted))
   self.dashboardAdvice:SetText("Conseils :\n" .. self:AdviceLines())

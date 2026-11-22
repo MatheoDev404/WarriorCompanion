@@ -2,7 +2,7 @@
 ## Title: Warrior Companion
 ## Notes: Assistant de progression et statistiques - WoW Forever
 ## Author: Warrior Companion
-## Version: 0.3.0-dev
+## Version: 0.3.1-dev
 ## SavedVariables: WC_DB
 
 Core.lua
@@ -10,5 +10,6 @@ Diagnostics.lua
 Observer.lua
 Activity.lua
 Combat.lua
+Performance.lua
 Advisor.lua
 Dashboard.lua
