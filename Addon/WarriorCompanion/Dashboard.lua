@@ -12,7 +12,6 @@ local COLORS = {
   gold = {0.85, 0.64, 0.36, 1},
   blood = {0.46, 0.062, 0.050, 1},
   litBlood = {0.65, 0.115, 0.080, 1},
-  faded = {0.20, 0.14, 0.14, 0.95},
 }
 local function tint(text, hex)
   return "|cff" .. hex .. tostring(text) .. "|r"
@@ -46,28 +45,14 @@ local function text(parent, font, x, y, width, height, value)
   return t
 end
 
--- Armature noire bordée de métal : feuillets empilés, bronze, rivets et angles.
+-- Panneau sobre : une surface, un filet de separation, aucun rivet.
 local function metalPlate(parent, x, y, width, height, active)
-  -- Bordure en acier sombre, double liseré cuivre et petits rivets :
-  -- le cadre garde la géométrie de la maquette sans texture propriétaire.
-  rectangle(parent, x, y, width, height, COLORS.black)
-  rectangle(parent, x, y, width, 2, COLORS.copper)
-  rectangle(parent, x, y-height+2, width, 2, COLORS.ridge)
-  rectangle(parent, x, y, 2, height, COLORS.copper)
-  rectangle(parent, x+width-2, y, 2, height, COLORS.ridge)
-  rectangle(parent, x+3, y-3, width-6, height-6, COLORS.ridge)
-  rectangle(parent, x+5, y-5, width-10, height-10,
+  rectangle(parent, x, y, width, height,
     active and COLORS.darkPlate or COLORS.steel)
-  rectangle(parent, x+7, y-7, width-14, height-14, COLORS.black)
-  rectangle(parent, x+9, y-9, width-18, height-18,
-    active and COLORS.darkPlate or COLORS.steel)
-  rectangle(parent, x+5, y-5, width-10, 2,
-    active and COLORS.litBlood or COLORS.copper)
-  rectangle(parent, x+5, y-height+7, width-10, 2, COLORS.faded)
-  for _, dx in ipairs({10, width-14}) do
-    rectangle(parent, x+dx, y-10, 4, 4, COLORS.gold, "ARTWORK")
-    rectangle(parent, x+dx, y-height+14, 4, 4, COLORS.ridge, "ARTWORK")
-  end
+  rectangle(parent, x, y, width, 1, COLORS.ridge, "ARTWORK")
+  rectangle(parent, x, y-height+1, width, 1, COLORS.ridge, "ARTWORK")
+  rectangle(parent, x, y, 1, height, COLORS.ridge, "ARTWORK")
+  rectangle(parent, x+width-1, y, 1, height, COLORS.ridge, "ARTWORK")
 end
 
 local function fmt(value, fallback)
