@@ -155,3 +155,17 @@ for version in 5.1 5.4; do
   "lua$version" tests/test_dashboard.lua
 done
 ```
+
+### Verification des talents reels dans WoW Forever
+
+Dans **GUIDE > TALENTS**, Warrior Companion tente maintenant de lire les noms localises et les rangs **actifs** du personnage par le systeme moderne `C_Traits`. Ouvrir directement avec `/wc talents`. Le code prend en charge l'API `C_SpecializationInfo` et la fonction globale `GetCombatConfigIDForSpecGroup` selon leur disponibilite. La lecture est facultative et **ne place jamais de points**.
+
+- Si une entree est reconnue : le nom du client remplace le libelle francais provisoire, et le rang affiche correspond au rang reellement lu.
+- Au niveau actuel, un rang qui differe du plan est affiche en rouge. Le plan recommande est conserve independamment et n'est pas modifie par la lecture.
+- Si l'API est absente, refuse les donnees, ou ne reconnait qu'une partie des talents : affichage prudent et mention explicite du probleme. Les emplacements non reconnus restent au rang *prevu*.
+- Les comparaisons avec un niveau historique (selectionne avec les fleches) sont desactivees : l'arbre reel correspond au personnage **actuel**, pas a son ancien niveau.
+- En cas de modification de l'arbre par Blizzard, de re-specialisation ou de changements d'identifiants, il faut revalider la correspondance en jeu.
+
+Sources techniques : [retour d'experience C_Traits sur Forever](https://github.com/nobody174/wow-forever/blob/main/ADDON_PLAN.md) et [talents du client francais releves par la communaute](https://wowforeverfr.com/atlas/classes/guerrier). Les traductions de repli actualisees incluent **Colere dechainee**, **Rage remanente**, **Coups dechaines** et **Tripes desalterantes** ; le nom exact provenant du jeu a toujours priorite.
+
+Cette fonctionnalite necessite encore une **validation visuelle sur le client WoW Forever en francais**. La couverture des API varie suivant la build, et un test simule ne constitue pas une verification du personnage.
