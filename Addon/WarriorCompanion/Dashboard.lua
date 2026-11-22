@@ -213,7 +213,7 @@ function WC:CreateDashboard()
   self.dashboardCombat = text(p, "GameFontHighlight", 18, -151, 218, 64)
 
   metalPlate(p, 258, -106, 253, 111, true)
-  rectangle(p, 264, -114, 240, 94, COLORS.blood, "ARTWORK")
+  picture(p, ROOT .. "AdviceArt", 264, -114, 240, 94, "ARTWORK")
   picture(p, ROOT .. "Warcrest", 445, -136, 49, 49, "ARTWORK")
   picture(p, "Interface\\Icons\\Ability_Warrior_BattleShout",
     270, -115, 33, 33)
