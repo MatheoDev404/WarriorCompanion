@@ -62,6 +62,7 @@ function WC:CreateMinimapButton()
   button:EnableMouse(true)
   button:RegisterForClicks("LeftButtonUp")
   button:RegisterForDrag("LeftButton")
+  button:SetScript("OnMouseDown", function() button.justDragged = false end)
   button:SetScript("OnDragStart", function()
     button.dragging = true
     WC:DragMinimapButton()
