@@ -37,9 +37,9 @@ function WC:BuildQuestPlan(mode)
   if mode=="guide" then
     local view=self.GetGuideView and self:GetGuideView()
     if not view then
-      return "Guide de leveling", "Aucun guide source verifie n'est encore charge.\\nLes vues Journal et A prendre restent disponibles."
+      return "Guide de leveling", "Aucun guide source verifie n'est encore charge.\nLes vues Journal et A prendre restent disponibles."
     end
-    return view.title, (view.status or "").."\\n\\n"..(view.steps or "")
+    return view.title, (view.status or "").."\n\n"..(view.steps or "")
   end
   if mode=="journal" then
     self:UpdateQuestAdvice()
