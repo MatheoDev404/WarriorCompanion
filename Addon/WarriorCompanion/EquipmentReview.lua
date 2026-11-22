@@ -149,7 +149,7 @@ function WC:EquipmentBagSuggestions(maxCount)
       end
     end
   end
-  local proposals={}
+  local proposals,usedIDs={},{}
   for _,slot in ipairs(SLOTS) do
     if level>=slot[3] and slot[1]~=17 then
       local valid,id=equipped(slot[1])
@@ -159,7 +159,7 @@ function WC:EquipmentBagSuggestions(maxCount)
         -- If an equipped item's metadata is absent, don't infer improvement.
         if not id or current then
           for _,item in ipairs(bagItems) do
-            if matchingLocation(slot[1],item.equipLoc) and
+            if not usedIDs[item.id] and matchingLocation(slot[1],item.equipLoc) and
                 (not current or
                 (item.level>current.level and
                  item.itemClass==current.itemClass and
@@ -169,6 +169,7 @@ function WC:EquipmentBagSuggestions(maxCount)
           end
         end
         if best then
+          usedIDs[best.id]=true
           proposals[#proposals+1]={
             slot=slot[2],item=best.name,link=best.link,
             level=best.level,previous=current and current.level or nil,
