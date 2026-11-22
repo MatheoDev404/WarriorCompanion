@@ -147,6 +147,16 @@ function WC:CreateDashboard()
       b.label=text(b,"GameFontNormalSmall",9,-5,entry[3]-16,20,
         tint(entry[2],"E9DFD2"))
       b:SetScript("OnClick",function() callback(entry[1]) end)
+      b:SetScript("OnEnter",function()
+        b.base:SetVertexColor(0.21,0.22,0.23,1)
+      end)
+      b:SetScript("OnLeave",function()
+        local selected=(page==WC.dashboardPages.advice and
+          WC.adviceMode==entry[1]) or
+          (page==WC.dashboardPages.combat and WC.combatMode==entry[1])
+        local c=selected and COLORS.blood or COLORS.darkPlate
+        b.base:SetVertexColor(c[1],c[2],c[3],c[4])
+      end)
       buttons[entry[1]]=b
       x=x+entry[3]+6
     end
@@ -193,9 +203,16 @@ function WC:CreateDashboard()
     b:SetPoint("TOPLEFT",settingsPage,"TOPLEFT",x,y)
     b:SetSize(width,31)
     b.base=rectangle(b,0,0,width,31,COLORS.darkPlate)
+    b.accent=rectangle(b,0,-29,width,2,COLORS.ridge,"ARTWORK")
     b.label=text(b,"GameFontNormal",9,-6,width-18,20,
-      tint(label,"F0C58A"))
+      tint(label,"E9DFD2"))
     b:SetScript("OnClick",callback)
+    b:SetScript("OnEnter",function()
+      b.base:SetVertexColor(0.21,0.22,0.23,1)
+    end)
+    b:SetScript("OnLeave",function()
+      WC:RefreshSettingsPanel()
+    end)
     self.dashboardSettingsButtons[key]=b
     return b
   end
@@ -499,6 +516,19 @@ end
 function WC:RefreshSettingsPanel()
   if not self.dashboardSettingsInfo then return end
   local options=self:Profile()
+  for key,enabled in pairs({
+    autostart=options.autoOpen==true,
+    alerts=options.showAlerts==true,
+    reset=self.settingsResetPending==true,
+  }) do
+    local b=self.dashboardSettingsButtons and self.dashboardSettingsButtons[key]
+    if b then
+      local base=enabled and COLORS.blood or COLORS.darkPlate
+      local accent=enabled and COLORS.gold or COLORS.ridge
+      b.base:SetVertexColor(base[1],base[2],base[3],base[4])
+      b.accent:SetVertexColor(accent[1],accent[2],accent[3],accent[4])
+    end
+  end
   local auto=options.autoOpen and "ACTIF" or "INACTIF"
   local alerts=options.showAlerts and "ACTIVES" or "DESACTIVEES"
   self.dashboardSettingsInfo:SetText(
