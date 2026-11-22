@@ -113,16 +113,36 @@ function WC:CreateDashboard()
   end
 
   self.dashboardPages = {
-    combat = contentPage(), advice = contentPage(), quests = contentPage()
+    combat = contentPage(), advice = contentPage(),
+    quests = contentPage(), settings = contentPage()
   }
   self.dashboardTabs = {}
   local tabs = {
     {"combat", -72, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
     {"advice", -146, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
     {"quests", -220, "Interface\\Icons\\INV_Misc_Map_01", "GUIDE"},
+    {"settings", -294, "Interface\\Icons\\INV_Misc_Gear_01", "REGL."},
   }
   for _, item in ipairs(tabs) do
     self.dashboardTabs[item[1]] = tab(f, item[1], item[2], item[3], item[4])
+  end
+
+  -- Sous-onglets sobres : les actions courantes sont accessibles au clic.
+  local function subTabs(page, descriptors, callback)
+    local buttons={}
+    local x=18
+    for _,entry in ipairs(descriptors) do
+      local b=CreateFrame("Button",nil,page)
+      b:SetSize(entry[3],28)
+      b:SetPoint("TOPLEFT",page,"TOPLEFT",x,-54)
+      b.base=rectangle(b,0,0,entry[3],28,COLORS.darkPlate)
+      b.label=text(b,"GameFontNormalSmall",7,-6,entry[3]-10,20,
+        tint(entry[2],"EBC487"))
+      b:SetScript("OnClick",function() callback(entry[1]) end)
+      buttons[entry[1]]=b
+      x=x+entry[3]+6
+    end
+    return buttons
   end
 
   local combatPage = self.dashboardPages.combat
@@ -132,7 +152,11 @@ function WC:CreateDashboard()
     tint("COMBAT - BILAN ET SECURITE", "F1C98D"))
   rectangle(combatPage, 18, -60, 582, 2, COLORS.ridge, "ARTWORK")
   self.dashboardCombatDetail = text(combatPage, "GameFontHighlight",
-    23, -78, 566, 245)
+    23, -100, 566, 236)
+  self.combatMode="combat"
+  self.dashboardCombatButtons=subTabs(combatPage,{
+    {"combat","COMBATS",124},{"performance","PERFORMANCE",148}
+  },function(mode) WC:SelectCombatView(mode) end)
   local advicePage = self.dashboardPages.advice
   metalPlate(advicePage, 0, -4, 620, 344)
   picture(advicePage, "Interface\\Icons\\Ability_Warrior_BattleShout",
@@ -141,7 +165,47 @@ function WC:CreateDashboard()
     tint("CONSEILS - GUERRIER FURIE", "F1C98D"))
   rectangle(advicePage, 18, -60, 582, 2, COLORS.ridge, "ARTWORK")
   self.dashboardAdviceDetail = text(advicePage, "GameFontHighlight",
-    23, -77, 566, 245)
+    23, -100, 565, 234)
+  self.adviceMode="advice"
+  self.dashboardAdviceButtons=subTabs(advicePage,{
+    {"advice","CONSEILS",105},{"equipment","EQUIPEMENT",115},
+    {"health","SANTE",80},{"weapons","ARMES",80},
+    {"spells","SORTS",82}
+  },function(mode) WC:SelectAdviceView(mode) end)
+
+  local settingsPage=self.dashboardPages.settings
+  metalPlate(settingsPage,0,-4,620,344)
+  text(settingsPage,"GameFontNormalLarge",24,-20,562,26,
+    tint("REGLAGES DE L'ADDON","F1C98D"))
+  self.dashboardSettingsInfo=text(settingsPage,"GameFontHighlight",
+    24,-68,552,125)
+  self.dashboardSettingsButtons={}
+  local function settingButton(key,label,x,y,width,callback)
+    local b=CreateFrame("Button",nil,settingsPage)
+    b:SetPoint("TOPLEFT",settingsPage,"TOPLEFT",x,y)
+    b:SetSize(width,31)
+    b.base=rectangle(b,0,0,width,31,COLORS.darkPlate)
+    b.label=text(b,"GameFontNormal",9,-6,width-18,20,
+      tint(label,"F0C58A"))
+    b:SetScript("OnClick",callback)
+    self.dashboardSettingsButtons[key]=b
+    return b
+  end
+  settingButton("autostart","DEMARRAGE AUTO",24,-202,175,function()
+    WC:Profile().autoOpen=not WC:Profile().autoOpen
+    WC:RefreshSettingsPanel()
+  end)
+  settingButton("alerts","NOTIFICATIONS",211,-202,172,function()
+    WC:Profile().showAlerts=not WC:Profile().showAlerts
+    WC:RefreshSettingsPanel()
+  end)
+  settingButton("reset","REINITIALISER SESSION",24,-252,250,function()
+    WC:ResetSession()
+    WC.settingsResetMessage="Session reinitialisee."
+    WC:RefreshSettingsPanel()
+  end)
+  text(settingsPage,"GameFontHighlightSmall",24,-291,557,36,
+    "La remise a zero efface les compteurs de session, pas le guide ni les options.")
 
   local questPage = self.dashboardPages.quests
   metalPlate(questPage, 0, -4, 620, 344)
@@ -252,7 +316,7 @@ function WC:CreateDashboard()
   }
 
   text(f, "GameFontHighlightSmall", 89, -439, 615, 15,
-    tint("/wc help     /wc reset     /wc performance", "C1A08A"))
+    tint("Warrior Companion   |   Guide - Conseils - Combat - Reglages", "C1A08A"))
   self.dashboard = f
   self.questPlanMode = "guide"
   if self.SelectQuestPlan then self:SelectQuestPlan("guide") end
@@ -380,28 +444,118 @@ function WC:RefreshTalentGuidePanel()
   end
 end
 
-function WC:RefreshDashboard()
-  if not self.dashboard or not self.dashboard:IsShown() then return end
+-- Navigation de sous-vues ; aucune fonction ne bascule en mode chat.
+local function selectButtons(buttons,chosen)
+  if not buttons then return end
+  for key,button in pairs(buttons) do
+    local c=key==chosen and COLORS.blood or COLORS.darkPlate
+    button.base:SetVertexColor(c[1],c[2],c[3],c[4])
+  end
+end
+function WC:SelectAdviceView(mode)
+  if not self.dashboardAdviceButtons or not
+      self.dashboardAdviceButtons[mode] then return end
+  self.adviceMode=mode
+  selectButtons(self.dashboardAdviceButtons,mode)
+  self:RefreshDashboard()
+end
+function WC:SelectCombatView(mode)
+  if not self.dashboardCombatButtons or not
+      self.dashboardCombatButtons[mode] then return end
+  self.combatMode=mode
+  selectButtons(self.dashboardCombatButtons,mode)
+  self:RefreshDashboard()
+end
+function WC:RefreshSettingsPanel()
+  if not self.dashboardSettingsInfo then return end
+  local options=self:Profile()
+  local auto=options.autoOpen and "ACTIF" or "INACTIF"
+  local alerts=options.showAlerts and "ACTIVES" or "DESACTIVEES"
+  self.dashboardSettingsInfo:SetText(
+    "|cffEBC487DEMARRAGE AUTOMATIQUE|r   "..auto..
+    "\\nLe mini-bilan s'ouvre a la connexion si active."..
+    "\\n\\n|cffEBC487NOTIFICATIONS|r   "..alerts..
+    "\\nAlertes importantes dans le chat, jamais en combat."..
+    (self.settingsResetMessage and
+      ("\\n\\n|cff75D38A"..self.settingsResetMessage.."|r") or ""))
+end
+function WC:AdviceViewText()
+  local mode=self.adviceMode or "advice"
+  if mode=="equipment" then
+    return self.EquipmentReviewText and self:EquipmentReviewText() or
+      "Equipement indisponible."
+  end
+  if mode=="health" then
+    local h=self.health
+    if not h or h.percent==nil then
+      return "POINTS DE VIE\\n\\nLecture indisponible ou protegee."
+    end
+    return "|cffEBC487POINTS DE VIE|r\\n\\n"..
+      tostring(h.current).." / "..tostring(h.maximum)..
+      "   ("..tostring(h.percent).." %)"..
+      "\\n\\nSoigne-toi et recupere entre les combats."
+  end
+  if mode=="weapons" then
+    local w=self.weapons
+    if not w or not w.available then
+      return "ARMES\\n\\nLecture indisponible : "..
+        tostring(w and w.reason or "non initialisee")
+    end
+    return "|cffEBC487MAIN DROITE|r\\n"..tostring(w.main or "Vide")..
+      "  -  "..tostring(w.mainType or w.mainReason or "Type inconnu")..
+      "\\n\\n|cffEBC487MAIN GAUCHE|r\\n"..tostring(w.off or "Vide")..
+      "  -  "..tostring(w.offType or w.offReason or "Type inconnu")..
+      "\\n\\nLe type d'arme ne suffit pas pour evaluer son DPS."
+  end
+  if mode=="spells" then
+    local book=self.spellbook
+    if not book or not book.known then
+      return "SORTS\\n\\nGrimoire non disponible : "..
+        tostring(book and book.reason or "non initialise")
+    end
+    local count=0
+    for _ in pairs(book.known) do count=count+1 end
+    local latest=book.learned and book.learned[#book.learned]
+    return "|cffEBC487GRIMOIRE OBSERVE|r\\n\\n"..
+      count.." sorts et rangs identifies"..
+      "\\n\\nNouveaux pendant la session : "..
+      tostring(book.learned and #book.learned or 0)..
+      (latest and ("\\nDernier : "..latest.name) or "")..
+      "\\n\\nLes sorts a acheter au maitre ne sont pas deduits."
+  end
+  local advice=self:AdviceLines(false)
+  return "|cffF0CA90PRIORITES|r\\n"..advice..
+    "\\n\\nConsulte EQUIPEMENT pour les objets a comparer."
+end
+function WC:CombatViewText()
+  if self.combatMode=="performance" then
+    local total=self.XPPerHour and self:XPPerHour()
+    local recent=self.RecentXPPerHour and self:RecentXPPerHour()
+    return "|cffEBC487PERFORMANCE XP|r\\n\\n"..
+      "XP/h session : "..(total and tostring(total) or "indisponible")..
+      "\\nXP/h sur les 10 dernieres minutes : "..
+      (recent and tostring(recent) or "indisponible")..
+      "\\n\\nCe sont des moyennes, pas une mesure de quete ou de monstre."
+  end
   local combat=self:GetCombatSummary()
   local status=combat.active and tint("EN COMBAT", "FC7A67")
     or tint("HORS COMBAT", "75D483")
-  self.dashboardCombatDetail:SetText(
-    "|cffF0CA90ETAT ACTUEL|r  "..status..
-    "\n\nCombats observes : "..fmt(combat.completed,"0")..
-    "\nCombats interrompus : "..fmt(combat.interrupted,"0")..
-    "\nDuree moyenne : "..(combat.average and
+  return "|cffF0CA90ETAT ACTUEL|r  "..status..
+    "\\n\\nCombats observes : "..fmt(combat.completed,"0")..
+    "\\nCombats interrompus : "..fmt(combat.interrupted,"0")..
+    "\\nDuree moyenne : "..(combat.average and
       tostring(combat.average).." secondes" or "non mesuree")..
-    "\nMorts en combat : "..fmt(combat.deathsInCombat,"0")..
-    "\n\n|cffBAA18FLes intervalles observes ne sont pas des ennemis tues."..
-    "\nEn guerrier Furie, privilegie des combats prudents et"..
-    "\nrecupere tes points de vie entre les affrontements.|r")
-  local advice=self:AdviceLines(false)
-  local gear=self.EquipmentReviewText and self:EquipmentReviewText()
-  if advice=="Aucun conseil verifie pour le moment." and gear then advice="" end
-  self.dashboardAdviceDetail:SetText(
-    (advice~="" and ("|cffF0CA90PRIORITES|r\n"..advice.."\n\n") or "")..
-    (gear and ("|cffF0CA90EQUIPEMENT A VERIFIER|r\n"..gear) or
-      "Aucun conseil verifie pour le moment."))
+    "\\nMorts en combat : "..fmt(combat.deathsInCombat,"0")..
+    "\\n\\n|cffBAA18FUn intervalle de combat n'est pas un monstre tue.|r"
+end
+
+function WC:RefreshDashboard()
+  if not self.dashboard or not self.dashboard:IsShown() then return end
+  selectButtons(self.dashboardAdviceButtons,self.adviceMode or "advice")
+  selectButtons(self.dashboardCombatButtons,self.combatMode or "combat")
+  self.dashboardCombatDetail:SetText(self:CombatViewText())
+  self.dashboardAdviceDetail:SetText(self:AdviceViewText())
+  self:RefreshSettingsPanel()
   if self.RefreshTalentGuidePanel then self:RefreshTalentGuidePanel() end
   if self.questPlanMode=="guide" and self.GetGuideView then
     local view=self:GetGuideView()
