@@ -65,7 +65,7 @@ assert(button.level==8 and button.strata=="MEDIUM")
 assert(button.highlight=="Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
 assert(button.dragButtons[1]=="LeftButton")
 assert(button.anchor[1]=="CENTER" and button.anchor[2]==Minimap)
-assert(math.abs(button.anchor[4]+66.11)<0.2 and math.abs(button.anchor[5]+24.06)<0.2,
+assert(math.abs(button.anchor[4]+66.11)<0.2 and math.abs(button.anchor[5]+30.85)<0.2,
   "default position 205 deg")
 assert(#textures==3,"background icon border")
 assert(textures[1].path=="Interface\\Minimap\\UI-Minimap-Background")
@@ -114,8 +114,8 @@ assert(not WC.dashboard:IsShown())
 -- Support pour les minimaps carrees : ne pas se baser sur le cercle.
 shape="SQUARE"
 WC:PositionMinimapButton(45)
-assert(math.abs(button.anchor[4]-69.23)<0.2)
-assert(math.abs(button.anchor[5]-69.23)<0.2)
+assert(math.abs(button.anchor[4]-66.59)<0.2)
+assert(math.abs(button.anchor[5]-66.59)<0.2)
 WC:PositionMinimapButton(0)
 assert(button.anchor[4]==73 and math.abs(button.anchor[5])<0.001)
 shape="INVALID"

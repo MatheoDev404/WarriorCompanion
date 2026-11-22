@@ -207,7 +207,7 @@ baseline()
 now = now + 601
 local beforeOpen = #messages
 SlashCmdList.WARRIORCOMPANION("")
-assert(WC.dashboardAdvice.text:find("Aucune XP", 1, true), "conseil actualisé à l'ouverture")
+assert(WC.dashboardAdviceDetail.text:find("Aucune XP", 1, true), "conseil complet actualise a l'ouverture")
 assert(#messages == beforeOpen, "ouvrir le tableau a envoyé une notification")
 SlashCmdList.WARRIORCOMPANION("")
 -- Un premier échantillon tardif ne couvre pas la période avant sa lecture.
