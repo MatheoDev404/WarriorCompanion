@@ -233,9 +233,11 @@ function WC:CreateDashboard()
   self.dashboardCombatDetail = createSubPage(
     self.dashboardPages.combat, "RAPPORT DE COMBAT",
     "Interface\\Icons\\Ability_Warrior_Charge")
-  self.dashboardAdviceDetail = createSubPage(
-    self.dashboardPages.advice, "CONSEILS DU GUERRIER",
+  local advicePage = self.dashboardPages.advice
+  noteBox(advicePage, 0, -4, 512, 237, "CONSEILS DU GUERRIER",
     "Interface\\Icons\\Ability_Warrior_BattleShout")
+  self.dashboardAdviceDetail = text(advicePage, "GameFontHighlightSmall",
+    15, -43, 478, 188)
   self.dashboardActivityDetail = createSubPage(
     self.dashboardPages.activity, "JOURNAL DE SESSION",
     "Interface\\Icons\\INV_Misc_Note_01")
