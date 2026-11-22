@@ -369,7 +369,12 @@ function WC:RefreshDashboard()
   end
   self.dashboardAdvice:SetText((advice:match("([^\n]+)")) or advice)
   local gear = self.EquipmentReviewText and self:EquipmentReviewText()
-  self.dashboardAdviceDetail:SetText(advice .. (gear and ("\n\nBILAN EQUIPEMENT\n" .. gear) or ""))
+  local general = self:AdviceLines(false)
+  if general == "Aucun conseil verifie pour le moment." and gear then
+    general = ""
+  end
+  self.dashboardAdviceDetail:SetText((general ~= "" and (general .. "\n\n") or "") ..
+    (gear and ("BILAN EQUIPEMENT\n" .. gear) or ""))
   self.dashboardActivity:SetText(activityLines(self.activity, 2))
   self.dashboardActivityDetail:SetText(activityLines(self.activity, 8))
   -- Seul le guide charge est relu sans lancer de recherche QuestieDB.
