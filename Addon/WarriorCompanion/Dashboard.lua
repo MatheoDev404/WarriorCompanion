@@ -388,10 +388,23 @@ function WC:RefreshTalentGuidePanel()
     "|cffEBC487ARBRE FURIE|r  |cffCDBB9B- Niveau "..view.plan.level.."|r")
   self.dashboardTalentCurrent:SetText(
     "|cff75D38APOINT A PLACER|r  "..view.current)
+  local live=self.liveFuryTalents
+  local source=live and
+    (" | Reels : "..live.count.."/18 talents identifies") or
+    " | Rangs reels non disponibles"
   self.dashboardTalentDistribution:SetText(
-    view.distribution.."  |  Paliers 1 a 7")
+    view.distribution..source)
+  local level=self:CurrentTalentPlanLevel()
+  local sameLevel=view.plan.level==level
   self.dashboardTalentNext:SetText("|cffA9C8E9ENSUITE|r  "..view.next)
-  self.dashboardTalentNotice:SetText("|cffB6AA9C"..view.notice.."|r")
+  local caveat=live and
+    (sameLevel and
+      (live.complete and "Rangs reels (rouge = ecart avec le plan)" or
+        "Lecture partielle (rouge = ecart individuel)") or
+      "Historique : rangs actuels affiches, pas de comparaison") or
+    ("Lecture C_Traits indisponible : "..
+      tostring(self.liveFuryReason or "non prise en charge"))
+  self.dashboardTalentNotice:SetText("|cffB6AA9C"..caveat.."|r")
   local nodes=self:TalentTreeGrid(view.plan.level)
   if not nodes then return end
   local cells=self.dashboardTalentGrid
@@ -409,12 +422,17 @@ function WC:RefreshTalentGuidePanel()
     local index=(node.row-1)*4+node.column
     local cell=cells[index]
     if cell then
-      local color=node.status=="current" and "F7D392" or
-        (node.rank>0 and "8FD7A4" or "918A85")
-      local tintColor=node.status=="current" and COLORS.gold or
-        (node.rank>0 and {0.30,0.56,0.39,1} or COLORS.ridge)
+      local color=node.mismatch and "F17E78" or
+        (node.status=="current" and "F7D392" or
+        (node.rank>0 and "8FD7A4" or "918A85"))
+      local tintColor=node.mismatch and {0.74,0.22,0.22,1} or
+        (node.status=="current" and COLORS.gold or
+        (node.rank>0 and {0.30,0.56,0.39,1} or COLORS.ridge))
       cell.name:SetText(tint(node.label,color))
-      cell.rank:SetText(tint(node.rank.."/"..node.maximum,color))
+      local rankText=node.actualRank~=nil and
+        (tostring(node.actualRank).."/"..node.maximum) or
+        (tostring(node.rank).."/"..node.maximum)
+      cell.rank:SetText(tint(rankText,color))
       cell.stripe:SetVertexColor(
         tintColor[1],tintColor[2],tintColor[3],tintColor[4])
       if node.status=="current" then
