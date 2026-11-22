@@ -30,7 +30,7 @@ Les textures n'utilisent pas de code propriétaire de tiers. Le rendu exact, les
 
 ## Deux affichages : mini-bilan et interface complète
 
-Le mini-bilan mesure **304 × 88 pixels** et présente uniquement l'XP gagnée, l'XP/h, les morts, la balance nette de la session (gains moins dépenses), en or, argent et cuivre avec les icônes WoW et un code couleur : vert pour gain, rouge pour perte, gris clair pour zéro et une ligne de conseil. Il est déplaçable, avec position mémorisée. Le bouton `>>` agrandit vers la fenêtre complète **600 × 360** ; le bouton X de celle-ci revient au mini-bilan. Les onglets Combat, Conseils, Journal et Quêtes restent dans la fenêtre complète.
+Le mini-bilan mesure **304 × 88 pixels** et présente uniquement l'XP gagnée, le temps écoulé de session au format HH:MM:SS, les morts, la balance nette de la session (gains moins dépenses), en or, argent et cuivre avec les icônes WoW et un code couleur : vert pour gain, rouge pour perte, gris clair pour zéro et une ligne de conseil. Il est déplaçable, avec position mémorisée. Le bouton `>>` agrandit vers la fenêtre complète **720 × 460** ; le bouton X de celle-ci revient au mini-bilan. La fenêtre complète ne comporte plus que **Combat, Conseils et Guide** ; Bilan et Journal ne figurent plus parmi les onglets. Le Guide inspiré de RestedXP est sélectionné par défaut et présente une action, la position connue, la prochaine étape et les boutons précédent/suivant.
 
 Le mode compact est affiché au premier démarrage. Le choix compact/complet et la position du mini-bilan sont enregistrés dans WC_DB. La commande `/wc` alterne les deux vues, `/wc mini` force la vue réduite et `/wc full` force la vue complète. Aucun bouton de minimap n'est installé.
 
