@@ -39,16 +39,21 @@ function WC:GuideStart()
   end
   if not level then return false end
   -- Favorise la progression principale plutôt que la branche Silverpine 12-14.
-  local candidate
+  local candidate, previous
   for _, id in ipairs(self.guideOrder) do
     local pack = self.guideCatalog[id]
     if pack.primary and type(pack.minLevel) == "number"
-        and type(pack.maxLevel) == "number"
-        and level >= pack.minLevel and level < pack.maxLevel then
-      candidate = pack
-      break
+        and type(pack.maxLevel) == "number" and pack.minLevel <= level then
+      if not previous or pack.minLevel > previous.minLevel then previous = pack end
+      if level < pack.maxLevel then
+        candidate = pack
+        break
+      end
     end
   end
+  -- Certaines sections publiees omettent une tranche de niveau : reprendre
+  -- la plus recente plutot que fabriquer un itineraire pour ce niveau.
+  candidate = candidate or previous
   if candidate then return self:GuideLoad(candidate) end
   return false
 end
