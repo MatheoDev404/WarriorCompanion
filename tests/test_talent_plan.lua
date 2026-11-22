@@ -30,6 +30,20 @@ for level=41,43 do order[level]=saved[level] end
 valid,reason=WC:ValidateTalentPlan()
 assert(valid and reason==nil,"le parcours restaure reste valide")
 assert(WC:TalentPlanLevel(9)==nil and WC:TalentPlanLevel(61)==nil)
+-- Donnees manquantes et rangs incoherents doivent aussi etre bloques.
+local missing=order[33]
+order[33]=nil
+valid,reason=WC:ValidateTalentPlan()
+assert(not valid and reason:find("Point manquant",1,true))
+order[33]=missing
+local altered=order[58]
+order[58]={level=58,key="Booming Voice",rank=5}
+valid,reason=WC:ValidateTalentPlan()
+assert(not valid and reason:find("Rang invalide",1,true))
+order[58]=altered
+valid,reason=WC:ValidateTalentPlan()
+assert(valid and reason==nil)
+
 local totals={}
 for level=10,60 do
   local plan=WC:TalentPlanLevel(level)
