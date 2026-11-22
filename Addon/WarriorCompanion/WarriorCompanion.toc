@@ -18,6 +18,7 @@ TalentObserver.lua
 QuestAdvisor.lua
 QuestDiscovery.lua
 QuestClusters.lua
+QuestPlan.lua
 QuestieBridge.lua
 WeaponTargets.lua
 FuryAdvisor.lua
