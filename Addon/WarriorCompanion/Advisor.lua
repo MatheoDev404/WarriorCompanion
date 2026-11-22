@@ -58,6 +58,7 @@ function WC:UpdateAdvice()
   end
   -- Les conseils Furie sont exclusivement informatifs et demandent une classe verifiee.
   if self.AddFuryAdvice then self:AddFuryAdvice(alerts) end
+  if self.AddEquipmentReviewAdvice then self:AddEquipmentReviewAdvice(alerts) end
   -- Une condition non verifiable ne devient jamais une alerte certaine.
   self.alerts = alerts
 end
