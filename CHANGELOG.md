@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.4-rc1 — nettoyage et recentrage sur le leveling
+
+- Suppression du module `QuestClusters.lua`, de la commande `/wc route`, de la vue temporaire de regroupement de PNJ et de leur test obsolète.
+- Conservation de la véritable progression Horde 1–60, des vues Étapes/Talents/Mes quêtes/À prendre, du mini-bilan, des conseils et du suivi de combat.
+- Retrait des fonctions mortes de l'ancien Bilan et de l'ancien Journal, et du double formatage de monnaie de la grande fenêtre. Le formatage monétaire du mini-bilan reste testé.
+- Suppression de `AdviceArt.tga` (128 Kio), devenu inutilisé.
+- Allègement de la décoration des panneaux : surfaces sobres et bordures simples à la place des couches métalliques et rivets.
+- Réécriture de la documentation et du protocole de tests sur les écrans réellement présents.
+- Diagnostic avancé, historique et performance conservés en commandes, hors de l'interface principale.
+- Contrôle automatique sous Lua 5.1 et 5.4 avant fusion ; vérification du rendu dans le jeu toujours nécessaire.
+
+
 ## 0.6.3-rc1 — correctif de sécurité des recommandations de quêtes
 
 - Les missions d'incursion du Bois de la Pénombre (IDs 81730–81747, vérifiées Élite) ne sont plus proposées comme pistes solo.
