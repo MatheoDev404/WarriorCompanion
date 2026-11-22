@@ -216,7 +216,7 @@ function WC:CreateDashboard()
   end
   local function stepButton(label, x, direction)
     local b = CreateFrame("Button", nil, questPage)
-    b:SetPoint("TOPLEFT", questPage, "TOPLEFT", x, -300)
+    b:SetPoint("TOPLEFT", questPage, "TOPLEFT", x, -348)
     b:SetSize(106, 25)
     rectangle(b, 0, 0, 106, 25, COLORS.ridge)
     rectangle(b, 2, -2, 102, 21, COLORS.darkPlate)
@@ -248,29 +248,50 @@ function WC:CreateDashboard()
     -225, 554, 36)
   self.dashboardGuideNextText = text(questPage, "GameFontHighlightSmall", 24,
     -265, 554, 33)
-  -- Vue d'arbre de talents simplifiee, partageant le panneau GUIDE.
-  self.dashboardTalentHeader = text(questPage, "GameFontNormalLarge", 24,
-    -93, 552, 26)
-  self.dashboardTalentCurrent = text(questPage, "GameFontHighlight", 24,
-    -130, 558, 28)
-  self.dashboardTalentDistribution = text(questPage, "GameFontHighlightSmall", 24,
-    -161, 555, 25)
-  self.dashboardTalentRanks = text(questPage, "GameFontHighlight", 32,
-    -190, 286, 110)
-  rectangle(questPage, 312, -190, 1, 109, COLORS.ridge, "ARTWORK")
-  self.dashboardTalentUpcoming = text(questPage, "GameFontHighlight", 328,
-    -190, 255, 110)
-  self.dashboardTalentNext = text(questPage, "GameFontHighlight", 264,
-    -302, 326, 27)
-  self.dashboardTalentNotice = text(questPage, "GameFontHighlightSmall", 24,
-    -328, 568, 22)
+  -- Grille graphique de sept paliers, lisible sans ouvrir l'arbre Blizzard.
+  -- Les rangs affiches correspondent au PLAN, pas aux talents observes.
+  self.dashboardTalentHeader = text(questPage, "GameFontNormalLarge",
+    24, -87, 552, 24)
+  self.dashboardTalentCurrent = text(questPage, "GameFontHighlight",
+    24, -111, 562, 23)
+  self.dashboardTalentDistribution = text(questPage, "GameFontHighlightSmall",
+    24, -133, 558, 16)
+  self.dashboardTalentNext = text(questPage, "GameFontHighlightSmall",
+    272, -318, 316, 17)
+  self.dashboardTalentNotice = text(questPage, "GameFontHighlightSmall",
+    24, -335, 560, 15)
+  self.dashboardTalentGrid = {}
   self.dashboardTalentWidgets = {
     self.dashboardTalentHeader,self.dashboardTalentCurrent,
-    self.dashboardTalentDistribution,self.dashboardTalentRanks,
-    self.dashboardTalentUpcoming,self.dashboardTalentNext,
+    self.dashboardTalentDistribution,self.dashboardTalentNext,
     self.dashboardTalentNotice,
   }
+  -- Ne jamais superposer ces cellules aux textes du guide.
+  for row=1,7 do
+    text(questPage,"GameFontNormalSmall",20,-150-(row-1)*24,
+      17,18,tint(tostring(row),"A98F73"))
+  end
+  for row=1,7 do
+    for column=1,4 do
+      local x=39+(column-1)*138
+      local y=-149-(row-1)*24
+      local cell=CreateFrame("Frame",nil,questPage)
+      cell:SetPoint("TOPLEFT",questPage,"TOPLEFT",x,y)
+      cell:SetSize(131,22)
+      local background=rectangle(cell,0,0,131,22,COLORS.darkPlate)
+      local stripe=rectangle(cell,0,0,3,22,COLORS.ridge,"ARTWORK")
+      local name=text(cell,"GameFontNormalSmall",7,-3,96,16)
+      local rank=text(cell,"GameFontNormalSmall",104,-3,26,16)
+      cell.background=background
+      cell.stripe=stripe
+      cell.name=name
+      cell.rank=rank
+      self.dashboardTalentGrid[#self.dashboardTalentGrid+1]=cell
+      self.dashboardTalentWidgets[#self.dashboardTalentWidgets+1]=cell
+    end
+  end
   for _,widget in ipairs(self.dashboardTalentWidgets) do widget:Hide() end
+  
   self.dashboardQuestWidgets = {
     self.dashboardQuestTitle,self.dashboardQuestDetail,
     self.dashboardGuideLocation,self.dashboardGuideNextText,
@@ -348,17 +369,44 @@ function WC:RefreshTalentGuidePanel()
   if not active or not self.TalentPlanText then return end
   local view=self:TalentPlanText()
   if not view then return end
-  self.dashboardTalentHeader:SetText("|cffEBC487TALENTS - FURIE AMBIDEXTRE|r")
+  self.dashboardTalentHeader:SetText(
+    "|cffEBC487ARBRE FURIE|r  |cffCDBB9B- Niveau "..view.plan.level.."|r")
   self.dashboardTalentCurrent:SetText(
-    "|cff75D38APOINT CONSEILLE|r  "..view.current)
-  self.dashboardTalentDistribution:SetText(view.distribution)
-  self.dashboardTalentRanks:SetText(
-    "|cffEBC487TALENTS DEJA PLANIFIES|r\n"..view.recent)
-  self.dashboardTalentUpcoming:SetText(
-    "|cffEBC487PROCHAINS NIVEAUX|r\n"..view.upcoming)
+    "|cff75D38APOINT A PLACER|r  "..view.current)
+  self.dashboardTalentDistribution:SetText(
+    view.distribution.."  |  Paliers 1 a 7")
   self.dashboardTalentNext:SetText("|cffA9C8E9ENSUITE|r  "..view.next)
-  self.dashboardTalentNotice:SetText(
-    "|cffB6AA9C"..view.notice.."|r")
+  self.dashboardTalentNotice:SetText("|cffB6AA9C"..view.notice.."|r")
+  local nodes=self:TalentTreeGrid(view.plan.level)
+  if not nodes then return end
+  local cells=self.dashboardTalentGrid
+  for _,cell in ipairs(cells) do
+    cell.name:SetText("")
+    cell.rank:SetText("")
+    cell.background:SetVertexColor(
+      COLORS.darkPlate[1],COLORS.darkPlate[2],
+      COLORS.darkPlate[3],COLORS.darkPlate[4])
+    cell.stripe:SetVertexColor(
+      COLORS.ridge[1],COLORS.ridge[2],
+      COLORS.ridge[3],COLORS.ridge[4])
+  end
+  for _,node in ipairs(nodes) do
+    local index=(node.row-1)*4+node.column
+    local cell=cells[index]
+    if cell then
+      local color=node.status=="current" and "F7D392" or
+        (node.rank>0 and "8FD7A4" or "918A85")
+      local tintColor=node.status=="current" and COLORS.gold or
+        (node.rank>0 and {0.30,0.56,0.39,1} or COLORS.ridge)
+      cell.name:SetText(tint(node.label,color))
+      cell.rank:SetText(tint(node.rank.."/"..node.maximum,color))
+      cell.stripe:SetVertexColor(
+        tintColor[1],tintColor[2],tintColor[3],tintColor[4])
+      if node.status=="current" then
+        cell.background:SetVertexColor(0.29,0.19,0.10,1)
+      end
+    end
+  end
 end
 
 function WC:RefreshDashboard()
