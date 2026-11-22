@@ -191,7 +191,7 @@ function WC:EquipmentReviewText()
   local result=self:ReadEquipmentReview()
   if not result then return "Equipement : lecture indisponible sur ce personnage." end
   local lines={}
-  local bag=self:EquipmentBagSuggestions(5)
+  local bag=self:EquipmentBagSuggestions(3)
   if #bag>0 then
     lines[#lines+1]="OBJETS DISPONIBLES DANS TES SACS :"
     for _,p in ipairs(bag) do
@@ -202,7 +202,7 @@ function WC:EquipmentReviewText()
     lines[#lines+1]="Verifie l'armure, les bonus et les restrictions avant d'equiper."
     lines[#lines+1]=""
   end
-  local targets=self.EquipmentQuestTargets and self:EquipmentQuestTargets(3) or {}
+  local targets=self.EquipmentQuestTargets and self:EquipmentQuestTargets(2) or {}
   if #targets>0 then
     lines[#lines+1]="OBJETS A OBTENIR (QUETES) :"
     for _,p in ipairs(targets) do
@@ -217,13 +217,13 @@ function WC:EquipmentReviewText()
   else
     lines[#lines+1]=tostring(#result.rows)..
       " emplacement(s) a verifier en priorite :"
-    for i=1,math.min(8,#result.rows) do
+    for i=1,math.min(3,#result.rows) do
       local row=result.rows[i]
       lines[#lines+1]="- "..row.slot.." : "..
         (row.item and row.item.." ("..row.reason..")" or row.reason)
     end
-    if #result.rows>8 then
-      lines[#lines+1]="... et "..tostring(#result.rows-8).." autre(s)."
+    if #result.rows>3 then
+      lines[#lines+1]="... et "..tostring(#result.rows-3).." autre(s)."
     end
   end
   if result.unknown>0 then
