@@ -124,7 +124,7 @@ end
 function WC:CreateDashboard()
   if self.dashboard then return end
   local f = CreateFrame("Frame", "WarriorCompanionDashboard", UIParent)
-  f:SetSize(600, 360)
+  f:SetSize(720, 460)
   f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   f:SetFrameStrata("DIALOG")
   f:EnableMouse(true)
@@ -133,15 +133,15 @@ function WC:CreateDashboard()
   f:SetScript("OnDragStart", function(frame) frame:StartMoving() end)
   f:SetScript("OnDragStop", function(frame) frame:StopMovingOrSizing() end)
 
-  rectangle(f, 0, 0, 600, 360, COLORS.ridge)
-  rectangle(f, 3, -3, 594, 354, COLORS.black)
-  rectangle(f, 4, -4, 592, 48, COLORS.darkPlate)
-  picture(f, ROOT .. "HordeSky", 348, -4, 248, 48)
+  rectangle(f, 0, 0, 720, 460, COLORS.ridge)
+  rectangle(f, 3, -3, 714, 454, COLORS.black)
+  rectangle(f, 4, -4, 712, 48, COLORS.darkPlate)
+  picture(f, ROOT .. "HordeSky", 468, -4, 248, 48)
   picture(f, ROOT .. "HeaderPlate", 53, -2, 326, 52, "ARTWORK")
-  rectangle(f, 4, -51, 592, 3, COLORS.litBlood)
-  rectangle(f, 3, -55, 60, 300, COLORS.darkPlate)
-  rectangle(f, 63, -55, 2, 300, COLORS.ridge)
-  rectangle(f, 3, -356, 594, 4, COLORS.copper)
+  rectangle(f, 4, -51, 712, 3, COLORS.litBlood)
+  rectangle(f, 3, -55, 73, 397, COLORS.darkPlate)
+  rectangle(f, 76, -55, 2, 397, COLORS.ridge)
+  rectangle(f, 3, -456, 714, 4, COLORS.copper)
 
   picture(f, ROOT .. "Warcrest", 8, -4, 48, 48)
   text(f, "GameFontNormalLarge", 63, -9, 257, 22,
@@ -154,102 +154,51 @@ function WC:CreateDashboard()
 
   local function contentPage()
     local p = CreateFrame("Frame", nil, f)
-    p:SetSize(515, 285)
-    p:SetPoint("TOPLEFT", f, "TOPLEFT", 72, -61)
+    p:SetSize(626, 380)
+    p:SetPoint("TOPLEFT", f, "TOPLEFT", 84, -61)
     return p
   end
 
   self.dashboardPages = {
-    overview = contentPage(), combat = contentPage(),
-    advice = contentPage(), activity = contentPage(), quests = contentPage()
+    combat = contentPage(), advice = contentPage(), quests = contentPage()
   }
   self.dashboardTabs = {}
   local tabs = {
-    {"overview", -64, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
-    {"combat", -122, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
-    {"advice", -180, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
-    {"activity", -238, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
-    {"quests", -296, "Interface\\Icons\\INV_Misc_Map_01", "QUETES"},
+    {"combat", -72, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
+    {"advice", -146, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
+    {"quests", -220, "Interface\\Icons\\INV_Misc_Map_01", "GUIDE"},
   }
   for _, item in ipairs(tabs) do
     self.dashboardTabs[item[1]] = tab(f, item[1], item[2], item[3], item[4])
   end
 
-  local p = self.dashboardPages.overview
-  self.dashboardXP = stat(p, 0, "XP GAGNEE", "Interface\\Icons\\INV_Misc_Book_11")
-  self.dashboardSessionRate = stat(p, 130, "XP/H SESSION",
-    "Interface\\Icons\\Spell_Holy_BorrowedTime")
-  self.dashboardRecentRate = stat(p, 260, "XP/H 10 MIN",
-    "Interface\\Icons\\Spell_Holy_BorrowedTime")
-  self.dashboardDeaths = stat(p, 390, "MORTS",
-    "Interface\\Icons\\Ability_Rogue_FeignDeath")
-
-
-  -- Bandeau unique quetes / monnaie, comme la maquette de reference.
-  metalPlate(p, 0, -65, 511, 34)
-  picture(p, "Interface\\Icons\\INV_Misc_Note_01", 12, -71, 22, 22)
-  text(p, "GameFontNormalSmall", 39, -72, 63, 19,
-    tint("QUETES", "E9C48A"))
-  self.dashboardQuests = text(p, "GameFontHighlightLarge", 104, -71, 40, 22)
-  rectangle(p, 174, -71, 2, 20, COLORS.ridge, "ARTWORK")
-  text(p, "GameFontNormalSmall", 185, -72, 62, 19,
-    tint("ARGENT", "E9C48A"))
-  self.dashboardMoney = { digits = {} }
-  self.dashboardMoney.sign = text(p, "GameFontHighlightSmall", 248, -72, 17, 19)
-  for i, coin in ipairs({"Gold", "Silver", "Copper"}) do
-    local px = 269 + (i-1)*79
-    picture(p, "Interface\\MoneyFrame\\UI-"..coin.."Icon",
-      px, -72, 20, 20)
-    self.dashboardMoney.digits[i] =
-      text(p, "GameFontHighlight", px + 23, -73, 48, 19)
-  end
-
-  -- Deux panneaux lateraux avec titres et grandes icones de classe.
-  metalPlate(p, 0, -106, 248, 111)
-  picture(p, "Interface\\Icons\\Ability_Warrior_Charge", 9, -115, 34, 34)
-  text(p, "GameFontNormalLarge", 51, -115, 191, 23,
-    tint("COMBAT", "F4D497"))
-  rectangle(p, 50, -139, 185, 1, COLORS.copper, "ARTWORK")
-  self.dashboardCombat = text(p, "GameFontHighlight", 18, -151, 218, 64)
-
-  metalPlate(p, 258, -106, 253, 111, true)
-  picture(p, ROOT .. "AdviceArt", 264, -114, 240, 94, "ARTWORK")
-  picture(p, ROOT .. "Warcrest", 445, -136, 49, 49, "ARTWORK")
-  picture(p, "Interface\\Icons\\Ability_Warrior_BattleShout",
-    270, -115, 33, 33)
-  text(p, "GameFontNormalLarge", 311, -115, 189, 22,
-    tint("CONSEIL DU GUERRIER", "F5D59B"))
-  rectangle(p, 270, -141, 217, 1, COLORS.copper, "ARTWORK")
-  self.dashboardAdvice = text(p, "GameFontHighlight", 276, -150, 207, 63)
-
-  -- Journal epure et dominant, avec les deux derniers gains.
-  metalPlate(p, 0, -225, 511, 59)
-  picture(p, "Interface\\Icons\\INV_Misc_Note_01", 10, -230, 30, 30)
-  text(p, "GameFontNormalLarge", 49, -230, 442, 24,
-    tint("DERNIERES ACTIVITES", "F4D497"))
-  rectangle(p, 48, -252, 443, 1, COLORS.copper, "ARTWORK")
-  self.dashboardActivity = text(p, "GameFontHighlight", 50, -258, 440, 30)
-
-  self.dashboardCombatDetail = createSubPage(
-    self.dashboardPages.combat, "RAPPORT DE COMBAT",
-    "Interface\\Icons\\Ability_Warrior_Charge")
+  local combatPage = self.dashboardPages.combat
+  metalPlate(combatPage, 0, -4, 620, 344)
+  picture(combatPage, "Interface\\Icons\\Ability_Warrior_Charge", 18, -16, 35, 35)
+  text(combatPage, "GameFontNormalLarge", 62, -19, 510, 26,
+    tint("COMBAT - BILAN ET SECURITE", "F1C98D"))
+  rectangle(combatPage, 18, -60, 582, 2, COLORS.ridge, "ARTWORK")
+  self.dashboardCombatDetail = text(combatPage, "GameFontHighlight",
+    23, -78, 566, 245)
   local advicePage = self.dashboardPages.advice
-  noteBox(advicePage, 0, -4, 512, 237, "CONSEILS DU GUERRIER",
-    "Interface\\Icons\\Ability_Warrior_BattleShout")
-  self.dashboardAdviceDetail = text(advicePage, "GameFontHighlightSmall",
-    15, -43, 478, 188)
-  self.dashboardActivityDetail = createSubPage(
-    self.dashboardPages.activity, "JOURNAL DE SESSION",
-    "Interface\\Icons\\INV_Misc_Note_01")
+  metalPlate(advicePage, 0, -4, 620, 344)
+  picture(advicePage, "Interface\\Icons\\Ability_Warrior_BattleShout",
+    18, -16, 35, 35)
+  text(advicePage, "GameFontNormalLarge", 62, -19, 520, 26,
+    tint("CONSEILS - GUERRIER FURIE", "F1C98D"))
+  rectangle(advicePage, 18, -60, 582, 2, COLORS.ridge, "ARTWORK")
+  self.dashboardAdviceDetail = text(advicePage, "GameFontHighlight",
+    23, -77, 566, 245)
 
   local questPage = self.dashboardPages.quests
-  noteBox(questPage, 0, -4, 512, 237, "PLAN DE LEVELING",
-    "Interface\\Icons\\INV_Misc_Map_01")
+  metalPlate(questPage, 0, -4, 620, 344)
+  picture(questPage, "Interface\\Icons\\INV_Misc_Map_01", 18, -13, 34, 34)
+  text(questPage, "GameFontNormalLarge", 62, -17, 535, 26,
+    tint("GUIDE DE LEVELING - HORDE", "F1C98D"))
   local options = {
-    {"journal", "JOURNAL", 11, 111},
-    {"discover", "A PRENDRE", 130, 117},
-    {"route", "PARCOURS", 255, 117},
-    {"guide", "GUIDE", 378, 117},
+    {"guide", "ETAPES DU GUIDE", 15, 166},
+    {"journal", "MES QUETES", 190, 126},
+    {"discover", "A PRENDRE", 326, 126},
   }
   self.dashboardQuestButtons = {}
   for _, data in ipairs(options) do
@@ -266,7 +215,7 @@ function WC:CreateDashboard()
   end
   local function stepButton(label, x, direction)
     local b = CreateFrame("Button", nil, questPage)
-    b:SetPoint("TOPLEFT", questPage, "TOPLEFT", x, -241)
+    b:SetPoint("TOPLEFT", questPage, "TOPLEFT", x, -300)
     b:SetSize(106, 25)
     rectangle(b, 0, 0, 106, 25, COLORS.ridge)
     rectangle(b, 2, -2, 102, 21, COLORS.darkPlate)
@@ -278,18 +227,18 @@ function WC:CreateDashboard()
     end)
     return b
   end
-  self.dashboardGuidePrev = stepButton("< Precedente", 13, -1)
-  self.dashboardGuideNext = stepButton("Suivante >", 132, 1)
-  self.dashboardQuestTitle = text(questPage, "GameFontNormalSmall", 13, -77,
-    484, 17, tint("Choisis une vue de quetes", "E9C58D"))
-  self.dashboardQuestDetail = text(questPage, "GameFontHighlightSmall", 13,
-    -99, 484, 139, "Journal, quetes a prendre, ou departs regroupes.\n" ..
-      "Les parcours ne sont pas encore des itinéraires verifies.")
+  self.dashboardGuidePrev = stepButton("< Precedente", 20, -1)
+  self.dashboardGuideNext = stepButton("Suivante >", 138, 1)
+  rectangle(questPage, 18, -78, 582, 2, COLORS.ridge, "ARTWORK")
+  self.dashboardQuestTitle = text(questPage, "GameFontNormalLarge", 24, -91,
+    557, 26, tint("Etape en cours", "E9C58D"))
+  self.dashboardQuestDetail = text(questPage, "GameFontHighlight", 24,
+    -123, 550, 160, "Ouvre le guide pour voir la prochaine action.")
 
-  text(f, "GameFontHighlightSmall", 75, -343, 507, 15,
+  text(f, "GameFontHighlightSmall", 89, -439, 615, 15,
     tint("/wc help     /wc reset     /wc performance", "C1A08A"))
   self.dashboard = f
-  self:ShowDashboardPage("overview")
+  self:ShowDashboardPage("quests")
   f:Hide()
 
   -- Rafraichissement visuel uniquement, sans relancer les notifications.
@@ -337,57 +286,33 @@ end
 
 function WC:RefreshDashboard()
   if not self.dashboard or not self.dashboard:IsShown() then return end
-  local m = self.metrics
-  local recent = self:RecentXPPerHour()
-  local session = self:XPPerHour()
-  local combat = self:GetCombatSummary()
-  local coins = self:MoneyDelta()
-  self.dashboardXP:SetText(fmt(m.xpGained, "0"))
-  self.dashboardSessionRate:SetText(fmt(session, m.xpAvailable and "calcul..." or "--"))
-  self.dashboardRecentRate:SetText(fmt(recent, "--"))
-  self.dashboardDeaths:SetText(fmt(m.deaths, "0"))
-  self.dashboardQuests:SetText(fmt(m.questCount))
-
-  local sign, gold, silver, copper = self:MoneyParts(coins)
-  self.dashboardMoney.sign:SetText(sign or "")
-  self.dashboardMoney.digits[1]:SetText(fmt(gold))
-  self.dashboardMoney.digits[2]:SetText(fmt(silver))
-  self.dashboardMoney.digits[3]:SetText(fmt(copper))
-
-  local combatText = "Intervalles : " .. fmt(combat.completed, "0") ..
-    "     Duree moy. : " ..
-    (combat.average and tostring(combat.average) .. " s" or "--") ..
-    "\nInterrompus : " .. fmt(combat.interrupted, "0") ..
-    "     Etat : " ..
-    (combat.active and tint("En combat", "FC7A67") or tint("Repos", "75D483"))
-  self.dashboardCombat:SetText(combatText)
-  self.dashboardCombatDetail:SetText(combatText ..
-    "\nMorts en combat : " .. fmt(combat.deathsInCombat, "0") ..
-    "\n\nUn intervalle n'est pas necessairement un ennemi tue.")
-
-  local advice = self:AdviceLines()
-  if type(advice) ~= "string" or advice == "" then
-    advice = "Aucun conseil verifie pour le moment."
-  end
-  self.dashboardAdvice:SetText((advice:match("([^\n]+)")) or advice)
-  local gear = self.EquipmentReviewText and self:EquipmentReviewText()
-  local general = self:AdviceLines(false)
-  if general == "Aucun conseil verifie pour le moment." and gear then
-    general = ""
-  end
-  self.dashboardAdviceDetail:SetText((general ~= "" and (general .. "\n\n") or "") ..
-    (gear and ("BILAN EQUIPEMENT\n" .. gear) or ""))
-  self.dashboardActivity:SetText(activityLines(self.activity, 2))
-  self.dashboardActivityDetail:SetText(activityLines(self.activity, 8))
-  -- Seul le guide charge est relu sans lancer de recherche QuestieDB.
-  if self.questPlanMode == "guide" and self.GetGuideView then
-    local view = self:GetGuideView()
-    self.dashboardQuestTitle:SetText(view and view.title or "Guide : aucun parcours charge")
+  local combat=self:GetCombatSummary()
+  local status=combat.active and tint("EN COMBAT", "FC7A67")
+    or tint("HORS COMBAT", "75D483")
+  self.dashboardCombatDetail:SetText(
+    "|cffF0CA90ETAT ACTUEL|r  "..status..
+    "\\n\\nCombats observes : "..fmt(combat.completed,"0")..
+    "\\nCombats interrompus : "..fmt(combat.interrupted,"0")..
+    "\\nDuree moyenne : "..(combat.average and
+      tostring(combat.average).." secondes" or "non mesuree")..
+    "\\nMorts en combat : "..fmt(combat.deathsInCombat,"0")..
+    "\\n\\n|cffBAA18FLes intervalles observes ne sont pas des ennemis tues."..
+    "\\nEn guerrier Furie, privilegie des combats prudents et"..
+    "\\nrecupere tes points de vie entre les affrontements.|r")
+  local advice=self:AdviceLines(false)
+  local gear=self.EquipmentReviewText and self:EquipmentReviewText()
+  if advice=="Aucun conseil verifie pour le moment." and gear then advice="" end
+  self.dashboardAdviceDetail:SetText(
+    (advice~="" and ("|cffF0CA90PRIORITES|r\\n"..advice.."\\n\\n") or "")..
+    (gear and ("|cffF0CA90EQUIPEMENT A VERIFIER|r\\n"..gear) or
+      "Aucun conseil verifie pour le moment."))
+  if self.questPlanMode=="guide" and self.GetGuideView then
+    local view=self:GetGuideView()
+    self.dashboardQuestTitle:SetText(view and view.title or "Guide Horde")
     self.dashboardQuestDetail:SetText(view and
-      ((view.status or "") .. "\n\n" .. (view.steps or "")) or
-      "Les guides existants doivent etre importes puis verifies pour Forever.")
+      ((view.status or "").."\\n\\n"..(view.steps or "")) or
+      "Aucun parcours charge.")
   end
-  -- Donnees des quetes mises a jour uniquement au clic explicite.
 end
 
 function WC:ToggleDashboard()
