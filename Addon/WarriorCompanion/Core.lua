@@ -38,7 +38,7 @@ local events = {
   "PLAYER_DEAD", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
   "PLAYER_EQUIPMENT_CHANGED", "PLAYER_TALENT_UPDATE", "CHARACTER_POINTS_CHANGED",
   "PLAYER_MONEY", "QUEST_LOG_UPDATE", "SKILL_LINES_CHANGED",
-  "UNIT_HEALTH", "UNIT_MAXHEALTH"
+  "UNIT_HEALTH", "UNIT_MAXHEALTH", "PLAYER_ALIVE", "PLAYER_UNGHOST"
 }
 for _, event in ipairs(events) do frame:RegisterEvent(event) end
 
@@ -75,7 +75,8 @@ frame:SetScript("OnEvent", function(_, event, ...)
     if event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" then
       local unit = ...
       if WC:IsReadableUnit(unit) then WC:ReadHealth() else return end
-    elseif event == "PLAYER_ENTERING_WORLD" then
+    elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_DEAD"
+        or event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST" then
       WC:ReadHealth()
     end
     if not WC.inCombat then WC:Refresh() end
