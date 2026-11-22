@@ -81,7 +81,7 @@ for _, t in ipairs(textures) do
 end
 assert(sky and crest,"assets Horde originaux")
 assert(gold and silver and copper,"icones monnaie natives")
-assert(#buttons>=5,"navigation plus fermeture")
+assert(#buttons>=9,"five navigation tabs, quest filters and close")
 WC:ToggleDashboard()
 assert(WC.dashboard:IsShown() and notices==1)
 assert(WC.dashboardXP.text=="516")
@@ -101,6 +101,10 @@ assert(WC.dashboardPages.combat:IsShown() and not WC.dashboardPages.overview:IsS
 assert(WC.dashboardCombatDetail.text:find("Interrompus",1,true))
 WC.dashboardTabs.advice.handlers.OnClick()
 assert(WC.dashboardAdviceDetail.text:find("talents",1,true))
+WC.dashboardTabs.quests.handlers.OnClick()
+assert(WC.dashboardPages.quests:IsShown())
+assert(WC.dashboardQuestButtons.journal and WC.dashboardQuestButtons.discover
+  and WC.dashboardQuestButtons.route)
 WC.dashboardTabs.activity.handlers.OnClick()
 assert(WC.dashboardActivityDetail.text:find("+285 XP",1,true))
 WC:ShowDashboardPage("invalid")

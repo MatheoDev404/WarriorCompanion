@@ -191,3 +191,13 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 4. Comparer le classement avec un guerrier à deux niveaux différents et vérifier que les quêtes dangereuses ou à prérequis incertains ne sont pas promues.
 5. Sans QuestieDB ni coordonnées, la commande doit indiquer l'indisponibilité plutôt qu'inventer une route.
 6. Vérifier qu'aucune exécution de `/wc route` n'est faite automatiquement au login ou en combat, et que les marqueurs Questie restent inchangés.
+
+## Test V0.6.3 — onglet de quetes intégré
+
+1. Ouvrir la fenetre : le cinquieme onglet QUETES doit rester lisible sans changer la taille 600x360.
+2. Cliquer JOURNAL : voir les quetes acceptees et leur niveau/difficulte prudente.
+3. Cliquer A PRENDRE : voir les candidats non acceptes; un fournisseur absent doit afficher une explication, pas un ecran vide.
+4. Cliquer PARCOURS : voir les groupes de PNJ et leur zone ; au niveau 33, le guide de reference peut indiquer Mille pointes 33-34, sans recommander automatiquement d'y partir.
+5. Verifier que les missions Duskwood incursion #81730-81747 ne sont plus proposees en solo par la decouverte.
+6. Verifier que /wc quests, /wc discover et /wc route ouvrent cet onglet et ne spamment plus le chat.
+7. Durant le combat, aucune analyse QuestieDB n'est faite ; l'affichage indique pourquoi.

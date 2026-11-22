@@ -100,6 +100,14 @@ La capture en jeu a montré que `/wc route` pouvait mettre en avant les 18 missi
 
 Ces exclusions concernent seulement les faits identifiés ; les autres quêtes doivent toujours être vérifiées dans Questie. Un niveau de quête inférieur au niveau du personnage ne prouve pas que les ennemis soient faciles.
 
+## Affichage des quetes dans l'addon (V0.6.3)
+
+Un cinquieme onglet compact **QUETES** est ajoute au tableau sans agrandir la fenetre. Les boutons **JOURNAL**, **A PRENDRE**, **PARCOURS** permettent de consulter des informations ordonnees plutot que de recevoir une longue sortie dans la fenetre de chat. Les commandes `/wc quests`, `/wc discover`, `/wc route` ouvrent directement ce panneau et sa vue correspondante. Les scans QuestieDB ne sont faits **qu'au clic**, hors combat, pour eviter les ralentissements.
+
+La vue **PARCOURS** reste deliberement un **regroupement de PNJ de depart**, et ne pretend pas definir un itineraire entre objectifs. Un repere de zones issu du guide Horde de ForeverTavern est affiche pour les niveaux 30–37 lorsque pertinent, avec mention explicite qu'il doit etre recoupe avec QuestieDB et le client. Cette reference ne remplace pas un guide et aucune suite de quetes n'est recopiee ou inventee.
+
+Sources de recherche pour les prochaines etapes verifiees : [ForeverTavern — routes Horde](https://forevertavern.net/guides/leveling/horde), [Bind on Forever — routes Horde](https://bindonforever.com/fr/leveling/horde), [QuestieDB — schema des quetes](https://github.com/Questie/QuestieDB/blob/main/src/meta/questMeta.lua). Il reste a verifier les **objectifs**, les quetes qui se debloquent mutuellement, les trajets réels et les ennemis avant de proposer une route pas-a-pas.
+
 ## Installation et commandes
 
 Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Forever. Le fichier `WarriorCompanion.toc` doit se trouver directement dans `Interface/AddOns/WarriorCompanion/`. L’interface ciblée est `16001`.
