@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.7-rc1 — vérification stricte des conseils d'armes
+
+- Vérification du fonctionnement et des sources documentées de GearQuest Forever, classement par spécialisation et niveau.
+- Aucun objet, prix ni comparaison d'arme n'est présenté comme confirmé sans accès à une API de données publique stable.
+- Détection optionnelle de GearQuest chargé ; conseil contextualisé vers `/gq` seulement si un besoin d'arme est observé.
+- Diagnostic `/wc gear` et test de non-régression sous Lua 5.1 et 5.4.
+
+
+
 ## 0.5.6-rc1 — diagnostic des armes guerrier Furie
 
 - Observation des mains droite/gauche, du type équipé (arme à une main, deux mains, bouclier) avec lectures protégées.
