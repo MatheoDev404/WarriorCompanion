@@ -41,6 +41,52 @@ for _,g in ipairs(GROUPS) do
     ORDER[level]={level=level,key=talent,rank=rank+1}
   end
 end
+-- Grille visuelle des talents Furie (paliers verifies pour Forever).
+-- Les colonnes sont un rangement lisible dans Warrior Companion, non des
+-- coordonnees officielles extraites de l'interface Blizzard.
+local FURY_GRID={
+  {"Booming Voice","Voix tonitruante",1,1},
+  {"Cruelty","Cruaute",1,3},
+  {"Lingering Rage","Rage persistante",2,1},
+  {"Unbridled Wrath","Rage debridee",2,3},
+  {"Furious Precision","Precision furieuse",3,1},
+  {"Piercing Howl","Hurlement percant",3,2},
+  {"Blood Craze","Folie sanguinaire",3,3},
+  {"Enrage","Enrager",3,4},
+  {"Dual Wield Specialization","Ambidextrie",4,1},
+  {"Reckless Swings","Coups imprudents",4,2},
+  {"Improved Execute","Execution amelioree",4,4},
+  {"Improved Berserker Rage","Rage berserker",5,1},
+  {"Death Wish","Souhait mortel",5,2},
+  {"Gore Drinker","Buveur de sang",5,3},
+  {"Improved Intercept","Interception",5,4},
+  {"Improved Whirlwind","Tourbillon ameliore",6,1},
+  {"Flurry","Rafale",6,3},
+  {"Bloodthirst","Sanguinaire",7,2},
+}
+function WC:TalentTreeGrid(level)
+  local plan=self:TalentPlanLevel(level)
+  if not plan then return nil end
+  local ranks={}
+  for l=10,level do
+    local point=ORDER[l]
+    ranks[point.key]=(ranks[point.key] or 0)+1
+  end
+  local nodes={}
+  for _,item in ipairs(FURY_GRID) do
+    local meta=TALENTS[item[1]]
+    -- Tous les talents de la grille figurent dans le parcours propose.
+    local rank=ranks[item[1]] or 0
+    nodes[#nodes+1]={
+      key=item[1],label=item[2],row=item[3],column=item[4],
+      rank=rank,maximum=meta.max,
+      status=plan.current.english==item[1] and "current"
+        or (rank>0 and "planned" or "future"),
+    }
+  end
+  return nodes
+end
+
 WC.talentPlan=ORDER
 function WC:TalentPlanLevel(level)
   if type(level)~="number" or level~=math.floor(level)
