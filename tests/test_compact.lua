@@ -51,16 +51,29 @@ assert(not WC.compactDashboard:IsShown(),"pas de double apparition")
 WC:AutoOpenDashboard()
 assert(WC.compactDashboard:IsShown() and not WC.dashboard:IsShown())
 assert(WC.compactStats[1].text=="120" and WC.compactStats[2].text=="3456")
-assert(WC.compactStats[3].text=="2" and WC.compactStats[4].text=="-1.23")
-WC.MoneyDelta=function() return 25678 end
+assert(WC.compactStats[3].text=="2")
+local function contains(text,fragment) return text:find(fragment,1,true)~=nil end
+assert(contains(WC.compactMoneySign.text,"-"))
+assert(contains(WC.compactMoneyParts[1].text,"01") and
+       contains(WC.compactMoneyParts[2].text,"23") and
+       contains(WC.compactMoneyParts[3].text,"45"))
+assert(contains(WC.compactMoneyParts[1].text,"F17E78"),"perte rouge")
+WC.MoneyDelta=function() return 15833 end
 WC:RefreshCompactDashboard()
-assert(WC.compactStats[4].text=="+2.57","solde positif")
+assert(contains(WC.compactMoneySign.text,"+"))
+assert(contains(WC.compactMoneyParts[1].text,"01") and
+       contains(WC.compactMoneyParts[2].text,"58") and
+       contains(WC.compactMoneyParts[3].text,"33"))
+assert(contains(WC.compactMoneyParts[1].text,"70DB8B"),"gain vert")
 WC.MoneyDelta=function() return 0 end
 WC:RefreshCompactDashboard()
-assert(WC.compactStats[4].text=="+0.00","solde nul")
+assert(WC.compactMoneySign.text=="|cffD4D4D4|r")
+assert(contains(WC.compactMoneyParts[1].text,"00") and
+       contains(WC.compactMoneyParts[1].text,"D4D4D4"),"nul gris clair")
 WC.MoneyDelta=function() return nil end
 WC:RefreshCompactDashboard()
-assert(WC.compactStats[4].text=="--","montant indisponible")
+assert(contains(WC.compactMoneyParts[1].text,"--") and
+       contains(WC.compactMoneyParts[1].text,"888888"),"inconnu gris")
 assert(WC.compactAdvice.text:find("talent",1,true))
 WC.compactExpand.scripts.OnClick()
 assert(WC.dashboard:IsShown() and not WC.compactDashboard:IsShown())
