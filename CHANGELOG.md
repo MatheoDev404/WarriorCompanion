@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.2-rc1 — direction artistique D illustrée
+
+- Bandeau de bataille rouge illustré et écusson guerrier originaux, embarqués en textures TGA compatibles.
+- Armature métal noirci, bordures biseautées, reflets bronze, rivets et boutons Horde.
+- Bilan complet visible immédiatement : XP, monnaies g/s/c, combat, conseil et activités.
+- Tests du rendu structurel, navigation et format de monnaie en Lua 5.1/5.4, validation des fichiers TGA.
+- Test visuel sur WoW Forever nécessaire pour confirmer textures et proportions.
+
 ## 0.4.1-rc1 — HUD moderne (design D)
 
 - Remplacement des grands panneaux carrés par un HUD compact à navigation latérale (Bilan, Combat, Conseils, Journal).

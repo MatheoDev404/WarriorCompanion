@@ -68,3 +68,12 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 5. Tester les valeurs : +0, +1 or 23 argent 45 cuivre, et une variation négative. Aucun champ ne doit afficher un nombre négatif isolé en argent ou cuivre.
 6. Contrôler les tailles de police et les débordements à l'échelle UI habituelle et sur petit écran.
 7. Vérifier le rafraîchissement des valeurs après un gain d'XP et l'absence de notifications supplémentaires provoquées par les mises à jour graphiques.
+
+
+## Validation visuelle V0.4.2-rc1 — fidélité à la maquette D
+
+1. Vérifier que `Textures/HordeSky.tga` et `Textures/Warcrest.tga` sont présents dans le dossier addon après copie.
+2. Faire `/reload` puis `/wc`. Le bandeau rouge doit montrer une silhouette de forteresse, l'écusson doit être un bouclier rouge et noir (pas une texture blanche ou verte).
+3. Sur la page Bilan, vérifier simultanément les 4 compteurs du haut, les icônes de monnaie, les deux cartes Combat et Conseil, puis l'historique court en bas.
+4. Tester les 4 onglets latéraux, les variations d'or/argent/cuivre négatives, la fermeture, le déplacement et l'échelle de l'interface.
+5. Prendre une capture : vérifier que les ornements, chiffres et textes ne se chevauchent pas dans le client réel.
