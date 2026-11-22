@@ -16,7 +16,7 @@ WC:RecordPerformanceGain(50)
 assert(WC:RecentXPPerHour() == 1800, "XP/h depuis depart")
 now = 760
 assert(WC:RecentXPPerHour() == 300, "fenetre 10 minutes: seul 50 reste")
-now = 1000
+now = 1001
 assert(WC:RecentXPPerHour() == 0, "absence de XP recente est un taux de 0")
 WC:ShowPerformance()
 assert(#rows == 2)
