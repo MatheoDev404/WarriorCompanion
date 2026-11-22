@@ -136,3 +136,11 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 4. Avec un bouclier en main gauche, vérifier le conseil informatif ; avec deux armes équipées, il disparaît.
 5. Sur une autre classe ou en cas de lecture API impossible, aucun conseil d'arme Furie ne doit apparaître.
 6. Vérifier que `/wc reset` reprend une photographie valide des armes.
+
+## Vérification GearQuest et pertinence (0.5.7)
+
+1. Sans GearQuest installé, `/wc gear` doit indiquer que les suggestions de provenance sont indisponibles, sans noms d'objets inventés.
+2. Installer GearQuest Forever, relancer le jeu puis `/wc gear` : l'addon doit être détecté.
+3. Sur un guerrier Furie, monter d'un niveau ou changer une pièce d'équipement : le conseil doit proposer de consulter `/gq` pour **tous les emplacements**, pas seulement les armes. Après dix minutes, il doit disparaître.
+4. Dans GearQuest, sélectionner Guerrier/Furie, niveau actuel, vérifier les sources quêtes/boss/vendeurs et la comparaison avec l'objet équipé.
+5. En combat, aucun nouveau conseil de provenance ne doit être généré. Les prix et les disponibilités HDV ne doivent jamais être déclarés confirmés par Warrior Companion.

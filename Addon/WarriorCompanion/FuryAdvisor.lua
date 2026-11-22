@@ -57,6 +57,7 @@ function WC:AddFuryAdvice(items)
     }
   end
   if self.AddWeaponAdvice then self:AddWeaponAdvice(items) end
+  if self.AddGearQuestAdvice then self:AddGearQuestAdvice(items) end
   -- Ne pas deduire la specialisation reelle, le DPS des armes ou la maitrise de
   -- Premiers secours d'une API non validee.
 end

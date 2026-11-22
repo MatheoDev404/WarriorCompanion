@@ -34,6 +34,16 @@ Le tableau de bord s'ouvre automatiquement **une fois à la connexion** (pas à 
 
 Le bouton utilise une icône guerrier native recadrée à 20 pixels, la bordure et le survol standard WoW ; il respecte aussi les minimaps carrées lorsque `GetMinimapShape` est disponible. Le démarrage automatique est activé par défaut. L'option est sauvegardée et peut être désactivée avec `/wc autostart off`, puis réactivée avec `/wc autostart on`. La commande `/wc` reste toujours disponible. Décocher l'addon dans l'écran AddOns empêche naturellement son chargement.
 
+## Provenance des armes (GearQuest Forever)
+
+GearQuest Forever est une source externe spécialisée pour rechercher des améliorations selon la classe, la spécialisation, le niveau, l'équipement porté, les quêtes, les boss et les vendeurs. Son classement dépend de pondérations internes et peut évoluer avec les mises à jour de Forever.
+
+Warrior Companion ne recopie pas son catalogue ni son scoring et **n'affirme pas qu'un objet particulier est un meilleur choix** : son dépôt public ne comporte pas de licence clairement déclarée et aucune API publique stable d'export des recommandations n'a été identifiée. Lorsque GearQuest est chargé, un conseil informatif renvoie vers `/gq` après un changement de niveau ou d'équipement observé, afin de revoir **tous les emplacements** (armes, armure, bijoux et accessoires). Ce rappel expire après dix minutes. Cela évite les fausses informations, les prix HDV inventés et la duplication d'un système de classement complet.
+
+Pour vérifier l'intégration, utiliser `/wc gear` puis ouvrir GearQuest avec `/gq`. **GearQuest est optionnel** et Warrior Companion reste autonome sans lui. Le suivi des armes demeure disponible avec `/wc weapons`.
+
+Références : [GearQuest Forever](https://github.com/Henrik8210/gear-quest-forever) et [fiche de l'addon](https://www.curseforge.com/wow/addons/gearquest-forever).
+
 ## Installation et commandes
 
 Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Forever. Le fichier `WarriorCompanion.toc` doit se trouver directement dans `Interface/AddOns/WarriorCompanion/`. L’interface ciblée est `16001`.
@@ -45,6 +55,7 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 | `/wc status` | Afficher la version, les mesures, les options et la présence des fonctions d’API |
 | `/wc reset` | Recommencer les mesures et effacer l'historique de session |
 | `/wc performance` | Comparer XP/h globale et XP/h des dix dernières minutes |
+| `/wc gear` | Diagnostic de présence de GearQuest et explication des données vérifiables |
 | `/wc weapons` | Afficher les identifiants d'équipement et les types lus en mains droite/gauche |
 | `/wc spells` | Afficher le diagnostic du grimoire et la dernière nouveauté observée |
 | `/wc fury` | Diagnostiquer si la classe guerrier est lisible et si les conseils Furie sont applicables |

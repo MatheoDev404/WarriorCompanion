@@ -1,6 +1,6 @@
 local addonName, WC = ...
 _G.WarriorCompanion = WC
-WC.version = "0.5.6-rc1"
+WC.version = "0.5.7-rc1"
 WC.metrics = { xpGained = 0, deaths = 0, started = nil, lastXP = nil, lastXPMax = nil, lastLevel = nil, moneyStart = nil, moneyNow = nil, questCount = nil }
 WC.alerts = {}
 WC.inCombat = false
@@ -83,6 +83,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
     end
     WC:RecordPerformanceGain(WC.metrics.xpGained - priorXP)
     WC:OnActivityEvent(event, priorXP, priorQuests, ...)
+    WC:ObserveGearReviewEvent(event)
     WC:OnCombatObservedEvent(event)
     if event == "SPELLS_CHANGED" or event == "LEARNED_SPELL_IN_SKILL_LINE" then
       WC:ObserveSpellbook()
@@ -116,6 +117,7 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "fury" then WC:ShowFuryStatus()
   elseif msg == "spells" then WC:ShowSpellbookStatus()
   elseif msg == "weapons" then WC:ShowWeaponStatus()
+  elseif msg == "gear" then WC:ShowGearQuestStatus()
   elseif msg == "autostart on" then
     WC:Profile().autoOpen = true; WC:Print("Ouverture automatique activee a la connexion.")
   elseif msg == "autostart off" then
@@ -127,6 +129,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | autostart on/off | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | autostart on/off | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end
