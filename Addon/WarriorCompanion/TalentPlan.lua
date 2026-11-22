@@ -112,8 +112,17 @@ function WC:TalentPlanText()
     local marker=t.current and "|cff73D394> |r" or "  "
     rows[#rows+1]=marker..t.name.."   "..t.rank.."/"..t.maximum
   end
+  local upcoming={}
+  for l=level+1,math.min(60,level+5) do
+    local point=ORDER[l]
+    local talent=TALENTS[point.key]
+    upcoming[#upcoming+1]="Niv. "..l.."   "..talent.nameFR..
+      "  "..point.rank.."/"..talent.max
+  end
   return {
     plan=plan,
+    upcoming=#upcoming>0 and table.concat(upcoming,"\n") or
+      "Tous les points du parcours ont ete places.",
     current="Niv. "..level.."  |  "..plan.current.name.."  "..
       plan.current.rank.."/"..plan.current.maximum,
     next=plan.next and
