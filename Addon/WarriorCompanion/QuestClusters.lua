@@ -4,6 +4,7 @@ local _, WC = ...
 local MAX_CANDIDATES=40
 local MAX_GROUPS=4
 local CLOSE_COORD=15 -- pourcentage cartographique, PAS une distance/metres
+-- Les regroupements ne sont jamais des itinéraires de leveling garantis.
 local function safe(value,kind)
   if type(value)~=kind then return false end
   if type(issecretvalue)=="function" then
@@ -148,7 +149,7 @@ function WC:ShowQuestClusters()
   for i=1,math.min(MAX_GROUPS,#groups) do
     local group=groups[i]
     self:Print("Zone ID "..tostring(group.zone).." : "..tostring(#group.rows)..
-      " quete(s), PNJ proches en coordonnees de carte. Verifier dans Questie.")
+      " piste(s) a controler, PNJ proches sur la carte. Verifier dans Questie.")
     for j=1,math.min(3,#group.rows) do
       local row=group.rows[j]
       self:Print("  ["..tostring(row.level).."] "..row.name..

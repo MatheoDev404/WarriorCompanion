@@ -4,6 +4,27 @@ local _, WC = ...
 -- Refus prudent quand les restrictions, le statut ou les donnees sont incertains.
 local MAX_IDS = 30000
 local MAX_RESULTS = 7
+-- WoW Forever, Duskwood Nightmare Incursions 81730..81747:
+-- classées Elite dans le catalogue Forever daté du 22 novembre 2026.
+-- Confirmation : https://db.icy-veins.com/wow-forever/quests/zones/duskwood/
+-- L'API QuestieDB ne fournit pas de champ stable "difficulte solo".
+-- Ne jamais les promouvoir dans un parcours de leveling solo prudent.
+local function dangerousQuest(id, questApi)
+  if id >= 81730 and id <= 81747 then return true end
+  if type(questApi.GetQuestTagInfo)=="function" then
+    local ok,tag=pcall(questApi.GetQuestTagInfo,id)
+    if ok and type(tag)=="table" then
+      if tag.isElite==true then return true end
+      local kind=tag.tagID or tag.tagId
+      if type(kind)=="number" and (kind==81 or kind==62 or kind==82
+          or kind==83 or kind==88 or kind==89 or kind==1) then
+        return true
+      end
+      -- Les tags inconnus ne prouvent jamais qu'une quête soit solo.
+    end
+  end
+  return false
+end
 local function number(n, lo, hi)
   if type(n) ~= "number" or n ~= n or n ~= math.floor(n)
       or n < lo or n > hi then return false end
@@ -123,7 +144,8 @@ function WC:DiscoverQuests(limit)
   for _,id in ipairs(ids) do
     examined=examined+1
     if examined>MAX_IDS then break end
-    if number(id,1,10000000) and not active[id] then
+    if number(id,1,10000000) and not active[id]
+        and not dangerousQuest(id,questApi) then
       local required, reqOK=read(lib.Quest,id,"requiredLevel")
       local qLevel, lvlOK=read(lib.Quest,id,"questLevel")
       if reqOK and lvlOK and number(required,1,60)

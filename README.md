@@ -50,13 +50,13 @@ Pour vérifier l'intégration, utiliser `/wc gear` puis ouvrir GearQuest avec `/
 
 Références : [GearQuest Forever](https://github.com/Henrik8210/gear-quest-forever) et [fiche de l'addon](https://www.curseforge.com/wow/addons/gearquest-forever).
 
-## Points de talents (0.6.2-rc1)
+## Points de talents (0.6.3-rc1)
 
 Le module `TalentObserver.lua` utilise `C_ClassTalents.HasUnspentTalentPoints` lorsque disponible pour afficher les points disponibles (classe + spécialisation). Il retient les changements observés après des événements de talents, sans les présenter comme un talent précis dépensé : une respécialisation ou une mise à jour serveur peut aussi expliquer la différence. Si la lecture échoue, aucun chiffre n'est inventé.
 
 Commande `/wc talents` pour vérifier les compteurs et le nombre de changements observés. Le rappel déjà existant des points non dépensés continue de fonctionner. **L'arbre Furie et la recommandation d'un talent précis ne sont pas encore validés dans le client Forever.**
 
-## Conseiller de quêtes Horde Furie (0.6.2-rc1)
+## Conseiller de quêtes Horde Furie (0.6.3-rc1)
 
 Le module `QuestAdvisor.lua` classe **les quêtes déjà acceptées** et présentes dans le journal du personnage guerrier Horde. Il distingue les quêtes prêtes à rendre, les candidates solo en dessous du niveau du joueur, les quêtes proches du niveau nécessitant de la prudence, les quêtes plus hautes, et les marqueurs explicitement signalés groupe/donjon/élite. Si le client ne fournit pas un type fiable, le statut reste **inconnu**, sans être converti en solo.
 
@@ -91,6 +91,14 @@ L'algorithme privilégie les groupes contenant le plus de quêtes, puis les quê
 Recherche sur commande seulement, **hors combat**, limitée à 40 pistes et 4 groupes affichés. Si QuestieDB ou ses positions sont indisponibles, un message explicite remplace les recommandations.
 
 Références : [API publique QuestieDB](https://github.com/Questie/QuestieDB/blob/main/docs/api.md), [schéma PNJ](https://github.com/Questie/QuestieDB/blob/main/src/meta/npcMeta.lua), [limites Forever](https://github.com/Questie/QuestieDB/blob/main/docs/forever.md).
+
+## Correctif de prudence — Duskwood (V0.6.3)
+
+La capture en jeu a montré que `/wc route` pouvait mettre en avant les 18 missions de l'incursion cauchemardesque du Bois de la Pénombre comme un groupe intéressant pour le leveling. Les quêtes **81730 à 81747** sont toutes répertoriées comme **Élite** dans [la base WoW Forever d'Icy Veins](https://db.icy-veins.com/wow-forever/quests/zones/duskwood/). Elles sont désormais **exclues du classement de quêtes solo prudent**, même lorsque QuestieDB ne fournit pas un marqueur de difficulté exploitable. Les tags explicites d'élite/groupe/donjon disponibles dans le client sont également exclus.
+
+`/wc route` précise qu'il s'agit de **pistes regroupées par PNJ de départ**, pas d'un itinéraire : le nombre de quêtes d'un même PNJ n'est ni une preuve de sécurité ni un rendement XP/h.
+
+Ces exclusions concernent seulement les faits identifiés ; les autres quêtes doivent toujours être vérifiées dans Questie. Un niveau de quête inférieur au niveau du personnage ne prouve pas que les ennemis soient faciles.
 
 ## Installation et commandes
 
