@@ -81,9 +81,9 @@ local function moneyStrip(parent, x, y)
 end
 
 local function card(parent, x, title, value)
-  panel(parent, x, -82, 109, 81)
-  label(parent, "GameFontNormalSmall", x + 10, -94, 95, 20, title)
-  return label(parent, "GameFontHighlightLarge", x + 10, -117, 95, 36, value or "--")
+  panel(parent, x, -12, 109, 79)
+  label(parent, "GameFontNormalSmall", x + 10, -23, 95, 20, title)
+  return label(parent, "GameFontHighlightLarge", x + 10, -47, 95, 36, value or "--")
 end
 
 function WC:CreateDashboard()
@@ -156,20 +156,20 @@ function WC:CreateDashboard()
   self.dashboardRecentRate = card(overview, 234, "XP/H 10 MIN")
   self.dashboardDeaths = card(overview, 351, "MORTS")
 
-  self.dashboardMoney = moneyStrip(overview, 0, -172)
-  label(overview, "GameFontHighlightSmall", 16, -229, 220, 18,
+  self.dashboardMoney = moneyStrip(overview, 0, -100)
+  label(overview, "GameFontHighlightSmall", 16, -164, 220, 18,
     colorText("COMBAT", "F3C37E"))
-  panel(overview, 0, -223, 222, 109)
-  self.dashboardCombat = label(overview, "GameFontHighlight", 13, -254, 197, 72)
+  panel(overview, 0, -155, 222, 106)
+  self.dashboardCombat = label(overview, "GameFontHighlight", 13, -187, 197, 69)
 
-  panel(overview, 234, -223, 226, 109)
-  label(overview, "GameFontHighlightSmall", 246, -229, 206, 18,
+  panel(overview, 234, -155, 226, 106)
+  label(overview, "GameFontHighlightSmall", 246, -164, 206, 18,
     colorText("CONSEIL PRIORITAIRE", "F3C37E"))
-  self.dashboardAdvice = label(overview, "GameFontHighlightSmall", 246, -254, 200, 75)
+  self.dashboardAdvice = label(overview, "GameFontHighlightSmall", 246, -187, 200, 69)
 
-  panel(overview, 0, -341, 460, 55)
-  label(overview, "GameFontNormalSmall", 12, -349, 425, 18, "DERNIERES ACTIVITES")
-  self.dashboardActivity = label(overview, "GameFontHighlightSmall", 13, -367, 427, 35)
+  panel(overview, 0, -272, 460, 81)
+  label(overview, "GameFontNormalSmall", 12, -284, 425, 18, "DERNIERES ACTIVITES")
+  self.dashboardActivity = label(overview, "GameFontHighlightSmall", 13, -305, 427, 42)
 
   local combatPage = self.dashboardPages.combat
   panel(combatPage, 0, -5, 460, 205)
