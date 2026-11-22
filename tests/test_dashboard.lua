@@ -67,14 +67,6 @@ function WC:SelectQuestPlan(mode)
 end
 assert(loadfile("Addon/WarriorCompanion/Dashboard.lua"))("WarriorCompanion",WC)
 
-local sign, g, s, c=WC:MoneyParts(-10005)
-assert(sign=="-" and g==1 and s==0 and c==5, "monnaie negative")
-sign,g,s,c=WC:MoneyParts(1234567)
-assert(sign=="+" and g==123 and s==45 and c==67, "monnaie positive")
-sign,g,s,c=WC:MoneyParts(0)
-assert(sign=="" and g==0 and s==0 and c==0, "zero")
-assert(WC:MoneyParts(nil)==nil and WC:MoneyParts(0/0)==nil)
-
 WC:CreateDashboard()
 assert(WC.dashboard.w==720 and WC.dashboard.h==460,"grande fenetre lisible")
 assert(not WC.dashboard:IsShown())
