@@ -23,7 +23,7 @@ local function rect(parent,x,y,w,h,color)
 end
 -- Neuf morceaux redimensionnables d'une texture arrondie originale.
 -- Reprend le principe du nine-slice de PexGuide, sans en copier les assets.
-local PANEL="Interface\\\\AddOns\\\\WarriorCompanion\\\\Textures\\\\RoundedPanel.tga"
+local PANEL="Interface\\AddOns\\WarriorCompanion\\Textures\\RoundedPanel.tga"
 local function round(parent,x,y,w,h,color)
   local holder=CreateFrame("Frame",nil,parent)
   holder:SetPoint("TOPLEFT",parent,"TOPLEFT",x,y)
