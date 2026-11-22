@@ -263,7 +263,7 @@ start = #messages
 for i = 1, 3 do event("PLAYER_DEAD") end
 assert(#messages == start)
 command("")
-assert(WC.dashboardAdvice.text:find("3 morts", 1, true))
+assert(WC.dashboardAdviceDetail.text:find("3 morts", 1, true))
 command("")
 now = now + 300
 command("alerts on")
