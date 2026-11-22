@@ -74,24 +74,28 @@ function WC:MoneyParts(value)
     math.floor(n / 10000), math.floor(n % 10000 / 100), n % 100
 end
 
+-- Grande carte de statistiques centree, comme dans la maquette.
 local function stat(parent, x, heading, imagePath)
-  metalPlate(parent, x, -4, 121, 57)
-  if imagePath then picture(parent, imagePath, x + 9, -12, 19, 19) end
-  local offset = imagePath and 32 or 10
-  text(parent, "GameFontNormalSmall", x + offset, -11, 90, 17,
-    tint(heading, "E5B776"))
-  return text(parent, "GameFontHighlightLarge", x + 10, -31, 106, 25)
+  metalPlate(parent, x, -1, 120, 57)
+  rectangle(parent, x + 8, -10, 104, 1, COLORS.ridge, "ARTWORK")
+  if imagePath then picture(parent, imagePath, x + 12, -13, 28, 28) end
+  local value = text(parent, "GameFontHighlightLarge",
+    x + 43, -12, 74, 29)
+  text(parent, "GameFontNormalSmall", x + 9, -43, 108, 17,
+    tint(heading, "E7C19A"))
+  return value
 end
 
 local function tab(parent, key, y, iconPath, name)
   local frame = CreateFrame("Button", nil, parent)
   frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, y)
-  frame:SetSize(55, 52)
-  frame.base = rectangle(frame, 0, 0, 55, 51, COLORS.darkPlate)
-  frame.accent = rectangle(frame, 0, 0, 3, 51, COLORS.ridge)
-  picture(frame, iconPath, 16, -5, 23, 23)
-  text(frame, "GameFontNormalSmall", 2, -31, 52, 17,
-    tint(name, "DAB68E"))
+  frame:SetSize(55, 54)
+  frame.base = rectangle(frame, 0, 0, 55, 53, COLORS.darkPlate)
+  frame.accent = rectangle(frame, 0, 0, 3, 53, COLORS.ridge)
+  rectangle(frame, 6, -5, 43, 41, COLORS.black)
+  picture(frame, iconPath, 15, -7, 25, 25)
+  text(frame, "GameFontNormalSmall", 2, -35, 52, 16,
+    tint(name, "E8C99A"))
   frame:SetScript("OnClick", function() WC:ShowDashboardPage(key) end)
   return frame
 end
@@ -123,8 +127,9 @@ function WC:CreateDashboard()
   rectangle(f, 0, 0, 600, 360, COLORS.ridge)
   rectangle(f, 3, -3, 594, 354, COLORS.black)
   rectangle(f, 4, -4, 592, 48, COLORS.darkPlate)
-  picture(f, ROOT .. "HordeSky", 322, -4, 274, 48)
+  picture(f, ROOT .. "HordeSky", 311, -4, 285, 48)
   rectangle(f, 4, -51, 592, 3, COLORS.litBlood)
+  rectangle(f, 67, -4, 245, 45, COLORS.darkPlate)
   rectangle(f, 3, -55, 60, 300, COLORS.darkPlate)
   rectangle(f, 63, -55, 2, 300, COLORS.ridge)
   rectangle(f, 3, -356, 594, 4, COLORS.copper)
@@ -151,11 +156,11 @@ function WC:CreateDashboard()
   }
   self.dashboardTabs = {}
   local tabs = {
-    {"overview", -62, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
-    {"combat", -120, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
-    {"advice", -178, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
-    {"activity", -236, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
-    {"quests", -294, "Interface\\Icons\\INV_Misc_Map_01", "QUETES"},
+    {"overview", -64, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
+    {"combat", -122, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
+    {"advice", -180, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
+    {"activity", -238, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
+    {"quests", -296, "Interface\\Icons\\INV_Misc_Map_01", "QUETES"},
   }
   for _, item in ipairs(tabs) do
     self.dashboardTabs[item[1]] = tab(f, item[1], item[2], item[3], item[4])
@@ -170,33 +175,51 @@ function WC:CreateDashboard()
   self.dashboardDeaths = stat(p, 390, "MORTS",
     "Interface\\Icons\\Ability_Rogue_FeignDeath")
 
-  metalPlate(p, 0, -68, 511, 38)
-  picture(p, "Interface\\Icons\\INV_Misc_Note_01", 10, -76, 20, 20)
-  text(p, "GameFontNormalSmall", 36, -74, 71, 20,
-    tint("QUETES", "E6BC81"))
-  self.dashboardQuests = text(p, "GameFontHighlight", 98, -74, 45, 20)
-  text(p, "GameFontNormalSmall", 151, -74, 62, 20,
-    tint("ARGENT", "E6BC81"))
+
+  -- Bandeau unique quetes / monnaie, comme la maquette de reference.
+  metalPlate(p, 0, -65, 511, 34)
+  picture(p, "Interface\\Icons\\INV_Misc_Note_01", 12, -71, 22, 22)
+  text(p, "GameFontNormalSmall", 39, -72, 63, 19,
+    tint("QUETES", "E9C48A"))
+  self.dashboardQuests = text(p, "GameFontHighlightLarge", 104, -71, 40, 22)
+  rectangle(p, 174, -71, 2, 20, COLORS.ridge, "ARTWORK")
+  text(p, "GameFontNormalSmall", 185, -72, 62, 19,
+    tint("ARGENT", "E9C48A"))
   self.dashboardMoney = { digits = {} }
-  self.dashboardMoney.sign = text(p, "GameFontHighlight", 208, -74, 22, 20)
+  self.dashboardMoney.sign = text(p, "GameFontHighlightSmall", 248, -72, 17, 19)
   for i, coin in ipairs({"Gold", "Silver", "Copper"}) do
-    local px = 233 + (i-1)*90
-    self.dashboardMoney.digits[i] =
-      text(p, "GameFontHighlight", px, -74, 55, 20)
+    local px = 269 + (i-1)*79
     picture(p, "Interface\\MoneyFrame\\UI-"..coin.."Icon",
-      px + 49, -74, 18, 18)
+      px, -72, 20, 20)
+    self.dashboardMoney.digits[i] =
+      text(p, "GameFontHighlight", px + 23, -73, 48, 19)
   end
 
-  noteBox(p, 0, -115, 249, 94, "COMBAT",
-    "Interface\\Icons\\Ability_Warrior_Charge")
-  self.dashboardCombat = text(p, "GameFontHighlight", 13, -147, 229, 59)
-  noteBox(p, 259, -115, 252, 94, "CONSEIL DU GUERRIER",
-    "Interface\\Icons\\Ability_Warrior_BattleShout")
-  self.dashboardAdvice = text(p, "GameFontHighlightSmall", 271, -147, 230, 59)
+  -- Deux panneaux lateraux avec titres et grandes icones de classe.
+  metalPlate(p, 0, -106, 248, 111)
+  picture(p, "Interface\\Icons\\Ability_Warrior_Charge", 9, -115, 34, 34)
+  text(p, "GameFontNormalLarge", 51, -115, 191, 23,
+    tint("COMBAT", "F4D497"))
+  rectangle(p, 50, -139, 185, 1, COLORS.copper, "ARTWORK")
+  self.dashboardCombat = text(p, "GameFontHighlight", 18, -151, 218, 64)
 
-  noteBox(p, 0, -218, 511, 65, "DERNIERES ACTIVITES",
-    "Interface\\Icons\\INV_Misc_Note_01")
-  self.dashboardActivity = text(p, "GameFontHighlightSmall", 13, -247, 485, 34)
+  metalPlate(p, 258, -106, 253, 111, true)
+  rectangle(p, 264, -114, 240, 94, COLORS.blood, "ARTWORK")
+  picture(p, ROOT .. "Warcrest", 445, -136, 49, 49, "ARTWORK")
+  picture(p, "Interface\\Icons\\Ability_Warrior_BattleShout",
+    270, -115, 33, 33)
+  text(p, "GameFontNormalLarge", 311, -115, 189, 22,
+    tint("CONSEIL DU GUERRIER", "F5D59B"))
+  rectangle(p, 270, -141, 217, 1, COLORS.copper, "ARTWORK")
+  self.dashboardAdvice = text(p, "GameFontHighlight", 276, -150, 207, 63)
+
+  -- Journal epure et dominant, avec les deux derniers gains.
+  metalPlate(p, 0, -225, 511, 59)
+  picture(p, "Interface\\Icons\\INV_Misc_Note_01", 10, -230, 30, 30)
+  text(p, "GameFontNormalLarge", 49, -230, 442, 24,
+    tint("DERNIERES ACTIVITES", "F4D497"))
+  rectangle(p, 48, -252, 443, 1, COLORS.copper, "ARTWORK")
+  self.dashboardActivity = text(p, "GameFontHighlight", 50, -258, 440, 30)
 
   self.dashboardCombatDetail = createSubPage(
     self.dashboardPages.combat, "RAPPORT DE COMBAT",
