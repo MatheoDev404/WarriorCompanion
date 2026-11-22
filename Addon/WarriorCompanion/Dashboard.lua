@@ -20,7 +20,7 @@ local function plate(parent, anchorX, anchorY, width, height, color)
   bg:SetTexture("Interface\\Buttons\\WHITE8X8")
   bg:SetPoint("TOPLEFT", parent, "TOPLEFT", anchorX, anchorY)
   bg:SetSize(width, height)
-  bg:SetVertexColor(unpack(color))
+  bg:SetVertexColor(color[1], color[2], color[3], color[4])
   return bg
 end
 
@@ -61,7 +61,7 @@ function WC:CreateDashboard()
   local base = f:CreateTexture(nil, "BACKGROUND")
   base:SetTexture("Interface\\Buttons\\WHITE8X8")
   base:SetAllPoints(f)
-  base:SetVertexColor(unpack(THEME.iron))
+  base:SetVertexColor(THEME.iron[1], THEME.iron[2], THEME.iron[3], THEME.iron[4])
   plate(f, 0, 0, 428, 54, THEME.plate)
   plate(f, 0, -52, 428, 3, THEME.blood)
   plate(f, 0, -471, 428, 4, THEME.bronze)
