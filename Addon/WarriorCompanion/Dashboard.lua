@@ -47,12 +47,13 @@ end
 
 -- Panneau sobre : une surface, un filet de separation, aucun rivet.
 local function metalPlate(parent, x, y, width, height, active)
-  rectangle(parent, x, y, width, height,
-    active and COLORS.darkPlate or COLORS.steel)
-  rectangle(parent, x, y, width, 1, COLORS.ridge, "ARTWORK")
-  rectangle(parent, x, y-height+1, width, 1, COLORS.ridge, "ARTWORK")
-  rectangle(parent, x, y, 1, height, COLORS.ridge, "ARTWORK")
-  rectangle(parent, x+width-1, y, 1, height, COLORS.ridge, "ARTWORK")
+  if WC.SoftPanel then
+    WC:SoftPanel(parent,x,y,width,height,
+      active and COLORS.darkPlate or COLORS.steel)
+  else
+    rectangle(parent,x,y,width,height,
+      active and COLORS.darkPlate or COLORS.steel)
+  end
 end
 
 local function fmt(value, fallback)
