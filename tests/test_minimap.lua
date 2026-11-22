@@ -8,6 +8,7 @@ local function mkframe()
   function f:RegisterForDrag(...) self.dragButtons={...} end
   function f:GetCenter() return 100,100 end
   function f:GetEffectiveScale() return 1 end
+  function f:GetWidth() return self.minimapWidth end
   function f:SetFrameStrata(s) self.strata=s end
   function f:SetFrameLevel(v) self.level=v end
   function f:EnableMouse(v) self.mouse=v end
@@ -35,6 +36,7 @@ function CreateFrame(kind,name,parent)
   return f
 end
 Minimap=mkframe()
+Minimap.minimapWidth=140
 local tip={shown=false}
 function tip:SetOwner() end
 function tip:SetText(t) self.text=t end
@@ -52,6 +54,7 @@ local WC={dashboard=mkframe()}
 function WC:Profile() return opts end
 function WC:Trace() end
 function WC:RefreshDashboard() self.refreshes=(self.refreshes or 0)+1 end
+function WC:Print() end
 function WC:ToggleDashboard()
   if self.dashboard:IsShown() then self.dashboard:Hide() else self.dashboard:Show() end
 end
@@ -62,8 +65,8 @@ assert(button.level==8 and button.strata=="MEDIUM")
 assert(button.highlight=="Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
 assert(button.dragButtons[1]=="LeftButton")
 assert(button.anchor[1]=="CENTER" and button.anchor[2]==Minimap)
-assert(math.abs(button.anchor[4]+56.5685)<0.02 and math.abs(button.anchor[5]+56.5685)<0.02,
-  "default position 225 deg")
+assert(math.abs(button.anchor[4]+66.11)<0.2 and math.abs(button.anchor[5]+30.85)<0.2,
+  "default position 205 deg")
 assert(#textures==3,"background icon border")
 assert(textures[1].path=="Interface\\Minimap\\UI-Minimap-Background")
 assert(textures[1].w==20 and textures[1].h==20)
@@ -96,7 +99,7 @@ assert(button.dragging and math.abs(opts.minimapAngle-0)<0.0001)
 cx,cy=100,200
 button.scripts.OnUpdate(button)
 assert(math.abs(opts.minimapAngle-90)<0.0001)
-assert(math.abs(button.anchor[4])<0.01 and math.abs(button.anchor[5]-80)<0.01)
+assert(math.abs(button.anchor[4])<0.01 and math.abs(button.anchor[5]-73)<0.01)
 cx,cy=0,100
 button.scripts.OnDragStop(button)
 assert(math.abs(opts.minimapAngle-180)<0.0001)
@@ -111,18 +114,18 @@ assert(not WC.dashboard:IsShown())
 -- Support pour les minimaps carrees : ne pas se baser sur le cercle.
 shape="SQUARE"
 WC:PositionMinimapButton(45)
-assert(math.abs(button.anchor[4]-72.9289)<0.15)
-assert(math.abs(button.anchor[5]-72.9289)<0.15)
+assert(math.abs(button.anchor[4]-66.59)<0.2)
+assert(math.abs(button.anchor[5]-66.59)<0.2)
 WC:PositionMinimapButton(0)
-assert(button.anchor[4]==80 and math.abs(button.anchor[5])<0.001)
+assert(button.anchor[4]==73 and math.abs(button.anchor[5])<0.001)
 shape="INVALID"
 WC:PositionMinimapButton(90)
-assert(math.abs(button.anchor[5]-80)<0.001,"unknown shape fallback")
+assert(math.abs(button.anchor[5]-73)<0.001,"unknown shape fallback")
 WC:PositionMinimapButton(0/0)
-assert(opts.minimapAngle==225,"invalid saved angle")
+assert(opts.minimapAngle==205,"invalid saved angle")
 WC.minimapButton=nil
 button=WC:CreateMinimapButton()
-assert(opts.minimapAngle==225 and button.anchor[4]<0,"persisted angle")
+assert(opts.minimapAngle==205 and button.anchor[4]<0,"persisted angle")
 
 WC:AutoOpenDashboard()
 assert(WC.dashboard:IsShown() and WC.refreshes==1)

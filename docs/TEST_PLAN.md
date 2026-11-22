@@ -144,3 +144,12 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 3. Sur un guerrier Furie, monter d'un niveau ou changer une pièce d'équipement : le conseil doit proposer de consulter `/gq` pour **tous les emplacements**, pas seulement les armes. Après dix minutes, il doit disparaître.
 4. Dans GearQuest, sélectionner Guerrier/Furie, niveau actuel, vérifier les sources quêtes/boss/vendeurs et la comparaison avec l'objet équipé.
 5. En combat, aucun nouveau conseil de provenance ne doit être généré. Les prix et les disponibilités HDV ne doivent jamais être déclarés confirmés par Warrior Companion.
+
+## Test V0.5.8 : compacité et minimap
+
+1. Faire `/reload`, ouvrir `/wc` : fenêtre 600×360, les quatre compteurs, l'argent, Combat, Conseil et Activités doivent rester visibles.
+2. Cliquer Bilan / Combat / Conseils / Journal : aucune vue ne doit déborder ; le conseil complet doit rester visible dans l'onglet dédié.
+3. Contrôler que les icônes or / argent / cuivre et l'XP/h restent lisibles à l'échelle UI du joueur.
+4. Sur la minimap actuelle, exécuter `/wc minimap reset` : l'icône doit toucher l'anneau sans flotter loin du bord.
+5. Faire glisser le bouton sur différents angles ; déconnexion/reconnexion doit conserver l'angle.
+6. Comparer une capture d'écran avec les autres boutons d'addons et relever les éventuels conflits de position.

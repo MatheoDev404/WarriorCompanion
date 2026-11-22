@@ -65,10 +65,12 @@ assert(sign=="" and g==0 and s==0 and c==0, "zero")
 assert(WC:MoneyParts(nil)==nil and WC:MoneyParts(0/0)==nil)
 
 WC:CreateDashboard()
-assert(WC.dashboard.w==710 and WC.dashboard.h==448,"dimensions")
+assert(WC.dashboard.w==600 and WC.dashboard.h==360,"dimensions")
 assert(not WC.dashboard:IsShown(),"ferme au depart")
 assert(WC.dashboardPage=="overview")
 assert(WC.dashboardPages.overview:IsShown())
+assert(WC.dashboardPages.overview.w==515 and WC.dashboardPages.overview.h==285,
+  "overview fits inside compact window")
 local sky, crest, gold, silver, copper=false,false,false,false,false
 for _, t in ipairs(textures) do
   if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\HordeSky" then sky=true end
@@ -125,5 +127,5 @@ assert(WC.dashboardMoney.sign.text=="")
 assert(WC.dashboardMoney.digits[1].text=="--")
 assert(WC.dashboardActivity.text:find("Aucune activite",1,true))
 WC:CreateDashboard()
-assert(WC.dashboard.w==710,"pas de duplication")
+assert(WC.dashboard.w==600,"pas de duplication")
 print("OK: art Horde, navigation, combat, argent, valeurs absentes, cadence et regression")

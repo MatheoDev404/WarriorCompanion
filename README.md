@@ -28,6 +28,12 @@ Le **Bilan** montre simultanément quatre statistiques, les quêtes, la variatio
 
 Les textures n'utilisent pas de code propriétaire de tiers. Le rendu exact, les proportions et la prise en charge TGA de Forever doivent être vérifiés en jeu : la CI ne teste pas le moteur graphique WoW.
 
+## Fenêtre compacte et recalage minimap
+
+Le tableau est désormais dessiné en **600 × 360 unités WoW** (contre 710 × 448), avec les mêmes statistiques et onglets. Les espacements et éléments décoratifs ont été réduits ; les conseils complets restent consultables dans l'onglet **Conseils**. L'écran Bilan montre seulement la première ligne du conseil pour éviter l'encombrement.
+
+La position du bouton tient compte de la taille réelle de la minimap lorsque l'API est disponible. Une ancienne position peut être remise à l'angle de départ avec `/wc minimap reset`. Le glisser-déposer et la persistance sont conservés.
+
 ## Démarrage et icône de minimap
 
 Le tableau de bord s'ouvre automatiquement **une fois à la connexion** (pas à chaque changement de zone). Une icône circulaire de 31 pixels s’attache au bord de la minimap comme les boutons des autres addons. Maintiens le clic gauche et glisse-la autour de la minimap pour choisir sa position ; elle est sauvegardée. Un clic gauche normal ouvre ou ferme la fenêtre. L'icône est créée au chargement, puis une nouvelle tentative est faite lors de l'entrée dans le monde si la minimap n'était pas encore disponible.
@@ -55,6 +61,7 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 | `/wc status` | Afficher la version, les mesures, les options et la présence des fonctions d’API |
 | `/wc reset` | Recommencer les mesures et effacer l'historique de session |
 | `/wc performance` | Comparer XP/h globale et XP/h des dix dernières minutes |
+| `/wc minimap reset` | Replacer le bouton sur le bord de la minimap à sa position par défaut |
 | `/wc gear` | Diagnostic de présence de GearQuest et explication des données vérifiables |
 | `/wc weapons` | Afficher les identifiants d'équipement et les types lus en mains droite/gauche |
 | `/wc spells` | Afficher le diagnostic du grimoire et la dernière nouveauté observée |
