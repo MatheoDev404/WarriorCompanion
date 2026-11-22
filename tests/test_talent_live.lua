@@ -13,7 +13,8 @@ C_SpecializationInfo={
   GetActiveSpecGroup=function()return 1 end,
   GetCombatConfigIDForSpecGroup=function(group)
     assert(group==1)
-    return fail and nil or 900
+    if fail then return nil end
+    return 900
   end,
 }
 C_Traits={
