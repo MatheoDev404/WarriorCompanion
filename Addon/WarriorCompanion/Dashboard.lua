@@ -144,7 +144,7 @@ function WC:CreateDashboard()
       b:SetPoint("TOPLEFT",page,"TOPLEFT",x,-54)
       b.base=rectangle(b,0,0,entry[3],28,COLORS.darkPlate)
       b.accent=rectangle(b,0,-26,entry[3],2,COLORS.ridge,"ARTWORK")
-      b.label=text(b,"GameFontNormalSmall",9,-5,entry[3]-16,20,
+      b.label=text(b,"GameFontNormal",9,-5,entry[3]-16,20,
         tint(entry[2],"E9DFD2"))
       b:SetScript("OnClick",function() callback(entry[1]) end)
       b:SetScript("OnEnter",function()
@@ -256,7 +256,7 @@ function WC:CreateDashboard()
     button:SetPoint("TOPLEFT", questPage, "TOPLEFT", data[3], -40)
     button.base=rectangle(button,0,0,data[4],26,COLORS.darkPlate)
     button.accent=rectangle(button,0,-24,data[4],2,COLORS.ridge,"ARTWORK")
-    button.label=text(button,"GameFontNormalSmall",9,-5,data[4]-16,18,
+    button.label=text(button,"GameFontNormal",9,-5,data[4]-16,18,
       tint(data[2],"E9DFD2"))
     local mode = data[1]
     button:SetScript("OnClick", function() WC:SelectQuestPlan(mode) end)
