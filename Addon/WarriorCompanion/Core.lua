@@ -118,6 +118,16 @@ frame:SetScript("OnEvent", function(_, event, ...)
   end
 end)
 
+local function openTab(page, mode)
+  if WC.OpenFullDashboard then WC:OpenFullDashboard() end
+  if WC.ShowDashboardPage then WC:ShowDashboardPage(page) end
+  if page=="advice" and mode and WC.SelectAdviceView then
+    WC:SelectAdviceView(mode)
+  elseif page=="combat" and mode and WC.SelectCombatView then
+    WC:SelectCombatView(mode)
+  end
+end
+
 SLASH_WARRIORCOMPANION1 = "/wc"
 SlashCmdList = SlashCmdList or {}
 SlashCmdList.WARRIORCOMPANION = function(msg)
@@ -131,14 +141,12 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
     WC:Print("Journal desactive et efface.")
   elseif msg == "logs" then WC:ShowLogs()
   elseif msg == "history" then WC:ShowActivity()
-  elseif msg == "combat" then WC:ShowCombatStatus()
-  elseif msg == "health" then WC:ShowHealthStatus()
+  elseif msg == "combat" then openTab("combat","combat")
+  elseif msg == "health" then openTab("advice","health")
   elseif msg == "fury" then WC:ShowFuryStatus()
-  elseif msg == "spells" then WC:ShowSpellbookStatus()
-  elseif msg == "weapons" then WC:ShowWeaponStatus()
-  elseif msg == "gear" then
-    WC:OpenFullDashboard()
-    WC:ShowDashboardPage("advice")
+  elseif msg == "spells" then openTab("advice","spells")
+  elseif msg == "weapons" then openTab("advice","weapons")
+  elseif msg == "gear" then openTab("advice","equipment")
   elseif msg == "talents" then
     WC:ShowTalentStatus()
     if WC.ObserveLiveFuryTalents then WC:ObserveLiveFuryTalents() end
@@ -153,13 +161,15 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
     WC:Profile().autoOpen = true; WC:Print("Ouverture automatique activee a la connexion.")
   elseif msg == "autostart off" then
     WC:Profile().autoOpen = false; WC:Print("Ouverture automatique desactivee.")
-  elseif msg == "performance" then WC:ShowPerformance()
+  elseif msg == "performance" then openTab("combat","performance")
   elseif msg == "clear" then WC:ClearLogs(); WC:Print("Traces effacees.")
   elseif msg == "status" then WC:Status()
   elseif msg == "reset" then WC:ResetSession()
+  elseif msg == "settings" then openTab("settings")
+  elseif msg == "advice" then openTab("advice","advice")
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | guide | mini | full | autostart on/off | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | guide | advice | settings | mini | full | autostart on/off | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end
