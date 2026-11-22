@@ -161,3 +161,14 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 3. Dépenser un point : un changement du nombre de points doit être consigné dans `/wc history`, sans prétendre connaître le talent choisi.
 4. `/wc reset` efface cet historique de session et reconstruit la photographie de référence.
 5. API indisponible : `/wc talents` indique l'indisponibilité plutôt que d'afficher des données inventées.
+
+## Test V0.6.0 — quêtes et Questie
+
+1. Tester `/wc quests` sur un guerrier Horde avec des quêtes acceptées de niveaux différents. Vérifier la classification et l'ordre des cinq premières.
+2. Une quête marquée donjon/groupe/élite doit être annoncée comme non solo ; si le type n'est pas lisible, le statut doit rester inconnu.
+3. Vérifier qu'une quête prête à rendre est priorisée sans inventer son PNJ de remise.
+4. Installer une version de Questie adaptée à Forever : `/wc questie` doit indiquer son état. Les marqueurs restent ceux de Questie.
+5. Accepter/mettre à jour une quête : le classement doit se rafraîchir sur `QUEST_LOG_UPDATE` ou notification publique Questie.
+6. Hors du personnage guerrier Horde, aucun conseil spécifique ne doit être généré.
+7. Sans Questie, le journal du client doit continuer de fonctionner, ou annoncer explicitement une indisponibilité API.
+8. Vérifier que le nouveau conseiller ne déclenche pas d'alertes intrusives pendant le combat.

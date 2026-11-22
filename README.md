@@ -50,11 +50,25 @@ Pour vérifier l'intégration, utiliser `/wc gear` puis ouvrir GearQuest avec `/
 
 Références : [GearQuest Forever](https://github.com/Henrik8210/gear-quest-forever) et [fiche de l'addon](https://www.curseforge.com/wow/addons/gearquest-forever).
 
-## Points de talents (0.5.9-rc1)
+## Points de talents (0.6.0-rc1)
 
 Le module `TalentObserver.lua` utilise `C_ClassTalents.HasUnspentTalentPoints` lorsque disponible pour afficher les points disponibles (classe + spécialisation). Il retient les changements observés après des événements de talents, sans les présenter comme un talent précis dépensé : une respécialisation ou une mise à jour serveur peut aussi expliquer la différence. Si la lecture échoue, aucun chiffre n'est inventé.
 
 Commande `/wc talents` pour vérifier les compteurs et le nombre de changements observés. Le rappel déjà existant des points non dépensés continue de fonctionner. **L'arbre Furie et la recommandation d'un talent précis ne sont pas encore validés dans le client Forever.**
+
+## Conseiller de quêtes Horde Furie (0.6.0-rc1)
+
+Le module `QuestAdvisor.lua` classe **les quêtes déjà acceptées** et présentes dans le journal du personnage guerrier Horde. Il distingue les quêtes prêtes à rendre, les candidates solo en dessous du niveau du joueur, les quêtes proches du niveau nécessitant de la prudence, les quêtes plus hautes, et les marqueurs explicitement signalés groupe/donjon/élite. Si le client ne fournit pas un type fiable, le statut reste **inconnu**, sans être converti en solo.
+
+Le niveau d'une quête **n'est pas** le niveau précis de ses ennemis ; aucune récompense, difficulté réelle, temps de trajet, XP/h ou prérequis d'une quête non acceptée n'est inventé. Le journal du personnage Horde ne prouve pas qu'une quête soit exclusive à la Horde.
+
+**Questie** conserve l'affichage de ses marqueurs sur minimap et carte. Warrior Companion n'en crée aucun deuxième. L'intégration optionnelle utilise `Questie.API.isReady`, `RegisterOnReady` et `RegisterForQuestUpdates` documentés publiquement pour actualiser nos conseils, avec un repli sur `QUEST_LOG_UPDATE` du client si Questie n'est pas disponible. Aucun accès aux tables internes de Questie et aucune dépendance obligatoire.
+
+Commandes : `/wc quests` affiche un classement prudent jusqu'à cinq quêtes ; `/wc questie` vérifie si Questie est détecté et prêt.
+
+**À développer ensuite** : propositions de quêtes *non encore acceptées* avec faction, prérequis, chaîne et source contrôlés via une base de données compatible Forever, et validation du niveau réel des ennemis pour un guerrier Furie prudent.
+
+Sources de l'API : [Questie — API publique](https://github.com/Questie/Questie/blob/master/Public/README.md), [Questie — notifications](https://github.com/Questie/Questie/blob/master/Public/RegisterForQuestUpdates.lua).
 
 ## Installation et commandes
 
@@ -68,6 +82,8 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 | `/wc reset` | Recommencer les mesures et effacer l'historique de session |
 | `/wc performance` | Comparer XP/h globale et XP/h des dix dernières minutes |
 | `/wc minimap reset` | Replacer le bouton sur le bord de la minimap à sa position par défaut |
+| `/wc quests` | Classement prudent des quêtes du journal du guerrier Horde |
+| `/wc questie` | Vérifier l'état de l'intégration optionnelle avec Questie |
 | `/wc talents` | Diagnostic des points de talents disponibles et de leurs changements |
 | `/wc gear` | Diagnostic de présence de GearQuest et explication des données vérifiables |
 | `/wc weapons` | Afficher les identifiants d'équipement et les types lus en mains droite/gauche |

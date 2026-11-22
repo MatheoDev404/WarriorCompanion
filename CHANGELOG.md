@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0-rc1 — conseiller de quêtes Horde et intégration Questie
+
+- Classement conservateur des quêtes déjà acceptées selon niveau, statut de remise, présence explicite d'indications groupe/donjon/élite et niveau du guerrier Horde.
+- Catégorie inconnue si l'API ne confirme pas le type ; les récompenses, la difficulté réelle et les quêtes à aller chercher ne sont pas inventées.
+- Écoute optionnelle des notifications via les API publiques de Questie, sans modifier ses données ni dupliquer ses marqueurs minimap/carte.
+- Commandes `/wc quests` et `/wc questie`, tests Lua 5.1 / 5.4 et tests de non-régression.
+
+
+
 ## 0.5.9-rc1 — suivi prudent des talents
 
 - Lecture stricte des points non dépensés avec validation des retours de `C_ClassTalents`.
