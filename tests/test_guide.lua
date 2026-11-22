@@ -17,6 +17,11 @@ assert(view.steps:find("Accepter la quete",1,true))
 assert(view.actionText=="Accepter la quete")
 assert(view.locationText=="Lieu non precise dans cette etape.")
 assert(view.nextText==[[Terminer l'objectif]])
+assert(WC:GuideStepText({text="Desolace >>Get to Shadowprey Village in Desolace: Fly to Sun Rock Retreat, then ride to Shadowprey Village"})==
+  "Rejoindre Shadowprey Village in Desolace : Prendre un vol vers Sun Rock Retreat, puis rejoindre Shadowprey Village",
+  "les prefixes techniques sont retires et le trajet est traduit")
+assert(WC:GuideStepText({text="Talk to Gornek"})=="Parler a Gornek")
+
 assert(WC:GuideMove(1) and WC.guideIndex==2)
 assert(settings.guideProgress.index==2)
 assert(WC:GuideLoad(sample) and WC.guideIndex==2)
