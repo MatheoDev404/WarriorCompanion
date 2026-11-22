@@ -93,7 +93,7 @@ function WC:GetGuideView() return {
 } end
 
 WC:CreateDashboard()
-assert(WC.dashboard.w==720 and WC.dashboard.h==460,"grande fenetre lisible")
+assert(WC.dashboard.w==720 and WC.dashboard.h==520,"grande fenetre lisible")
 assert(not WC.dashboard:IsShown())
 assert(WC.dashboardPage=="quests","guide par defaut")
 assert(WC.dashboardPages.quests.w==626 and WC.dashboardPages.quests.h==380)
@@ -218,4 +218,4 @@ WC.dashboard.handlers.OnUpdate(WC.dashboard,3.1)
 assert(notices==0,"rafraichissement sans conseil notifie")
 WC:CreateDashboard()
 assert(WC.dashboard.w==720,"pas de duplication")
-print("OK: interface anthracite et bronze, 4 onglets, etats actifs, survol, guide et conseils")
+print("OK: interface ardoise a navigation horizontale, 4 onglets, etats actifs, survol, guide et conseils")
