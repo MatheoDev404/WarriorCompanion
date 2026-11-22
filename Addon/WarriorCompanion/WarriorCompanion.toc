@@ -14,6 +14,7 @@ Health.lua
 Performance.lua
 Spellbook.lua
 Weapons.lua
+EquipmentReview.lua
 TalentObserver.lua
 QuestAdvisor.lua
 QuestDiscovery.lua
