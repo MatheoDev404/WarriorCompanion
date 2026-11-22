@@ -4,14 +4,14 @@ local _, WC = ...
 -- Compatible avec Lua 5.1 : pas de backdrops ni d'API Retail obligatoires.
 local ROOT = "Interface\\AddOns\\WarriorCompanion\\Textures\\"
 local COLORS = {
-  black = {0.035, 0.029, 0.034, 0.98},
-  steel = {0.083, 0.062, 0.064, 0.97},
-  darkPlate = {0.13, 0.096, 0.101, 0.97},
-  ridge = {0.39, 0.278, 0.235, 1},
-  copper = {0.72, 0.48, 0.31, 1},
-  gold = {0.85, 0.64, 0.36, 1},
-  blood = {0.46, 0.062, 0.050, 1},
-  litBlood = {0.65, 0.115, 0.080, 1},
+  black = {0.055, 0.061, 0.067, 0.98},
+  steel = {0.093, 0.101, 0.110, 0.97},
+  darkPlate = {0.132, 0.144, 0.155, 0.98},
+  ridge = {0.245, 0.260, 0.275, 1},
+  copper = {0.56, 0.40, 0.25, 1},
+  gold = {0.79, 0.59, 0.37, 1},
+  blood = {0.26, 0.21, 0.17, 1},
+  litBlood = {0.67, 0.49, 0.30, 1},
 }
 local function tint(text, hex)
   return "|cff" .. hex .. tostring(text) .. "|r"
@@ -63,14 +63,23 @@ end
 local function tab(parent, key, y, iconPath, name)
   local frame = CreateFrame("Button", nil, parent)
   frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, y)
-  frame:SetSize(55, 54)
-  frame.base = rectangle(frame, 0, 0, 55, 53, COLORS.darkPlate)
-  frame.accent = rectangle(frame, 0, 0, 3, 53, COLORS.ridge)
-  rectangle(frame, 6, -5, 43, 41, COLORS.black)
-  picture(frame, iconPath, 15, -7, 25, 25)
-  text(frame, "GameFontNormalSmall", 2, -35, 52, 16,
-    tint(name, "E8C99A"))
+  frame:SetSize(63, 61)
+  frame.base = rectangle(frame, 0, 0, 63, 60, COLORS.darkPlate)
+  frame.accent = rectangle(frame, 0, 0, 3, 60, COLORS.ridge)
+  picture(frame, iconPath, 19, -7, 25, 25)
+  text(frame, "GameFontNormalSmall", 2, -37, 59, 18,
+    tint(name, "E9D9C4"))
   frame:SetScript("OnClick", function() WC:ShowDashboardPage(key) end)
+  frame:SetScript("OnEnter", function()
+    if WC.dashboardPage~=key then
+      frame.base:SetVertexColor(0.22,0.24,0.25,1)
+    end
+  end)
+  frame:SetScript("OnLeave", function()
+    if WC.dashboardPage~=key then
+      frame.base:SetVertexColor(unpack(COLORS.darkPlate))
+    end
+  end)
   return frame
 end
 
@@ -87,20 +96,18 @@ function WC:CreateDashboard()
   f:SetScript("OnDragStop", function(frame) frame:StopMovingOrSizing() end)
 
   rectangle(f, 0, 0, 720, 460, COLORS.ridge)
-  rectangle(f, 3, -3, 714, 454, COLORS.black)
-  rectangle(f, 4, -4, 712, 48, COLORS.darkPlate)
-  picture(f, ROOT .. "HordeSky", 468, -4, 248, 48)
-  picture(f, ROOT .. "HeaderPlate", 53, -2, 326, 52, "ARTWORK")
-  rectangle(f, 4, -51, 712, 3, COLORS.litBlood)
-  rectangle(f, 3, -55, 73, 397, COLORS.darkPlate)
-  rectangle(f, 76, -55, 2, 397, COLORS.ridge)
-  rectangle(f, 3, -456, 714, 4, COLORS.copper)
+  rectangle(f, 1, -1, 718, 458, COLORS.black)
+  rectangle(f, 1, -1, 718, 51, COLORS.steel)
+  rectangle(f, 1, -51, 718, 1, COLORS.copper)
+  rectangle(f, 1, -53, 77, 405, COLORS.steel)
+  rectangle(f, 77, -53, 1, 405, COLORS.ridge)
+  rectangle(f, 1, -457, 718, 2, COLORS.copper)
 
-  picture(f, ROOT .. "Warcrest", 8, -4, 48, 48)
-  text(f, "GameFontNormalLarge", 63, -9, 257, 22,
-    tint("WARRIOR COMPANION", "F7DCAB"))
-  text(f, "GameFontHighlightSmall", 64, -31, 256, 16,
-    tint("HORDE  /  RAPPORT DE CAMPAGNE", "D49A7D"))
+  picture(f, ROOT .. "Warcrest", 13, -8, 32, 32)
+  text(f, "GameFontNormalLarge", 56, -8, 336, 24,
+    tint("WARRIOR COMPANION", "E9DFD2"))
+  text(f, "GameFontHighlightSmall", 57, -31, 352, 16,
+    tint("GUIDE DE PROGRESSION / HORDE", "C9A47B"))
   local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, -2)
   close:SetScript("OnClick", function() WC:ShowCompact() end)
@@ -136,8 +143,9 @@ function WC:CreateDashboard()
       b:SetSize(entry[3],28)
       b:SetPoint("TOPLEFT",page,"TOPLEFT",x,-54)
       b.base=rectangle(b,0,0,entry[3],28,COLORS.darkPlate)
-      b.label=text(b,"GameFontNormalSmall",7,-6,entry[3]-10,20,
-        tint(entry[2],"EBC487"))
+      b.accent=rectangle(b,0,-26,entry[3],2,COLORS.ridge,"ARTWORK")
+      b.label=text(b,"GameFontNormalSmall",9,-5,entry[3]-16,20,
+        tint(entry[2],"E9DFD2"))
       b:SetScript("OnClick",function() callback(entry[1]) end)
       buttons[entry[1]]=b
       x=x+entry[3]+6
@@ -150,9 +158,9 @@ function WC:CreateDashboard()
   picture(combatPage, "Interface\\Icons\\Ability_Warrior_Charge", 18, -16, 35, 35)
   text(combatPage, "GameFontNormalLarge", 62, -19, 510, 26,
     tint("COMBAT - BILAN ET SECURITE", "F1C98D"))
-  rectangle(combatPage, 18, -60, 582, 2, COLORS.ridge, "ARTWORK")
+  rectangle(combatPage, 18, -91, 582, 1, COLORS.ridge, "ARTWORK")
   self.dashboardCombatDetail = text(combatPage, "GameFontHighlight",
-    23, -100, 566, 236)
+    26, -105, 556, 227)
   self.combatMode="combat"
   self.dashboardCombatButtons=subTabs(combatPage,{
     {"combat","COMBATS",124},{"performance","PERFORMANCE",148}
@@ -163,9 +171,9 @@ function WC:CreateDashboard()
     18, -16, 35, 35)
   text(advicePage, "GameFontNormalLarge", 62, -19, 520, 26,
     tint("CONSEILS - GUERRIER FURIE", "F1C98D"))
-  rectangle(advicePage, 18, -60, 582, 2, COLORS.ridge, "ARTWORK")
+  rectangle(advicePage, 18, -91, 582, 1, COLORS.ridge, "ARTWORK")
   self.dashboardAdviceDetail = text(advicePage, "GameFontHighlight",
-    23, -100, 565, 234)
+    26, -105, 556, 227)
   self.adviceMode="advice"
   self.dashboardAdviceButtons=subTabs(advicePage,{
     {"advice","CONSEILS",105},{"equipment","EQUIPEMENT",115},
@@ -229,10 +237,10 @@ function WC:CreateDashboard()
     local button = CreateFrame("Button", nil, questPage)
     button:SetSize(data[4], 26)
     button:SetPoint("TOPLEFT", questPage, "TOPLEFT", data[3], -40)
-    rectangle(button, 0, 0, data[4], 26, COLORS.ridge)
-    rectangle(button, 2, -2, data[4]-4, 22, COLORS.darkPlate)
-    text(button, "GameFontNormalSmall", 7, -5, data[4]-12, 18,
-      tint(data[2], "F0C58A"))
+    button.base=rectangle(button,0,0,data[4],26,COLORS.darkPlate)
+    button.accent=rectangle(button,0,-24,data[4],2,COLORS.ridge,"ARTWORK")
+    button.label=text(button,"GameFontNormalSmall",9,-5,data[4]-16,18,
+      tint(data[2],"E9DFD2"))
     local mode = data[1]
     button:SetScript("OnClick", function() WC:SelectQuestPlan(mode) end)
     self.dashboardQuestButtons[mode] = button
@@ -241,8 +249,8 @@ function WC:CreateDashboard()
     local b = CreateFrame("Button", nil, questPage)
     b:SetPoint("TOPLEFT", questPage, "TOPLEFT", x, -348)
     b:SetSize(106, 25)
-    rectangle(b, 0, 0, 106, 25, COLORS.ridge)
-    rectangle(b, 2, -2, 102, 21, COLORS.darkPlate)
+    b.base=rectangle(b,0,0,106,25,COLORS.darkPlate)
+    b.accent=rectangle(b,0,-23,106,2,COLORS.copper,"ARTWORK")
     b.labelText = text(b, "GameFontNormalSmall", 7, -5, 96, 18,
       tint(label, "F0C58A"))
     b:SetScript("OnClick", function()
@@ -263,7 +271,7 @@ function WC:CreateDashboard()
   self.dashboardQuestTitle = text(questPage, "GameFontNormalLarge", 24, -91,
     557, 26, tint("Etape en cours", "E9C58D"))
   rectangle(questPage, 18, -123, 582, 91, COLORS.darkPlate)
-  rectangle(questPage, 18, -123, 4, 91, COLORS.litBlood, "ARTWORK")
+  rectangle(questPage, 18, -123, 2, 91, COLORS.gold, "ARTWORK")
   self.dashboardQuestDetail = text(questPage, "GameFontHighlight", 33,
     -135, 540, 77, "Ouvre le guide pour voir la prochaine action.")
   rectangle(questPage, 18, -220, 582, 2, COLORS.ridge, "ARTWORK")
@@ -321,8 +329,8 @@ function WC:CreateDashboard()
     self.dashboardGuideLocation,self.dashboardGuideNextText,
   }
 
-  text(f, "GameFontHighlightSmall", 89, -439, 615, 15,
-    tint("Warrior Companion   |   Guide - Conseils - Combat - Reglages", "C1A08A"))
+  text(f, "GameFontHighlightSmall", 90, -438, 597, 17,
+    tint("GUIDE  /  CONSEILS  /  COMBAT  /  REGLAGES", "B4A391"))
   self.dashboard = f
   self.questPlanMode = "guide"
   if self.SelectQuestPlan then self:SelectQuestPlan("guide") end
@@ -360,7 +368,19 @@ function WC:ShowDashboardPage(page)
   self:RefreshDashboard()
 end
 
+local function refreshGuideButtons(self)
+  if not self.dashboardQuestButtons then return end
+  local active=self.questPlanMode or "guide"
+  for key,b in pairs(self.dashboardQuestButtons) do
+    local color=key==active and COLORS.blood or COLORS.darkPlate
+    local accent=key==active and COLORS.gold or COLORS.ridge
+    b.base:SetVertexColor(unpack(color))
+    b.accent:SetVertexColor(unpack(accent))
+  end
+end
+
 function WC:RefreshTalentGuidePanel()
+  refreshGuideButtons(self)
   if not self.dashboardTalentWidgets then return end
   local active=self.questPlanMode=="talents"
   for _,t in ipairs(self.dashboardTalentWidgets) do
@@ -456,6 +476,10 @@ local function selectButtons(buttons,chosen)
   for key,button in pairs(buttons) do
     local c=key==chosen and COLORS.blood or COLORS.darkPlate
     button.base:SetVertexColor(c[1],c[2],c[3],c[4])
+    if button.accent then
+      local accent=key==chosen and COLORS.gold or COLORS.ridge
+      button.accent:SetVertexColor(accent[1],accent[2],accent[3],accent[4])
+    end
   end
 end
 function WC:SelectAdviceView(mode)
