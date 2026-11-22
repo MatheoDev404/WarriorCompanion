@@ -57,6 +57,14 @@ end
 function WC:AdviceLines() return "Verifier les talents du guerrier." end
 function WC:UpdateAdvice() notices=notices+1 end
 function WC:Print() end
+local settings={autoOpen=true,showAlerts=true}
+function WC:Profile() return settings end
+function WC:ResetSession() self.sessionReset=(self.sessionReset or 0)+1 end
+function WC:EquipmentReviewText() return "Objet a examiner dans le sac." end
+WC.health={current=75,maximum=100,percent=75}
+WC.weapons={available=true,main=123,off=456,
+  mainType="INVTYPE_WEAPON",offType="INVTYPE_WEAPON"}
+WC.spellbook={known={a=true,b=true},learned={{name="Frappe",time=1}}}
 function UnitLevel() return 33 end
 assert(loadfile("Addon/WarriorCompanion/TalentPlan.lua"))("WarriorCompanion",WC)
 function WC:SelectQuestPlan(mode)
@@ -72,7 +80,8 @@ assert(WC.dashboard.w==720 and WC.dashboard.h==460,"grande fenetre lisible")
 assert(not WC.dashboard:IsShown())
 assert(WC.dashboardPage=="quests","guide par defaut")
 assert(WC.dashboardPages.quests.w==626 and WC.dashboardPages.quests.h==380)
-assert(WC.dashboardPages.combat and WC.dashboardPages.advice)
+assert(WC.dashboardPages.combat and WC.dashboardPages.advice
+  and WC.dashboardPages.settings)
 assert(not WC.dashboardPages.overview and not WC.dashboardPages.activity,
   "bilan et journal retires de la grande fenetre")
 assert(not WC.dashboardTabs.overview and not WC.dashboardTabs.activity)
@@ -119,6 +128,32 @@ assert(WC.dashboardCombatDetail.text:find("Combats",1,true))
 assert(WC.dashboardCombatDetail.text:find("28 secondes",1,true))
 WC.dashboardTabs.advice.handlers.OnClick()
 assert(WC.dashboardAdviceDetail.text:find("talents",1,true))
+WC.dashboardTabs.advice.handlers.OnClick()
+WC.dashboardAdviceButtons.equipment.handlers.OnClick()
+assert(WC.adviceMode=="equipment" and
+  WC.dashboardAdviceDetail.text:find("Objet a examiner",1,true))
+WC.dashboardAdviceButtons.health.handlers.OnClick()
+assert(WC.dashboardAdviceDetail.text:find("75 %",1,true))
+WC.dashboardAdviceButtons.weapons.handlers.OnClick()
+assert(WC.dashboardAdviceDetail.text:find("MAIN GAUCHE",1,true))
+WC.dashboardAdviceButtons.spells.handlers.OnClick()
+assert(WC.dashboardAdviceDetail.text:find("2 sorts",1,true))
+WC.dashboardAdviceButtons.advice.handlers.OnClick()
+WC.dashboardTabs.combat.handlers.OnClick()
+WC.dashboardCombatButtons.performance.handlers.OnClick()
+assert(WC.combatMode=="performance" and
+  WC.dashboardCombatDetail.text:find("XP/h session",1,true))
+WC.dashboardCombatButtons.combat.handlers.OnClick()
+WC.dashboardTabs.settings.handlers.OnClick()
+assert(WC.dashboardSettingsInfo.text:find("ACTIF",1,true))
+WC.dashboardSettingsButtons.autostart.handlers.OnClick()
+assert(settings.autoOpen==false and
+  WC.dashboardSettingsInfo.text:find("INACTIF",1,true))
+WC.dashboardSettingsButtons.alerts.handlers.OnClick()
+assert(settings.showAlerts==false and
+  WC.dashboardSettingsInfo.text:find("DESACTIVEES",1,true))
+WC.dashboardSettingsButtons.reset.handlers.OnClick()
+assert(WC.sessionReset==1)
 WC.dashboardTabs.quests.handlers.OnClick()
 assert(WC.dashboardPage=="quests" and WC.dashboardPages.quests:IsShown())
 WC.dashboardQuestButtons.guide.handlers.OnClick()
