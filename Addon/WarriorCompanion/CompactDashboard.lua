@@ -64,15 +64,31 @@ function WC:CreateCompactDashboard()
   font(expand,6,-1,20,17,"GameFontNormalSmall",">>")
   expand:SetScript("OnClick",function() WC:OpenFullDashboard() end)
   self.compactExpand=expand
-  local names={{"XP",5},{"XP/H",75},{"MORTS",159},{"OR +/-",228}}
+  -- Trois statistiques sur une ligne ; toute la largeur pour la monnaie.
+  local names={{"XP",6,22},{"XP/H",103,39},{"MORTS",210,43}}
   self.compactStats={}
   for i,item in ipairs(names) do
-    local x=item[2]
-    font(f,x,-30,66,13,"GameFontNormalSmall","|cffC9A987"..item[1].."|r")
-    self.compactStats[i]=font(f,x,-43,70,19,"GameFontHighlightSmall")
+    font(f,item[2],-30,item[3],17,"GameFontNormalSmall",
+      "|cffC9A987"..item[1].."|r")
+    self.compactStats[i]=font(f,item[2]+item[3],-30,72,17,
+      "GameFontHighlightSmall")
   end
-  block(f,5,-67,294,1,.35,.21,.17)
-  self.compactAdvice=font(f,8,-68,289,16,"GameFontHighlightSmall")
+  block(f,5,-49,294,1,.35,.21,.17)
+  font(f,7,-52,59,15,"GameFontNormalSmall","|cffC9A987SOLDE|r")
+  self.compactMoneySign=font(f,67,-52,15,15,"GameFontHighlightSmall")
+  self.compactMoneyParts={}
+  local positions={83,154,225}
+  local coins={"Gold","Silver","Copper"}
+  for i=1,3 do
+    self.compactMoneyParts[i]=font(f,positions[i],-52,38,15,
+      "GameFontHighlightSmall")
+    local coin=f:CreateTexture(nil,"ARTWORK")
+    coin:SetTexture("Interface\\MoneyFrame\\UI-"..coins[i].."Icon")
+    coin:SetPoint("TOPLEFT",f,"TOPLEFT",positions[i]+35,-52)
+    coin:SetSize(14,14)
+  end
+  block(f,5,-69,294,1,.35,.21,.17)
+  self.compactAdvice=font(f,8,-70,289,14,"GameFontHighlightSmall")
   self.compactDashboard=f
   f:Hide()
   local elapsed=0
@@ -82,17 +98,25 @@ function WC:CreateCompactDashboard()
     if elapsed>=3 then elapsed=0;WC:RefreshCompactDashboard() end
   end)
 end
--- Balance nette de la session, en pieces d'or. Montant de reference en cuivre.
-local function goldBalance(copper)
-  if type(copper)~="number" or copper~=copper or
-      copper==math.huge or copper==-math.huge then return "--" end
-  local gold=copper/10000
-  local absolute=math.abs(gold)
-  if absolute>=1000 then
-    return string.format("%s%.1fk",gold<0 and "-" or "+",absolute/1000)
+-- Solde en cuivre ; deux chiffres minimum par denomination.
+local function moneyParts(copper)
+  if type(copper)~="number" or copper~=copper
+      or copper==math.huge or copper==-math.huge then
+    return "", "--", "--", "--", "unknown"
   end
-  return string.format("%+.2f",gold)
+  local n=math.floor(math.abs(copper))
+  local sign=copper<0 and "-" or copper>0 and "+" or ""
+  local gold=math.floor(n/10000)
+  local silver=math.floor(n%10000/100)
+  local bronze=n%100
+  local state=copper<0 and "negative" or copper>0 and "positive" or "zero"
+  return sign,string.format("%02d",gold),string.format("%02d",silver),
+    string.format("%02d",bronze),state
 end
+local moneyColors={
+  positive="|cff70DB8B", negative="|cffF17E78",
+  zero="|cffD4D4D4",unknown="|cff888888"
+}
 
 function WC:RefreshCompactDashboard()
   if not self.compactDashboard or not self.compactDashboard:IsShown() then return end
@@ -101,9 +125,15 @@ function WC:RefreshCompactDashboard()
   local balance=self.MoneyDelta and self:MoneyDelta()
   local values={
     tostring(m.xpGained or 0),xp and tostring(math.floor(xp+.5)) or "--",
-    tostring(m.deaths or 0),goldBalance(balance),
+    tostring(m.deaths or 0),
   }
-  for i=1,4 do self.compactStats[i]:SetText(values[i]) end
+  for i=1,3 do self.compactStats[i]:SetText(values[i]) end
+  local sign,gold,silver,bronze,state=moneyParts(balance)
+  local color=moneyColors[state]
+  self.compactMoneySign:SetText(color..sign.."|r")
+  for i,part in ipairs({gold,silver,bronze}) do
+    self.compactMoneyParts[i]:SetText(color..part.."|r")
+  end
   local advice=self.AdviceLines and self:AdviceLines() or ""
   local first=advice:match("([^\n]+)") or ""
   if first=="" or first=="Aucun conseil verifie pour le moment." then
