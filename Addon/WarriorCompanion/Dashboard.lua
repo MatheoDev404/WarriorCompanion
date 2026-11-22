@@ -190,43 +190,66 @@ function WC:CreateDashboard()
     {"spells","SORTS",82}
   },function(mode) WC:SelectAdviceView(mode) end)
 
+  -- Reglages : trois cartes lisibles, etats ON/OFF visibles sans chat.
   local settingsPage=self.dashboardPages.settings
   metalPlate(settingsPage,0,-4,620,344)
-  text(settingsPage,"GameFontNormalLarge",24,-20,562,26,
-    tint("REGLAGES DE L'ADDON","F1C98D"))
-  self.dashboardSettingsInfo=text(settingsPage,"GameFontHighlight",
-    24,-68,552,125)
+  text(settingsPage,"GameFontNormalLarge",24,-17,555,26,
+    tint("Reglages","EFF0F5"))
+  text(settingsPage,"GameFontHighlightSmall",24,-42,550,20,
+    tint("Preferences de Warrior Companion","949CAE"))
   self.dashboardSettingsButtons={}
-  local function settingButton(key,label,x,y,width,callback)
-    local b=CreateFrame("Button",nil,settingsPage)
-    b:SetPoint("TOPLEFT",settingsPage,"TOPLEFT",x,y)
-    b:SetSize(width,31)
-    b.base=rectangle(b,0,0,width,31,COLORS.darkPlate)
-    b.accent=rectangle(b,0,-29,width,2,COLORS.ridge,"ARTWORK")
-    b.label=text(b,"GameFontNormal",9,-6,width-18,20,
-      tint(label,"E9DFD2"))
-    b:SetScript("OnClick",callback)
-    b:SetScript("OnEnter",function()
-      b.base:SetVertexColor(0.21,0.22,0.23,1)
-    end)
-    b:SetScript("OnLeave",function()
+  self.dashboardSettingsCards={}
+  local function settingsCard(key,y,height,heading,description)
+    local card=CreateFrame("Frame",nil,settingsPage)
+    card:SetPoint("TOPLEFT",settingsPage,"TOPLEFT",22,y)
+    card:SetSize(568,height)
+    card.bg=rectangle(card,0,0,568,height,COLORS.darkPlate)
+    card.title=text(card,"GameFontNormal",18,-12,410,22,
+      tint(heading,"EFF0F5"))
+    card.description=text(card,"GameFontHighlightSmall",18,-35,426,28,
+      tint(description,"ABB3C1"))
+    self.dashboardSettingsCards[key]=card
+    return card
+  end
+  local function toggleSetting(key,y,heading,description,field)
+    local card=settingsCard(key,y,70,heading,description)
+    local button=CreateFrame("Button",nil,card)
+    button:SetPoint("TOPRIGHT",card,"TOPRIGHT",-17,-20)
+    button:SetSize(68,29)
+    button.base=rectangle(button,0,0,68,29,COLORS.ridge)
+    button.indicator=rectangle(button,3,-3,24,23,COLORS.steel,"ARTWORK")
+    button.label=text(button,"GameFontNormalSmall",9,-7,52,17,"")
+    button:SetScript("OnClick",function()
+      WC:Profile()[field]=not WC:Profile()[field]
       WC:RefreshSettingsPanel()
     end)
-    self.dashboardSettingsButtons[key]=b
-    return b
+    button:SetScript("OnEnter",function()
+      if not WC:Profile()[field] then
+        button.base:SetVertexColor(0.29,0.32,0.36,1)
+      end
+    end)
+    button:SetScript("OnLeave",function() WC:RefreshSettingsPanel() end)
+    self.dashboardSettingsButtons[key]=button
   end
-  settingButton("autostart","DEMARRAGE AUTO",24,-202,175,function()
-    WC:Profile().autoOpen=not WC:Profile().autoOpen
-    WC:RefreshSettingsPanel()
-  end)
-  settingButton("alerts","NOTIFICATIONS",211,-202,172,function()
-    WC:Profile().showAlerts=not WC:Profile().showAlerts
-    WC:RefreshSettingsPanel()
-  end)
-  settingButton("reset","REINITIALISER SESSION",24,-252,250,function()
+  toggleSetting("autostart",-73,"Demarrage automatique",
+    "Afficher Warrior Companion a la connexion.","autoOpen")
+  toggleSetting("alerts",-150,"Notifications",
+    "Afficher les alertes importantes, hors combat.","showAlerts")
+
+  local resetCard=settingsCard("reset",-227,96,
+    "Reinitialisation de session",
+    "Effacer XP, morts et duree. Le guide et les options sont conserves.")
+  local resetButton=CreateFrame("Button",nil,resetCard)
+  resetButton:SetPoint("TOPLEFT",resetCard,"TOPLEFT",18,-62)
+  resetButton:SetSize(182,26)
+  resetButton.base=rectangle(resetButton,0,0,182,26,
+    {0.27,0.18,0.20,1})
+  resetButton.label=text(resetButton,"GameFontNormalSmall",12,-5,165,18,
+    "Reinitialiser")
+  resetButton:SetScript("OnClick",function()
     if not WC.settingsResetPending then
       WC.settingsResetPending=true
-      WC.settingsResetMessage="Confirmer en cliquant de nouveau pour effacer la session."
+      WC.settingsResetMessage="Confirmer la remise a zero de la session ?"
     else
       WC.settingsResetPending=false
       WC:ResetSession()
@@ -234,8 +257,13 @@ function WC:CreateDashboard()
     end
     WC:RefreshSettingsPanel()
   end)
-  text(settingsPage,"GameFontHighlightSmall",24,-291,557,36,
-    "La remise a zero efface les compteurs de session, pas le guide ni les options.")
+  resetButton:SetScript("OnEnter",function()
+    resetButton.base:SetVertexColor(0.38,0.24,0.26,1)
+  end)
+  resetButton:SetScript("OnLeave",function() WC:RefreshSettingsPanel() end)
+  self.dashboardSettingsButtons.reset=resetButton
+  self.dashboardSettingsNotice=text(resetCard,"GameFontHighlightSmall",
+    215,-67,338,20,"")
 
   local questPage = self.dashboardPages.quests
   metalPlate(questPage, 0, -4, 620, 344)
@@ -522,30 +550,35 @@ function WC:SelectCombatView(mode)
   self:RefreshDashboard()
 end
 function WC:RefreshSettingsPanel()
-  if not self.dashboardSettingsInfo then return end
+  if not self.dashboardSettingsButtons then return end
   local options=self:Profile()
-  for key,enabled in pairs({
-    autostart=options.autoOpen==true,
-    alerts=options.showAlerts==true,
-    reset=self.settingsResetPending==true,
-  }) do
-    local b=self.dashboardSettingsButtons and self.dashboardSettingsButtons[key]
-    if b then
-      local base=enabled and COLORS.blood or COLORS.darkPlate
-      local accent=enabled and COLORS.gold or COLORS.ridge
-      b.base:SetVertexColor(base[1],base[2],base[3],base[4])
-      b.accent:SetVertexColor(accent[1],accent[2],accent[3],accent[4])
+  local function toggle(key,enabled)
+    local button=self.dashboardSettingsButtons[key]
+    if not button then return end
+    local base=enabled and {0.27,0.35,0.29,1} or COLORS.ridge
+    button.base:SetVertexColor(base[1],base[2],base[3],base[4])
+    local offset=enabled and 41 or 3
+    button.indicator:ClearAllPoints()
+    button.indicator:SetPoint("TOPLEFT",button,"TOPLEFT",offset,-3)
+    local knob=enabled and {0.46,0.87,0.59,1} or {0.73,0.76,0.81,1}
+    button.indicator:SetVertexColor(knob[1],knob[2],knob[3],knob[4])
+    button.label:SetText(enabled and "ON" or "OFF")
+  end
+  toggle("autostart",options.autoOpen==true)
+  toggle("alerts",options.showAlerts==true)
+  local button=self.dashboardSettingsButtons.reset
+  if button then
+    if self.settingsResetPending then
+      button.label:SetText("Confirmer")
+      button.base:SetVertexColor(0.49,0.22,0.23,1)
+    else
+      button.label:SetText("Reinitialiser")
+      button.base:SetVertexColor(0.27,0.18,0.20,1)
     end
   end
-  local auto=options.autoOpen and "ACTIF" or "INACTIF"
-  local alerts=options.showAlerts and "ACTIVES" or "DESACTIVEES"
-  self.dashboardSettingsInfo:SetText(
-    "|cffEBC487DEMARRAGE AUTOMATIQUE|r   "..auto..
-    "\nLe mini-bilan s'ouvre a la connexion si active."..
-    "\n\n|cffEBC487NOTIFICATIONS|r   "..alerts..
-    "\nAlertes importantes dans le chat, jamais en combat."..
-    (self.settingsResetMessage and
-      ("\n\n|cff75D38A"..self.settingsResetMessage.."|r") or ""))
+  if self.dashboardSettingsNotice then
+    self.dashboardSettingsNotice:SetText(self.settingsResetMessage or "")
+  end
 end
 function WC:AdviceViewText()
   local mode=self.adviceMode or "advice"
