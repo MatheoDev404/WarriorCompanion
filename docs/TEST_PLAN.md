@@ -18,7 +18,7 @@ Ce protocole concerne **l'interface actuellement maintenue**, et remplace les an
 - Déplacement et sauvegarde de la position ; bouton `>>` ouvrant la grande fenêtre.
 - `/wc reset` remet à zéro les mesures et l'heure de départ de la session.
 
-## 3. Grande fenêtre (720 × 460)
+## 3. Grande fenêtre (720 × 520)
 
 - **Quatre onglets principaux seulement** : **Guide**, **Conseils**, **Combat**, **Réglages**.
 - Le contenu ne dépasse pas et la taille des caractères reste lisible.
