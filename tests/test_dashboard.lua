@@ -54,6 +54,11 @@ end
 function WC:AdviceLines() return "Verifier les talents du guerrier." end
 function WC:UpdateAdvice() notices=notices+1 end
 function WC:Print() end
+function WC:SelectQuestPlan(mode)
+  self.questPlanMode=mode
+  self.dashboardQuestTitle:SetText("Guide de leveling")
+  self.dashboardQuestDetail:SetText("Pas de parcours verifie")
+end
 assert(loadfile("Addon/WarriorCompanion/Dashboard.lua"))("WarriorCompanion",WC)
 
 local sign, g, s, c=WC:MoneyParts(-10005)
