@@ -80,9 +80,9 @@ assert(not WC.dashboardPages.overview and not WC.dashboardPages.activity,
 assert(not WC.dashboardTabs.overview and not WC.dashboardTabs.activity)
 local sky,crest,header=false,false,false
 for _,t in ipairs(textures) do
-  if t.path=="Interface\\\\AddOns\\\\WarriorCompanion\\\\Textures\\\\HordeSky" then sky=true end
-  if t.path=="Interface\\\\AddOns\\\\WarriorCompanion\\\\Textures\\\\Warcrest" then crest=true end
-  if t.path=="Interface\\\\AddOns\\\\WarriorCompanion\\\\Textures\\\\HeaderPlate" then header=true end
+  if t.path and t.path:find("HordeSky",1,true) then sky=true end
+  if t.path and t.path:find("Warcrest",1,true) then crest=true end
+  if t.path and t.path:find("HeaderPlate",1,true) then header=true end
 end
 assert(sky and crest and header,"theme visuel Horde conserve")
 assert(#buttons>=8,"3 onglets et boutons du guide")
