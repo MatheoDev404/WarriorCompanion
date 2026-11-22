@@ -60,24 +60,26 @@ local function fmt(value, fallback)
   return fallback or "--"
 end
 
-local function tab(parent, key, y, iconPath, name)
-  local frame = CreateFrame("Button", nil, parent)
-  frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, y)
-  frame:SetSize(63, 61)
-  frame.base = rectangle(frame, 0, 0, 63, 60, COLORS.darkPlate)
-  frame.accent = rectangle(frame, 0, 0, 3, 60, COLORS.ridge)
-  picture(frame, iconPath, 19, -7, 25, 25)
-  text(frame, "GameFontNormalSmall", 2, -37, 59, 18,
-    tint(name, "E9D9C4"))
-  frame:SetScript("OnClick", function() WC:ShowDashboardPage(key) end)
-  frame:SetScript("OnEnter", function()
+-- PexGuide : navigation horizontale simple, sans colonne d'icones.
+local function tab(parent,key,x,iconPath,name)
+  local frame=CreateFrame("Button",nil,parent)
+  frame:SetPoint("TOPLEFT",parent,"TOPLEFT",x,-58)
+  frame:SetSize(144,38)
+  frame.base=rectangle(frame,0,0,144,38,COLORS.darkPlate)
+  frame.accent=rectangle(frame,0,-36,144,2,COLORS.ridge,"ARTWORK")
+  picture(frame,iconPath,13,-9,20,20)
+  frame.label=text(frame,"GameFontNormal",43,-10,96,20,
+    tint(name,"EDEFF5"))
+  frame:SetScript("OnClick",function() WC:ShowDashboardPage(key) end)
+  frame:SetScript("OnEnter",function()
     if WC.dashboardPage~=key then
-      frame.base:SetVertexColor(0.22,0.24,0.25,1)
+      frame.base:SetVertexColor(0.20,0.21,0.25,1)
     end
   end)
-  frame:SetScript("OnLeave", function()
+  frame:SetScript("OnLeave",function()
     if WC.dashboardPage~=key then
-      frame.base:SetVertexColor(COLORS.darkPlate[1],COLORS.darkPlate[2],COLORS.darkPlate[3],COLORS.darkPlate[4])
+      frame.base:SetVertexColor(COLORS.darkPlate[1],
+        COLORS.darkPlate[2],COLORS.darkPlate[3],COLORS.darkPlate[4])
     end
   end)
   return frame
@@ -86,7 +88,7 @@ end
 function WC:CreateDashboard()
   if self.dashboard then return end
   local f = CreateFrame("Frame", "WarriorCompanionDashboard", UIParent)
-  f:SetSize(720, 460)
+  f:SetSize(720, 520)
   f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   f:SetFrameStrata("DIALOG")
   f:EnableMouse(true)
@@ -95,10 +97,9 @@ function WC:CreateDashboard()
   f:SetScript("OnDragStart", function(frame) frame:StartMoving() end)
   f:SetScript("OnDragStop", function(frame) frame:StopMovingOrSizing() end)
 
-  rectangle(f,0,0,720,460,COLORS.black)
-  rectangle(f,0,0,720,45,COLORS.steel)
-  rectangle(f,12,-44,696,1,COLORS.ridge)
-  rectangle(f,1,-55,77,392,COLORS.steel)
+  rectangle(f,0,0,720,520,COLORS.black)
+  rectangle(f,0,0,720,46,COLORS.steel)
+  rectangle(f,12,-45,696,1,COLORS.ridge)
 
   picture(f, ROOT .. "Warcrest", 13, -8, 32, 32)
   text(f, "GameFontNormalLarge", 56, -7, 336, 24,
@@ -112,7 +113,7 @@ function WC:CreateDashboard()
   local function contentPage()
     local p = CreateFrame("Frame", nil, f)
     p:SetSize(626, 380)
-    p:SetPoint("TOPLEFT", f, "TOPLEFT", 84, -61)
+    p:SetPoint("TOPLEFT", f, "TOPLEFT", 47, -105)
     return p
   end
 
@@ -122,10 +123,10 @@ function WC:CreateDashboard()
   }
   self.dashboardTabs = {}
   local tabs = {
-    {"combat", -72, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
-    {"advice", -146, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
-    {"quests", -220, "Interface\\Icons\\INV_Misc_Map_01", "GUIDE"},
-    {"settings", -294, "Interface\\Icons\\INV_Misc_Gear_01", "REGL."},
+    {"quests", 48, "Interface\\Icons\\INV_Misc_Map_01", "GUIDE"},
+    {"advice", 208, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
+    {"combat", 368, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
+    {"settings", 528, "Interface\\Icons\\INV_Misc_Gear_01", "REGLAGES"},
   }
   for _, item in ipairs(tabs) do
     self.dashboardTabs[item[1]] = tab(f, item[1], item[2], item[3], item[4])
@@ -341,8 +342,8 @@ function WC:CreateDashboard()
   }
   if self.CreateGuideTracker then self:CreateGuideTracker(questPage) end
 
-  text(f, "GameFontHighlightSmall", 90, -438, 597, 17,
-    tint("GUIDE  /  CONSEILS  /  COMBAT  /  REGLAGES", "B4A391"))
+  text(f, "GameFontHighlightSmall", 49, -504, 615, 15,
+    tint("Warrior Companion  |  Guide Furie Horde 1-60", "949CAE"))
   self.dashboard = f
   self.questPlanMode = "guide"
   if self.SelectQuestPlan then self:SelectQuestPlan("guide") end
@@ -371,10 +372,14 @@ function WC:ShowDashboardPage(page)
     if key == page then frame:Show() else frame:Hide() end
     local tabFrame = self.dashboardTabs[key]
     if tabFrame then
-      local color = key == page and COLORS.blood or COLORS.darkPlate
-      tabFrame.base:SetVertexColor(color[1], color[2], color[3], color[4])
-      local metal = key == page and COLORS.gold or COLORS.ridge
-      tabFrame.accent:SetVertexColor(metal[1], metal[2], metal[3], metal[4])
+      local color=key==page and COLORS.blood or COLORS.darkPlate
+      local line=key==page and COLORS.gold or COLORS.ridge
+      tabFrame.base:SetVertexColor(color[1],color[2],color[3],color[4])
+      tabFrame.accent:SetVertexColor(line[1],line[2],line[3],line[4])
+      if tabFrame.label and tabFrame.label.SetTextColor then
+        local c=key==page and COLORS.gold or {0.81,0.83,0.86,1}
+        tabFrame.label:SetTextColor(c[1],c[2],c[3],c[4])
+      end
     end
   end
   self:RefreshDashboard()
