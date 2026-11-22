@@ -85,14 +85,14 @@ assert(WC.dashboardPages.combat and WC.dashboardPages.advice
 assert(not WC.dashboardPages.overview and not WC.dashboardPages.activity,
   "bilan et journal retires de la grande fenetre")
 assert(not WC.dashboardTabs.overview and not WC.dashboardTabs.activity)
-local sky,crest,header=false,false,false
+local crest,oldDecoration=false,false
 for _,t in ipairs(textures) do
-  if t.path and t.path:find("HordeSky",1,true) then sky=true end
   if t.path and t.path:find("Warcrest",1,true) then crest=true end
-  if t.path and t.path:find("HeaderPlate",1,true) then header=true end
+  if t.path and (t.path:find("HordeSky",1,true) or
+      t.path:find("HeaderPlate",1,true)) then oldDecoration=true end
 end
-assert(sky and crest and header,"theme visuel Horde conserve")
-assert(#buttons>=8,"3 onglets et boutons du guide")
+assert(crest and not oldDecoration,"en-tete sobre, blason conserve")
+assert(#buttons>=8,"onglets et boutons du guide")
 WC.dashboard:Show()
 WC:RefreshDashboard()
 assert(WC.dashboard:IsShown() and notices==0)
@@ -100,8 +100,16 @@ assert(WC.dashboardQuestButtons.guide and WC.dashboardQuestButtons.journal
   and WC.dashboardQuestButtons.discover and not WC.dashboardQuestButtons.route)
 assert(WC.dashboardGuidePrev and WC.dashboardGuideNext)
 assert(WC.dashboardQuestButtons.talents,"vue talents dans le guide")
+assert(WC.dashboardQuestButtons.guide.base.color[1]~=nil)
+local guideAccent=WC.dashboardQuestButtons.guide.accent.color
+assert(guideAccent and guideAccent[1]>0.7,
+  "bouton du guide actif en bronze")
 WC.dashboardQuestButtons.talents.handlers.OnClick()
 assert(WC.questPlanMode=="talents")
+assert(WC.dashboardQuestButtons.talents.accent.color[1]>0.7,
+  "talents actif en bronze")
+assert(WC.dashboardQuestButtons.guide.accent.color[1]<0.5,
+  "etapes inactive sur fond anthracite")
 assert(WC.dashboardTalentHeader:IsShown() and
        not WC.dashboardQuestDetail:IsShown(),"vue talents distincte")
 assert(WC.dashboardTalentCurrent.text:find("Niv. 33",1,true))
