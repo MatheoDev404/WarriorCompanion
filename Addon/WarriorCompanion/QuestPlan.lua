@@ -100,7 +100,8 @@ end
 
 function WC:OpenQuestPlan(mode)
   if not self.dashboard then return end
-  if not self.dashboard:IsShown() then self.dashboard:Show() end
+  if self.OpenFullDashboard then self:OpenFullDashboard()
+  elseif not self.dashboard:IsShown() then self.dashboard:Show() end
   self:ShowDashboardPage("quests")
   self:SelectQuestPlan(mode or "journal")
 end
