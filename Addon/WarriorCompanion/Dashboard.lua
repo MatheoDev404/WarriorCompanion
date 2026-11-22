@@ -75,22 +75,22 @@ function WC:MoneyParts(value)
 end
 
 local function stat(parent, x, heading, imagePath)
-  metalPlate(parent, x, -7, 144, 78)
-  if imagePath then picture(parent, imagePath, x + 12, -20, 25, 25) end
-  local offset = imagePath and 44 or 13
-  text(parent, "GameFontNormalSmall", x + offset, -15, 97, 21,
+  metalPlate(parent, x, -4, 121, 57)
+  if imagePath then picture(parent, imagePath, x + 9, -12, 19, 19) end
+  local offset = imagePath and 32 or 10
+  text(parent, "GameFontNormalSmall", x + offset, -11, 90, 17,
     tint(heading, "E5B776"))
-  return text(parent, "GameFontHighlightLarge", x + 13, -47, 118, 31)
+  return text(parent, "GameFontHighlightLarge", x + 10, -31, 106, 25)
 end
 
 local function tab(parent, key, y, iconPath, name)
   local frame = CreateFrame("Button", nil, parent)
-  frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 8, y)
-  frame:SetSize(65, 73)
-  frame.base = rectangle(frame, 0, 0, 65, 72, COLORS.darkPlate)
-  frame.accent = rectangle(frame, 0, 0, 4, 72, COLORS.ridge)
-  picture(frame, iconPath, 16, -7, 33, 33)
-  text(frame, "GameFontNormalSmall", 4, -46, 61, 20,
+  frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, y)
+  frame:SetSize(55, 61)
+  frame.base = rectangle(frame, 0, 0, 55, 60, COLORS.darkPlate)
+  frame.accent = rectangle(frame, 0, 0, 3, 60, COLORS.ridge)
+  picture(frame, iconPath, 14, -6, 27, 27)
+  text(frame, "GameFontNormalSmall", 2, -38, 52, 19,
     tint(name, "DAB68E"))
   frame:SetScript("OnClick", function() WC:ShowDashboardPage(key) end)
   return frame
@@ -98,20 +98,20 @@ end
 
 local function noteBox(parent, x, y, w, h, name, iconPath)
   metalPlate(parent, x, y, w, h)
-  if iconPath then picture(parent, iconPath, x + 12, y - 13, 25, 25) end
-  text(parent, "GameFontNormal", x + (iconPath and 43 or 13), y - 15,
-    w - 54, 21, tint(name, "EBC487"))
+  if iconPath then picture(parent, iconPath, x + 10, y - 9, 20, 20) end
+  text(parent, "GameFontNormal", x + (iconPath and 34 or 11), y - 11,
+    w - 45, 18, tint(name, "EBC487"))
 end
 
 local function createSubPage(parent, heading, iconPath)
-  noteBox(parent, 0, -6, 602, 270, heading, iconPath)
-  return text(parent, "GameFontHighlight", 20, -63, 563, 188)
+  noteBox(parent, 0, -4, 512, 237, heading, iconPath)
+  return text(parent, "GameFontHighlight", 15, -43, 482, 184)
 end
 
 function WC:CreateDashboard()
   if self.dashboard then return end
   local f = CreateFrame("Frame", "WarriorCompanionDashboard", UIParent)
-  f:SetSize(710, 448)
+  f:SetSize(600, 360)
   f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   f:SetFrameStrata("DIALOG")
   f:EnableMouse(true)
@@ -120,19 +120,19 @@ function WC:CreateDashboard()
   f:SetScript("OnDragStart", function(frame) frame:StartMoving() end)
   f:SetScript("OnDragStop", function(frame) frame:StopMovingOrSizing() end)
 
-  rectangle(f, 0, 0, 710, 448, COLORS.ridge)
-  rectangle(f, 3, -3, 704, 442, COLORS.black)
-  rectangle(f, 4, -4, 702, 66, COLORS.darkPlate)
-  picture(f, ROOT .. "HordeSky", 384, -4, 321, 66)
-  rectangle(f, 4, -69, 702, 3, COLORS.litBlood)
-  rectangle(f, 3, -73, 79, 370, COLORS.darkPlate)
-  rectangle(f, 81, -73, 3, 370, COLORS.ridge)
-  rectangle(f, 3, -444, 704, 4, COLORS.copper)
+  rectangle(f, 0, 0, 600, 360, COLORS.ridge)
+  rectangle(f, 3, -3, 594, 354, COLORS.black)
+  rectangle(f, 4, -4, 592, 48, COLORS.darkPlate)
+  picture(f, ROOT .. "HordeSky", 322, -4, 274, 48)
+  rectangle(f, 4, -51, 592, 3, COLORS.litBlood)
+  rectangle(f, 3, -55, 60, 300, COLORS.darkPlate)
+  rectangle(f, 63, -55, 2, 300, COLORS.ridge)
+  rectangle(f, 3, -356, 594, 4, COLORS.copper)
 
-  picture(f, ROOT .. "Warcrest", 9, -4, 65, 65)
-  text(f, "GameFontNormalLarge", 79, -12, 340, 25,
+  picture(f, ROOT .. "Warcrest", 8, -4, 48, 48)
+  text(f, "GameFontNormalLarge", 63, -9, 257, 22,
     tint("WARRIOR COMPANION", "F7DCAB"))
-  text(f, "GameFontHighlightSmall", 81, -40, 350, 19,
+  text(f, "GameFontHighlightSmall", 64, -31, 256, 16,
     tint("HORDE  /  RAPPORT DE CAMPAGNE", "D49A7D"))
   local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, -2)
@@ -140,8 +140,8 @@ function WC:CreateDashboard()
 
   local function contentPage()
     local p = CreateFrame("Frame", nil, f)
-    p:SetSize(607, 357)
-    p:SetPoint("TOPLEFT", f, "TOPLEFT", 91, -80)
+    p:SetSize(515, 285)
+    p:SetPoint("TOPLEFT", f, "TOPLEFT", 72, -61)
     return p
   end
 
@@ -151,10 +151,10 @@ function WC:CreateDashboard()
   }
   self.dashboardTabs = {}
   local tabs = {
-    {"overview", -90, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
-    {"combat", -175, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
-    {"advice", -260, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
-    {"activity", -345, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
+    {"overview", -66, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
+    {"combat", -138, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
+    {"advice", -210, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
+    {"activity", -282, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
   }
   for _, item in ipairs(tabs) do
     self.dashboardTabs[item[1]] = tab(f, item[1], item[2], item[3], item[4])
@@ -162,40 +162,40 @@ function WC:CreateDashboard()
 
   local p = self.dashboardPages.overview
   self.dashboardXP = stat(p, 0, "XP GAGNEE", "Interface\\Icons\\INV_Misc_Book_11")
-  self.dashboardSessionRate = stat(p, 153, "XP/H SESSION",
+  self.dashboardSessionRate = stat(p, 130, "XP/H SESSION",
     "Interface\\Icons\\Spell_Holy_BorrowedTime")
-  self.dashboardRecentRate = stat(p, 306, "XP/H 10 MIN",
+  self.dashboardRecentRate = stat(p, 260, "XP/H 10 MIN",
     "Interface\\Icons\\Spell_Holy_BorrowedTime")
-  self.dashboardDeaths = stat(p, 459, "MORTS",
+  self.dashboardDeaths = stat(p, 390, "MORTS",
     "Interface\\Icons\\Ability_Rogue_FeignDeath")
 
-  metalPlate(p, 0, -94, 603, 45)
-  picture(p, "Interface\\Icons\\INV_Misc_Note_01", 14, -105, 25, 25)
-  text(p, "GameFontNormalSmall", 45, -103, 83, 22,
+  metalPlate(p, 0, -68, 511, 38)
+  picture(p, "Interface\\Icons\\INV_Misc_Note_01", 10, -76, 20, 20)
+  text(p, "GameFontNormalSmall", 36, -74, 71, 20,
     tint("QUETES", "E6BC81"))
-  self.dashboardQuests = text(p, "GameFontHighlight", 119, -102, 48, 25)
-  text(p, "GameFontNormalSmall", 183, -103, 69, 22,
+  self.dashboardQuests = text(p, "GameFontHighlight", 98, -74, 45, 20)
+  text(p, "GameFontNormalSmall", 151, -74, 62, 20,
     tint("ARGENT", "E6BC81"))
   self.dashboardMoney = { digits = {} }
-  self.dashboardMoney.sign = text(p, "GameFontHighlight", 256, -102, 24, 25)
+  self.dashboardMoney.sign = text(p, "GameFontHighlight", 208, -74, 22, 20)
   for i, coin in ipairs({"Gold", "Silver", "Copper"}) do
-    local px = 282 + (i-1)*100
+    local px = 233 + (i-1)*90
     self.dashboardMoney.digits[i] =
-      text(p, "GameFontHighlight", px, -102, 58, 25)
+      text(p, "GameFontHighlight", px, -74, 55, 20)
     picture(p, "Interface\\MoneyFrame\\UI-"..coin.."Icon",
-      px + 53, -102, 20, 20)
+      px + 49, -74, 18, 18)
   end
 
-  noteBox(p, 0, -149, 294, 111, "COMBAT",
+  noteBox(p, 0, -115, 249, 94, "COMBAT",
     "Interface\\Icons\\Ability_Warrior_Charge")
-  self.dashboardCombat = text(p, "GameFontHighlight", 18, -193, 267, 65)
-  noteBox(p, 306, -149, 297, 111, "CONSEIL DU GUERRIER",
+  self.dashboardCombat = text(p, "GameFontHighlight", 13, -147, 229, 59)
+  noteBox(p, 259, -115, 252, 94, "CONSEIL DU GUERRIER",
     "Interface\\Icons\\Ability_Warrior_BattleShout")
-  self.dashboardAdvice = text(p, "GameFontHighlightSmall", 325, -193, 257, 65)
+  self.dashboardAdvice = text(p, "GameFontHighlightSmall", 271, -147, 230, 59)
 
-  noteBox(p, 0, -270, 603, 81, "DERNIERES ACTIVITES",
+  noteBox(p, 0, -218, 511, 65, "DERNIERES ACTIVITES",
     "Interface\\Icons\\INV_Misc_Note_01")
-  self.dashboardActivity = text(p, "GameFontHighlightSmall", 18, -308, 560, 41)
+  self.dashboardActivity = text(p, "GameFontHighlightSmall", 13, -247, 485, 34)
 
   self.dashboardCombatDetail = createSubPage(
     self.dashboardPages.combat, "RAPPORT DE COMBAT",
@@ -207,7 +207,7 @@ function WC:CreateDashboard()
     self.dashboardPages.activity, "JOURNAL DE SESSION",
     "Interface\\Icons\\INV_Misc_Note_01")
 
-  text(f, "GameFontHighlightSmall", 104, -431, 584, 16,
+  text(f, "GameFontHighlightSmall", 75, -343, 507, 15,
     tint("/wc help     /wc reset     /wc performance", "C1A08A"))
   self.dashboard = f
   self:ShowDashboardPage("overview")
@@ -290,7 +290,7 @@ function WC:RefreshDashboard()
   if type(advice) ~= "string" or advice == "" then
     advice = "Aucun conseil verifie pour le moment."
   end
-  self.dashboardAdvice:SetText(advice)
+  self.dashboardAdvice:SetText((advice:match("([^\n]+)")) or advice)
   self.dashboardAdviceDetail:SetText(advice)
   self.dashboardActivity:SetText(activityLines(self.activity, 2))
   self.dashboardActivityDetail:SetText(activityLines(self.activity, 8))

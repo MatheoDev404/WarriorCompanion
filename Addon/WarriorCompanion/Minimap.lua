@@ -5,10 +5,10 @@ local ICON = "Interface\\Icons\\Ability_Warrior_BattleShout"
 local BORDER = "Interface\\Minimap\\MiniMap-TrackingBorder"
 local BACKGROUND = "Interface\\Minimap\\UI-Minimap-Background"
 local HIGHLIGHT = "Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight"
-local DEFAULT_ANGLE = 225
-local ROUND_RADIUS = 80
-local SQUARE_RADIUS = 80
-local DIAGONAL_RADIUS = 103.13708498985
+local DEFAULT_ANGLE = 205
+local ROUND_RADIUS = 73
+local SQUARE_RADIUS = 73
+local DIAGONAL_RADIUS = 94.111
 
 -- Formes de minimaps courantes des addons (GetMinimapShape).
 -- Index : bas-droite, bas-gauche, haut-droite, haut-gauche.
@@ -59,13 +59,22 @@ function WC:PositionMinimapButton(angle)
   if x < 0 then quadrant = quadrant + 1 end
   if y > 0 then quadrant = quadrant + 2 end
 
+  -- Rayon calcule sur la taille reelle : meilleure adaptation aux minimaps
+  -- modifies, reduites ou agrandies. Le bouton chevauche legerement l'anneau.
+  local radius = ROUND_RADIUS
+  if type(Minimap.GetWidth) == "function" then
+    local ok, size = pcall(Minimap.GetWidth, Minimap)
+    if ok and validNumber(size) and size >= 80 and size <= 400 then
+      radius = math.max(55, math.min(145, size / 2 + 3))
+    end
+  end
   local shape = minimapShape()
   local xx, yy
   if SHAPES[shape][quadrant] then
-    xx, yy = x * ROUND_RADIUS, y * ROUND_RADIUS
+    xx, yy = x * radius, y * radius
   else
-    xx = math.max(-SQUARE_RADIUS, math.min(x * DIAGONAL_RADIUS, SQUARE_RADIUS))
-    yy = math.max(-SQUARE_RADIUS, math.min(y * DIAGONAL_RADIUS, SQUARE_RADIUS))
+    xx = math.max(-radius, math.min(x * (radius * 1.29), radius))
+    yy = math.max(-SQUARE_RADIUS, math.min(y * (radius * 1.29), radius))
   end
   button:ClearAllPoints()
   button:SetPoint("CENTER", Minimap, "CENTER", xx, yy)
@@ -170,6 +179,13 @@ function WC:CreateMinimapButton()
   self.minimapButton = button
   self:PositionMinimapButton(self:Profile().minimapAngle)
   return button
+end
+
+
+function WC:ResetMinimapPosition()
+  self:Profile().minimapAngle = DEFAULT_ANGLE
+  self:PositionMinimapButton(DEFAULT_ANGLE)
+  self:Print("Icone de minimap replacee sur le bord (angle par defaut).")
 end
 
 function WC:AutoOpenDashboard()
