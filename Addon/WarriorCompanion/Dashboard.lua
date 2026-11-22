@@ -369,7 +369,21 @@ function WC:RefreshTalentGuidePanel()
   end
   if not active or not self.TalentPlanText then return end
   local view=self:TalentPlanText()
-  if not view then return end
+  if not view then
+    self.dashboardTalentHeader:SetText("|cffF17E78PLAN DE TALENTS INDISPONIBLE|r")
+    self.dashboardTalentCurrent:SetText(
+      "Parcours non valide. Aucun point ne peut etre conseille.")
+    self.dashboardTalentDistribution:SetText(
+      self.talentPlanValidationError or "Donnees de talents absentes.")
+    self.dashboardTalentNext:SetText("")
+    self.dashboardTalentNotice:SetText(
+      "Verifier les talents du jeu avant de depenser un point.")
+    for _,cell in ipairs(self.dashboardTalentGrid or {}) do
+      cell.name:SetText("")
+      cell.rank:SetText("")
+    end
+    return
+  end
   self.dashboardTalentHeader:SetText(
     "|cffEBC487ARBRE FURIE|r  |cffCDBB9B- Niveau "..view.plan.level.."|r")
   self.dashboardTalentCurrent:SetText(
