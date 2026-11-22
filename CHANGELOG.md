@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.6-rc1 — interface anthracite et bronze
+
+- Grande fenêtre entièrement recolorée : fond anthracite, cartes graphite, filets bronze et texte ivoire.
+- En-tête débarrassé des illustrations couvrantes et de la décoration superflue ; blason Horde conservé discrètement.
+- Boutons des quatre rubriques agrandis et sous-onglets en police plus lisible.
+- Navigation avec **état actif visible** sur les onglets de Guide, Combat et Conseils ; interactions de survol sur la navigation.
+- Réglages avec indicateur visuel actif/inactif pour les options et confirmation de réinitialisation.
+- Suppression des textures d'en-tête non utilisées, `HordeSky.tga` et `HeaderPlate.tga` (384 Kio environ).
+- Aucun changement de logique du guide, de la lecture des talents ni du mini-bilan.
+- Tests automatiques de navigation, d'état actif et de la présence des textures après simplification.
+
 ## 0.6.5-rc1 — les fonctions joueur dans les onglets
 
 - La fenêtre complète conserve un **Guide**, des **Conseils** et un onglet **Combat**, avec un quatrième onglet **Réglages** pour les options courantes.
