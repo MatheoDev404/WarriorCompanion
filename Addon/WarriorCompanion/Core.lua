@@ -57,6 +57,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
     WC:InitWeaponObserver()
     WC:InitTalentObserver()
     WC:UpdateQuestAdvice()
+    WC:BindQuestie()
     WC:CreateDashboard()
     WC:CreateMinimapButton()
     WC.ready = true
@@ -77,6 +78,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
     local priorXP = WC.metrics.xpGained
     local priorQuests = WC.metrics.questCount
     WC:OnObservedEvent(event, ...)
+    if event == "PLAYER_ENTERING_WORLD" then WC:BindQuestie() end
     if event == "PLAYER_EQUIPMENT_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
       WC:ReadWeapons()
     end
@@ -130,6 +132,7 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "gear" then WC:ShowGearQuestStatus()
   elseif msg == "talents" then WC:ShowTalentStatus()
   elseif msg == "quests" then WC:UpdateQuestAdvice(); WC:ShowQuestAdvice()
+  elseif msg == "questie" then WC:BindQuestie(); WC:ShowQuestieStatus()
   elseif msg == "minimap reset" then WC:ResetMinimapPosition()
   elseif msg == "autostart on" then
     WC:Profile().autoOpen = true; WC:Print("Ouverture automatique activee a la connexion.")
@@ -142,6 +145,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | minimap reset | autostart on/off | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | minimap reset | autostart on/off | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end

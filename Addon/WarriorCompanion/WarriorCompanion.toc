@@ -16,6 +16,7 @@ Spellbook.lua
 Weapons.lua
 TalentObserver.lua
 QuestAdvisor.lua
+QuestieBridge.lua
 WeaponTargets.lua
 FuryAdvisor.lua
 Advisor.lua
