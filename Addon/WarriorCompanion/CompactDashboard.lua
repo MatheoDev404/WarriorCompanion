@@ -65,12 +65,12 @@ function WC:CreateCompactDashboard()
   expand:SetScript("OnClick",function() WC:OpenFullDashboard() end)
   self.compactExpand=expand
   -- Trois statistiques sur une ligne ; toute la largeur pour la monnaie.
-  local names={{"XP",6,22},{"TEMPS",103,39},{"MORTS",210,43}}
+  local names={{"XP",6,20,53},{"TEMPS",83,42,79},{"MORTS",211,40,43}}
   self.compactStats={}
   for i,item in ipairs(names) do
     font(f,item[2],-30,item[3],17,"GameFontNormalSmall",
       "|cffC9A987"..item[1].."|r")
-    self.compactStats[i]=font(f,item[2]+item[3],-30,72,17,
+    self.compactStats[i]=font(f,item[2]+item[3],-30,item[4],17,
       "GameFontHighlightSmall")
   end
   block(f,5,-49,294,1,.35,.21,.17)
