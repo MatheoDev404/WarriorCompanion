@@ -21,7 +21,6 @@ TalentPlan.lua
 TalentLive.lua
 QuestAdvisor.lua
 QuestDiscovery.lua
-QuestClusters.lua
 QuestPlan.lua
 Guide.lua
 Guides/Horde_01_14.lua
