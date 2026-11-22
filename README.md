@@ -38,7 +38,7 @@ Le bouton utilise une icône guerrier native recadrée à 20 pixels, la bordure 
 
 GearQuest Forever est une source externe spécialisée pour rechercher des améliorations selon la classe, la spécialisation, le niveau, l'équipement porté, les quêtes, les boss et les vendeurs. Son classement dépend de pondérations internes et peut évoluer avec les mises à jour de Forever.
 
-Warrior Companion ne recopie pas son catalogue ni son scoring et **n'affirme pas qu'un objet particulier est un meilleur choix** : son dépôt public ne comporte pas de licence clairement déclarée et aucune API publique stable d'export des recommandations n'a été identifiée. Lorsque GearQuest est chargé et que nos observations signalent un besoin d'arme, un conseil informatif renvoie vers `/gq`. Cela évite les fausses informations, les prix HDV inventés et la duplication d'un système de classement complet.
+Warrior Companion ne recopie pas son catalogue ni son scoring et **n'affirme pas qu'un objet particulier est un meilleur choix** : son dépôt public ne comporte pas de licence clairement déclarée et aucune API publique stable d'export des recommandations n'a été identifiée. Lorsque GearQuest est chargé, un conseil informatif renvoie vers `/gq` après un changement de niveau ou d'équipement observé, afin de revoir **tous les emplacements** (armes, armure, bijoux et accessoires). Ce rappel expire après dix minutes. Cela évite les fausses informations, les prix HDV inventés et la duplication d'un système de classement complet.
 
 Pour vérifier l'intégration, utiliser `/wc gear` puis ouvrir GearQuest avec `/gq`. **GearQuest est optionnel** et Warrior Companion reste autonome sans lui. Le suivi des armes demeure disponible avec `/wc weapons`.
 

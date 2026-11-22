@@ -4,7 +4,7 @@
 
 - Vérification du fonctionnement et des sources documentées de GearQuest Forever, classement par spécialisation et niveau.
 - Aucun objet, prix ni comparaison d'arme n'est présenté comme confirmé sans accès à une API de données publique stable.
-- Détection optionnelle de GearQuest chargé ; conseil contextualisé vers `/gq` seulement si un besoin d'arme est observé.
+- Détection optionnelle de GearQuest ; rappel vers `/gq` après niveau gagné ou équipement modifié, pour comparer tous les emplacements. Fenêtre de pertinence de dix minutes.
 - Diagnostic `/wc gear` et test de non-régression sous Lua 5.1 et 5.4.
 
 

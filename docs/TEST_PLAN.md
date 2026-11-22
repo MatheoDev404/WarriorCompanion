@@ -141,6 +141,6 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 
 1. Sans GearQuest installé, `/wc gear` doit indiquer que les suggestions de provenance sont indisponibles, sans noms d'objets inventés.
 2. Installer GearQuest Forever, relancer le jeu puis `/wc gear` : l'addon doit être détecté.
-3. Vérifier sur un guerrier Furie avec main gauche vide ou phases de combat très longues : le conseil propose de consulter `/gq`, pas un équipement prétendument meilleur.
+3. Sur un guerrier Furie, monter d'un niveau ou changer une pièce d'équipement : le conseil doit proposer de consulter `/gq` pour **tous les emplacements**, pas seulement les armes. Après dix minutes, il doit disparaître.
 4. Dans GearQuest, sélectionner Guerrier/Furie, niveau actuel, vérifier les sources quêtes/boss/vendeurs et la comparaison avec l'objet équipé.
 5. En combat, aucun nouveau conseil de provenance ne doit être généré. Les prix et les disponibilités HDV ne doivent jamais être déclarés confirmés par Warrior Companion.
