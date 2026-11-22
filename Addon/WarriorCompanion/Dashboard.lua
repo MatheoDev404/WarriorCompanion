@@ -103,6 +103,16 @@ local function noteBox(parent, x, y, w, h, name, iconPath)
     w - 45, 18, tint(name, "EBC487"))
 end
 
+local function guideButton(parent, label, x, callback)
+  local b = CreateFrame("Button", nil, parent)
+  b:SetPoint("TOPLEFT", parent, "TOPLEFT", x, -250)
+  b:SetSize(110, 24)
+  rectangle(b, 0, 0, 110, 24, COLORS.darkPlate)
+  text(b, "GameFontNormalSmall", 8, -5, 100, 17, tint(label, "EBC487"))
+  b:SetScript("OnClick", callback)
+  return b
+end
+
 local function createSubPage(parent, heading, iconPath)
   noteBox(parent, 0, -4, 512, 237, heading, iconPath)
   return text(parent, "GameFontHighlight", 15, -43, 482, 184)
@@ -147,14 +157,15 @@ function WC:CreateDashboard()
 
   self.dashboardPages = {
     overview = contentPage(), combat = contentPage(),
-    advice = contentPage(), activity = contentPage()
+    advice = contentPage(), activity = contentPage(), guide = contentPage()
   }
   self.dashboardTabs = {}
   local tabs = {
     {"overview", -66, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
-    {"combat", -138, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
-    {"advice", -210, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
-    {"activity", -282, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
+    {"combat", -124, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
+    {"guide", -182, "Interface\\Icons\\INV_Misc_Map_01", "GUIDE"},
+    {"advice", -240, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
+    {"activity", -298, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
   }
   for _, item in ipairs(tabs) do
     self.dashboardTabs[item[1]] = tab(f, item[1], item[2], item[3], item[4])
@@ -206,6 +217,21 @@ function WC:CreateDashboard()
   self.dashboardActivityDetail = createSubPage(
     self.dashboardPages.activity, "JOURNAL DE SESSION",
     "Interface\\Icons\\INV_Misc_Note_01")
+
+  local guidePage = self.dashboardPages.guide
+  noteBox(guidePage, 0, -4, 512, 235, "GUIDE DE LEVELING",
+    "Interface\\Icons\\INV_Misc_Map_01")
+  self.dashboardGuideTitle = text(guidePage, "GameFontNormal", 15, -40, 477, 22)
+  self.dashboardGuideStatus = text(guidePage, "GameFontHighlightSmall", 15, -70, 477, 40)
+  self.dashboardGuideSteps = text(guidePage, "GameFontHighlight", 15, -114, 477, 117)
+  guideButton(guidePage, "< Precedente", 15, function()
+    if WC.GuideMove then WC:GuideMove(-1) end
+    WC:RefreshDashboard()
+  end)
+  guideButton(guidePage, "Suivante >", 140, function()
+    if WC.GuideMove then WC:GuideMove(1) end
+    WC:RefreshDashboard()
+  end)
 
   text(f, "GameFontHighlightSmall", 75, -343, 507, 15,
     tint("/wc help     /wc reset     /wc performance", "C1A08A"))
@@ -294,6 +320,18 @@ function WC:RefreshDashboard()
   self.dashboardAdviceDetail:SetText(advice)
   self.dashboardActivity:SetText(activityLines(self.activity, 2))
   self.dashboardActivityDetail:SetText(activityLines(self.activity, 8))
+  if self.dashboardGuideTitle then
+    local view = self.GetGuideView and self:GetGuideView()
+    if view then
+      self.dashboardGuideTitle:SetText(view.title or "Guide")
+      self.dashboardGuideStatus:SetText(view.status or "")
+      self.dashboardGuideSteps:SetText(view.steps or "")
+    else
+      self.dashboardGuideTitle:SetText("Aucun parcours charge")
+      self.dashboardGuideStatus:SetText("Itineraires issus de guides existants et verifies pour Forever.")
+      self.dashboardGuideSteps:SetText("Pas de trajet ou XP/h invente.\nLes commandes /wc quests et /wc discover restent disponibles.")
+    end
+  end
 end
 
 function WC:ToggleDashboard()
