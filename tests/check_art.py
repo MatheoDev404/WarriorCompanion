@@ -3,7 +3,7 @@ from pathlib import Path
 import struct
 
 root = Path(__file__).resolve().parents[1] / "Addon" / "WarriorCompanion" / "Textures"
-expected = {"Warcrest.tga": (128,128)}
+expected = {"Warcrest.tga": (128,128), "RoundedPanel.tga": (32,32)}
 for name, (width, height) in expected.items():
     data=(root / name).read_bytes()
     assert len(data)==18+width*height*4, f"{name}: taille"
