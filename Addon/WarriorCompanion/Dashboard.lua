@@ -232,8 +232,15 @@ function WC:CreateDashboard()
   rectangle(questPage, 18, -78, 582, 2, COLORS.ridge, "ARTWORK")
   self.dashboardQuestTitle = text(questPage, "GameFontNormalLarge", 24, -91,
     557, 26, tint("Etape en cours", "E9C58D"))
-  self.dashboardQuestDetail = text(questPage, "GameFontHighlight", 24,
-    -123, 550, 160, "Ouvre le guide pour voir la prochaine action.")
+  rectangle(questPage, 18, -123, 582, 91, COLORS.darkPlate)
+  rectangle(questPage, 18, -123, 4, 91, COLORS.litBlood, "ARTWORK")
+  self.dashboardQuestDetail = text(questPage, "GameFontHighlight", 33,
+    -135, 540, 77, "Ouvre le guide pour voir la prochaine action.")
+  rectangle(questPage, 18, -220, 582, 2, COLORS.ridge, "ARTWORK")
+  self.dashboardGuideLocation = text(questPage, "GameFontHighlight", 24,
+    -225, 554, 36)
+  self.dashboardGuideNextText = text(questPage, "GameFontHighlightSmall", 24,
+    -265, 554, 33)
 
   text(f, "GameFontHighlightSmall", 89, -439, 615, 15,
     tint("/wc help     /wc reset     /wc performance", "C1A08A"))
@@ -315,8 +322,16 @@ function WC:RefreshDashboard()
     local view=self:GetGuideView()
     self.dashboardQuestTitle:SetText(view and view.title or "Guide Horde")
     self.dashboardQuestDetail:SetText(view and
-      ((view.status or "").."\n\n"..(view.steps or "")) or
+      ("|cffEBC487A FAIRE MAINTENANT|r\n"..(view.actionText or view.steps or "")) or
       "Aucun parcours charge.")
+    if self.dashboardGuideLocation then
+      self.dashboardGuideLocation:SetText(view and
+        ("|cffA0C8EEOU ALLER|r  "..(view.locationText or "")) or "")
+    end
+    if self.dashboardGuideNextText then
+      self.dashboardGuideNextText:SetText(view and
+        ("|cffBAAA91ENSUITE|r  "..(view.nextText or "")) or "")
+    end
   end
 end
 
