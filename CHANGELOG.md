@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0-rc1 — refonte visuelle Horde guerrier
+
+- Nouveau panneau plus grand, contrasté, rouge sombre / acier noirci / bronze.
+- Quatre sections lisibles et séparées, icône guerrier, stats XP/h de session et glissante, combat, conseils et dernières activités.
+- Affichage actualisé pendant l'ouverture seulement, sans provoquer de nouvelles notifications.
+- Tests d'interface simulée et documentation d'une validation visuelle en jeu.
+
 ## 0.3.1-dev — XP/heure récente
 
 - Calcul glissant XP/h sur dix minutes et comparaison à la session via `/wc performance`.
