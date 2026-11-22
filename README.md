@@ -15,7 +15,7 @@ Interface ciblée : `16001`. La compatibilité et le rendu réels doivent être 
 
 **Mini-bilan (304 × 88)** : XP gagnée sur la session, temps écoulé `HH:MM:SS`, morts, solde net avec **icônes or/argent/cuivre** et code couleur vert/rouge/gris, et une ligne de conseil. Il est déplaçable, avec position mémorisée. Bouton `>>` pour la fenêtre complète.
 
-**Fenêtre complète (720 × 460)** : quatre rubriques simples, avec les fonctions regroupées dans des sous-onglets :
+**Fenêtre complète (720 × 520)** : quatre rubriques simples, avec les fonctions regroupées dans des sous-onglets :
 
 - **GUIDE** — **Étapes**, **Talents**, **Mes quêtes**, **À prendre**. Suivi du parcours Horde sous forme de quatre cartes d'étapes compactes, barre de progression et texte important mis en avant, puis arbre Furie 10–60.
 - **CONSEILS** — **Conseils**, **Équipement**, **Santé**, **Armes**, **Sorts**. Données du personnage accessibles directement sans messages de diagnostic.
