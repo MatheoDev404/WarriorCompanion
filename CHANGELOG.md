@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.8-rc1 — HUD compact et minimap recalée
+
+- Recomposition de la fenêtre en 600 × 360 unités WoW (contre 710 × 448) ; statistiques et fonctions préservées.
+- Sidebar, bandeau, cartes et journal réorganisés ; conseil abrégé dans le bilan, intégral dans Conseils.
+- Rayon de placement de l'icône calculé depuis la taille réelle de la minimap (repli prudent si non disponible).
+- Nouvelle commande `/wc minimap reset` pour corriger une position enregistrée gênante ; déplacement toujours possible.
+- Tests Lua 5.1/5.4 et protocole visuel en jeu.
+
+
+
 ## 0.5.7-rc1 — vérification stricte des conseils d'armes
 
 - Vérification du fonctionnement et des sources documentées de GearQuest Forever, classement par spécialisation et niveau.
