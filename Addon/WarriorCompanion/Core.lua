@@ -38,6 +38,7 @@ local events = {
   "PLAYER_LOGIN", "PLAYER_ENTERING_WORLD", "PLAYER_XP_UPDATE", "PLAYER_LEVEL_UP",
   "PLAYER_DEAD", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
   "PLAYER_EQUIPMENT_CHANGED", "PLAYER_TALENT_UPDATE", "CHARACTER_POINTS_CHANGED",
+  "TRAIT_CONFIG_UPDATED", "TRAIT_NODE_CHANGED", "ACTIVE_TALENT_GROUP_CHANGED",
   "PLAYER_MONEY", "QUEST_LOG_UPDATE", "SKILL_LINES_CHANGED",
   "UNIT_HEALTH", "UNIT_MAXHEALTH", "PLAYER_ALIVE", "PLAYER_UNGHOST",
   "SPELLS_CHANGED", "LEARNED_SPELL_IN_SKILL_LINE"
@@ -56,6 +57,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
     WC:InitSpellbookObserver()
     WC:InitWeaponObserver()
     WC:InitTalentObserver()
+    if WC.ObserveLiveFuryTalents then WC:ObserveLiveFuryTalents() end
     WC:UpdateQuestAdvice()
     if WC.GuideStart then WC:GuideStart() end
     WC:BindQuestie()
@@ -92,10 +94,14 @@ frame:SetScript("OnEvent", function(_, event, ...)
         WC:GuideAdvanceFromJournal()
       end
     end
-    if event == "PLAYER_TALENT_UPDATE" or event == "CHARACTER_POINTS_CHANGED" then
+    if event == "PLAYER_TALENT_UPDATE" or event == "CHARACTER_POINTS_CHANGED"
+        or event == "TRAIT_CONFIG_UPDATED" or event == "TRAIT_NODE_CHANGED"
+        or event == "ACTIVE_TALENT_GROUP_CHANGED" then
       WC:ObserveTalents(true)
+      if WC.ObserveLiveFuryTalents then WC:ObserveLiveFuryTalents() end
     elseif event == "PLAYER_ENTERING_WORLD" then
       WC:ObserveTalents(false)
+      if WC.ObserveLiveFuryTalents then WC:ObserveLiveFuryTalents() end
     end
     WC:OnCombatObservedEvent(event)
     if event == "SPELLS_CHANGED" or event == "LEARNED_SPELL_IN_SKILL_LINE" then
@@ -133,7 +139,10 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "gear" then
     WC:OpenFullDashboard()
     WC:ShowDashboardPage("advice")
-  elseif msg == "talents" then WC:ShowTalentStatus()
+  elseif msg == "talents" then
+    WC:ShowTalentStatus()
+    if WC.ObserveLiveFuryTalents then WC:ObserveLiveFuryTalents() end
+    if WC.OpenQuestPlan then WC:OpenQuestPlan("talents") end
   elseif msg == "quests" then WC:OpenQuestPlan("journal")
   elseif msg == "questie" then WC:BindQuestie(); WC:ShowQuestieStatus()
   elseif msg == "discover" then WC:OpenQuestPlan("discover")
