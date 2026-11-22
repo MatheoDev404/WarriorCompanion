@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.7-rc1 — Guide de leveling sur le modèle de PexGuide
+
+- Étude de l'archive PexGuide fournie par l'utilisateur (notamment `Theme.lua` et `UI.lua`) : séparation titre/étapes/progression, cartes compactes, couleurs ardoise et or et polices du client.
+- Remplacement du grand bloc vide de l'onglet **Guide → Étapes** par un suivi compact : carte principale plus haute (texte sur plusieurs lignes), trois prochaines actions, compteur et barre de progression.
+- Ajout d'une texture **RoundedPanel.tga originale** et d'un moteur de panneaux 9-slice propres à Warrior Companion, sans copier les images ni le code de PexGuide.
+- Amélioration du rendu des textes importés : suppression des préfixes techniques de zone `>>`, traductions prudentes des mouvements courants.
+- Les modes **Talents, Mes quêtes, À prendre**, le mini-bilan, les conseils et les réglages sont conservés.
+- Dépendance graphique locale uniquement, contrôlée par les tests ; tests de navigation, de progression et de lecture des étapes.
+- La refonte concerne la présentation, sans promettre une validation des parcours ou de l'API des talents en jeu.
+
 ## 0.6.6-rc1 — interface anthracite et bronze
 
 - Grande fenêtre entièrement recolorée : fond anthracite, cartes graphite, filets bronze et texte ivoire.
