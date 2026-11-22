@@ -17,7 +17,7 @@ Interface ciblée : `16001`. La compatibilité et le rendu réels doivent être 
 
 **Fenêtre complète (720 × 460)** : quatre rubriques simples, avec les fonctions regroupées dans des sous-onglets :
 
-- **GUIDE** — **Étapes**, **Talents**, **Mes quêtes**, **À prendre**. Suivi du parcours Horde, progression sauvegardée et arbre Furie 10–60.
+- **GUIDE** — **Étapes**, **Talents**, **Mes quêtes**, **À prendre**. Suivi du parcours Horde sous forme de quatre cartes d'étapes compactes, barre de progression et texte important mis en avant, puis arbre Furie 10–60.
 - **CONSEILS** — **Conseils**, **Équipement**, **Santé**, **Armes**, **Sorts**. Données du personnage accessibles directement sans messages de diagnostic.
 - **COMBAT** — **Combats**, **Performance**. Mesures de combat et taux d'XP sur la session et les dix dernières minutes.
 - **RÉGLAGES** — boutons pour l'ouverture automatique, les notifications et la remise à zéro des compteurs de session.
@@ -30,7 +30,7 @@ Les anciens onglets principaux **Bilan** et **Journal** ont été supprimés : i
 
 ## Guide de leveling
 
-Les six fichiers `Guides/Horde_*.lua` contiennent un parcours Horde **1–60** construit à partir d'un guide OpenXP existant. Attribution et licence conservées dans `Addon/WarriorCompanion/Guides/LICENSE-CC-BY-NC-SA-4.0.txt` (**CC BY-NC-SA 4.0**). Le guide utilise la progression mémorisée et permet de reprendre au niveau du personnage.
+Le suivi visuel du guide reprend les principes de PexGuide (panneaux ardoise à coins arrondis, étapes empilées, accents or) grâce à une texture et une implémentation originales. Aucun fichier de PexGuide n'est intégré au paquet.\n\nLes six fichiers `Guides/Horde_*.lua` contiennent un parcours Horde **1–60** construit à partir d'un guide OpenXP existant. Attribution et licence conservées dans `Addon/WarriorCompanion/Guides/LICENSE-CC-BY-NC-SA-4.0.txt` (**CC BY-NC-SA 4.0**). Le guide utilise la progression mémorisée et permet de reprendre au niveau du personnage.
 
 Les étapes de quête peuvent afficher le nom fourni par le client français. Les objectifs non confirmés conservent leur texte source ; certains noms et parcours importés restent à vérifier dans le jeu.
 
