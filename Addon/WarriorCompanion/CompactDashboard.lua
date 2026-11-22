@@ -64,7 +64,7 @@ function WC:CreateCompactDashboard()
   font(expand,6,-1,20,17,"GameFontNormalSmall",">>")
   expand:SetScript("OnClick",function() WC:OpenFullDashboard() end)
   self.compactExpand=expand
-  local names={{"XP",5},{"XP/H",75},{"MORTS",159},{"QUETES",228}}
+  local names={{"XP",5},{"XP/H",75},{"MORTS",159},{"OR +/-",228}}
   self.compactStats={}
   for i,item in ipairs(names) do
     local x=item[2]
@@ -82,13 +82,26 @@ function WC:CreateCompactDashboard()
     if elapsed>=3 then elapsed=0;WC:RefreshCompactDashboard() end
   end)
 end
+-- Balance nette de la session, en pieces d'or. Montant de reference en cuivre.
+local function goldBalance(copper)
+  if type(copper)~="number" or copper~=copper or
+      copper==math.huge or copper==-math.huge then return "--" end
+  local gold=copper/10000
+  local absolute=math.abs(gold)
+  if absolute>=1000 then
+    return string.format("%s%.1fk",gold<0 and "-" or "+",absolute/1000)
+  end
+  return string.format("%+.2f",gold)
+end
+
 function WC:RefreshCompactDashboard()
   if not self.compactDashboard or not self.compactDashboard:IsShown() then return end
   local m=self.metrics or {}
   local xp=self.XPPerHour and self:XPPerHour()
+  local balance=self.MoneyDelta and self:MoneyDelta()
   local values={
     tostring(m.xpGained or 0),xp and tostring(math.floor(xp+.5)) or "--",
-    tostring(m.deaths or 0),m.questCount and tostring(m.questCount) or "--",
+    tostring(m.deaths or 0),goldBalance(balance),
   }
   for i=1,4 do self.compactStats[i]:SetText(values[i]) end
   local advice=self.AdviceLines and self:AdviceLines() or ""
