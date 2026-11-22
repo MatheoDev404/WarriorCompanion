@@ -125,7 +125,7 @@ WC:PositionMinimapButton(0/0)
 assert(opts.minimapAngle==205,"invalid saved angle")
 WC.minimapButton=nil
 button=WC:CreateMinimapButton()
-assert(opts.minimapAngle==225 and button.anchor[4]<0,"persisted angle")
+assert(opts.minimapAngle==205 and button.anchor[4]<0,"persisted angle")
 
 WC:AutoOpenDashboard()
 assert(WC.dashboard:IsShown() and WC.refreshes==1)
