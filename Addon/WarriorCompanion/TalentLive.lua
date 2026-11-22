@@ -70,7 +70,9 @@ local function configID()
   local specAPI=type(C_SpecializationInfo)=="table" and C_SpecializationInfo
   local group=specAPI and safeNumber(call(specAPI.GetActiveSpecGroup))
   if group==nil then return nil end
-  return safeNumber(call(specAPI.GetCombatConfigIDForSpecGroup,group))
+  local read=specAPI.GetCombatConfigIDForSpecGroup or
+    _G.GetCombatConfigIDForSpecGroup
+  return safeNumber(call(read,group))
 end
 local function extract()
   local traits=type(C_Traits)=="table" and C_Traits
