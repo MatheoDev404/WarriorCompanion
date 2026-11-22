@@ -235,6 +235,32 @@ now = now + 600
 event("PLAYER_ENTERING_WORLD")
 assert(WC:AdviceLines():find("Aucune XP", 1, true))
 local command = SlashCmdList.WARRIORCOMPANION
+-- Chaque commande utilisateur correspond a une vue cliquable identique.
+for _,case in ipairs({
+  {"combat","combat","combat"},
+  {"performance","combat","performance"},
+  {"gear","advice","equipment"},
+  {"health","advice","health"},
+  {"weapons","advice","weapons"},
+  {"spells","advice","spells"},
+  {"advice","advice","advice"},
+  {"settings","settings",nil},
+}) do
+  command(case[1])
+  assert(WC.dashboard:IsShown() and WC.dashboardPage==case[2],
+    "commande utilisateur integree : "..case[1])
+  if case[2]=="advice" then
+    assert(WC.adviceMode==case[3],case[1])
+  elseif case[2]=="combat" then
+    assert(WC.combatMode==case[3],case[1])
+  end
+end
+command("guide")
+assert(WC.dashboardPage=="quests" and WC.questPlanMode=="guide")
+command("talents")
+assert(WC.dashboardPage=="quests" and WC.questPlanMode=="talents")
+command("quests")
+assert(WC.dashboardPage=="quests" and WC.questPlanMode=="journal")
 -- Une sauvegarde ancienne ou endommagée ne doit pas activer le journal.
 WC_DB = "invalide"
 assert(WC:Profile().debug == false)
