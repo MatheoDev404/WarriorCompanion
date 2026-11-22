@@ -202,6 +202,16 @@ function WC:EquipmentReviewText()
     lines[#lines+1]="Verifie l'armure, les bonus et les restrictions avant d'equiper."
     lines[#lines+1]=""
   end
+  local targets=self.EquipmentQuestTargets and self:EquipmentQuestTargets(3) or {}
+  if #targets>0 then
+    lines[#lines+1]="OBJETS A OBTENIR (QUETES) :"
+    for _,p in ipairs(targets) do
+      lines[#lines+1]="- "..p.name.." : "..p.reason
+      lines[#lines+1]="  "..p.source.." ["..p.risk.."]"
+    end
+    lines[#lines+1]="Propositions basees sur des recompenses documentees, pas un meilleur DPS garanti."
+    lines[#lines+1]=""
+  end
   if #result.rows==0 then
     lines[#lines+1]="Aucun signal evident parmi les objets lisibles."
   else
