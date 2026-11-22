@@ -21,6 +21,51 @@ local function rect(parent,x,y,w,h,color)
   t:SetVertexColor(color[1],color[2],color[3],color[4])
   return t
 end
+-- Neuf morceaux redimensionnables d'une texture arrondie originale.
+-- Reprend le principe du nine-slice de PexGuide, sans en copier les assets.
+local PANEL="Interface\\\\AddOns\\\\WarriorCompanion\\\\Textures\\\\RoundedPanel.tga"
+local function round(parent,x,y,w,h,color)
+  local holder=CreateFrame("Frame",nil,parent)
+  holder:SetPoint("TOPLEFT",parent,"TOPLEFT",x,y)
+  holder:SetSize(w,h)
+  local parts={}
+  local corner=8
+  local pieces={
+    {0,.25,0,.25,"TOPLEFT",nil,nil,0,0,corner,corner},
+    {.75,1,0,.25,"TOPRIGHT",nil,nil,0,0,corner,corner},
+    {0,.25,.75,1,"BOTTOMLEFT",nil,nil,0,0,corner,corner},
+    {.75,1,.75,1,"BOTTOMRIGHT",nil,nil,nil,0,0,corner,corner},
+  }
+  for _,p in ipairs(pieces) do
+    local t=holder:CreateTexture(nil,"ARTWORK")
+    t:SetTexture(PANEL)
+    t:SetTexCoord(p[1],p[2],p[3],p[4])
+    t:SetSize(corner,corner)
+    t:SetPoint(p[5],holder,p[5],0,0)
+    parts[#parts+1]=t
+  end
+  local specs={
+    {.25,.75,0,.25,"TOPLEFT",corner,0,"TOPRIGHT",-corner,0},
+    {.25,.75,.75,1,"BOTTOMLEFT",corner,0,"BOTTOMRIGHT",-corner,0},
+    {0,.25,.25,.75,"TOPLEFT",0,-corner,"BOTTOMLEFT",0,corner},
+    {.75,1,.25,.75,"TOPRIGHT",0,-corner,"BOTTOMRIGHT",0,corner},
+    {.25,.75,.25,.75,"TOPLEFT",corner,-corner,"BOTTOMRIGHT",-corner,corner},
+  }
+  for _,p in ipairs(specs) do
+    local t=holder:CreateTexture(nil,"ARTWORK")
+    t:SetTexture(PANEL)
+    t:SetTexCoord(p[1],p[2],p[3],p[4])
+    t:SetPoint(p[5],holder,p[5],p[6],p[7])
+    t:SetPoint(p[8],holder,p[8],p[9],p[10])
+    parts[#parts+1]=t
+  end
+  local handle={}
+  function handle:SetVertexColor(rr,gg,bb,aa)
+    for _,t in ipairs(parts) do t:SetVertexColor(rr,gg,bb,aa or 1) end
+  end
+  handle:SetVertexColor(color[1],color[2],color[3],color[4])
+  return handle
+end
 local function label(parent,x,y,w,h,sz,color)
   local fs=parent:CreateFontString(nil,"OVERLAY","GameFontHighlight")
   fs:SetPoint("TOPLEFT",parent,"TOPLEFT",x,y)
@@ -44,7 +89,7 @@ function WC:CreateGuideTracker(page)
   local root=CreateFrame("Frame",nil,page)
   root:SetSize(570,255)
   root:SetPoint("TOPLEFT",page,"TOPLEFT",24,-91)
-  rect(root,0,0,570,255,C.bg)
+  round(root,0,0,570,255,C.bg)
   root.heading=label(root,10,-5,450,23,14,C.white)
   root.count=label(root,464,-5,98,23,11,C.muted)
   rect(root,10,-31,550,1,C.border)
@@ -55,7 +100,7 @@ function WC:CreateGuideTracker(page)
     local height=n==1 and 65 or 37
     row:SetSize(548,height)
     row:SetPoint("TOPLEFT",root,"TOPLEFT",11,positions[n])
-    row.bg=rect(row,0,0,548,height,C.card)
+    row.bg=round(row,0,0,548,height,C.card)
     row.accent=rect(row,0,0,3,height,C.border)
     row.number=label(row,12,-5,30,height-10,n==1 and 14 or 12,C.muted)
     row.title=label(row,48,-5,488,height-10,n==1 and 13 or 12,C.white)
