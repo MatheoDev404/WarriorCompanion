@@ -77,3 +77,12 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 3. Sur la page Bilan, vérifier simultanément les 4 compteurs du haut, les icônes de monnaie, les deux cartes Combat et Conseil, puis l'historique court en bas.
 4. Tester les 4 onglets latéraux, les variations d'or/argent/cuivre négatives, la fermeture, le déplacement et l'échelle de l'interface.
 5. Prendre une capture : vérifier que les ornements, chiffres et textes ne se chevauchent pas dans le client réel.
+
+## Test en jeu : conseiller de PV (0.5.0-rc1)
+
+1. Activer `/console scriptErrors 1`, faire `/reload`, puis `/wc health` au repos avec PV complets.
+2. Sur un personnage vivant avec moins de 35 % PV **hors combat**, ouvrir `/wc` puis l'onglet Conseils : un rappel de récupération doit apparaître, sans message de chat automatique.
+3. Une fois soigné à 35 % ou plus, ce conseil doit disparaître lors du prochain changement de PV.
+4. Pendant le combat, aucun rappel de récupération ne doit s'ajouter ; vérifier sa mise à jour après la sortie du combat.
+5. Après une mort ou une résurrection, le conseil ne doit pas inventer un pourcentage si l'API n'est pas lisible.
+6. `/wc health` affiche la mesure ou `indisponibles`. Fournir les erreurs Lua éventuelles et la sortie de cette commande.
