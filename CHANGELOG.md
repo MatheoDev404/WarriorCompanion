@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2-rc1 — observation des sorts et rangs
+
+- Lecture prudente des onglets du grimoire via `C_SpellBook` sur Forever.
+- Détection des nouvelles entrées ou rangs depuis la référence de session, sans inventer les sorts disponibles chez les maîtres.
+- Conseil informatif Furie valable dix minutes après une nouvelle observation ; commande `/wc spells`.
+- Protection contre API absentes, valeurs secrètes, indices invalides et changement massif d'onglets.
+- Tests Lua 5.1 et 5.4 ajoutés.
+
 ## 0.5.1-rc1 — conseils ciblés guerrier Furie
 
 - Conseils de récupération propres au guerrier Furie lorsqu'il est sous 35 % PV hors combat.

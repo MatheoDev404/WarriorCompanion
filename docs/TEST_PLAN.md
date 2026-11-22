@@ -94,3 +94,11 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 3. Repasser au-dessus du seuil : le conseil doit disparaître.
 4. Après cinq phases de combat dont la durée moyenne dépasse 45 s, un conseil d'efficacité devrait apparaître ; il ne doit pas prétendre connaître le DPS réel.
 5. Vérifier l'absence de notification automatique pour ces conseils.
+
+## Test en jeu du grimoire V0.5.2-rc1
+
+1. Connecter un guerrier puis `/wc spells` : afficher un nombre de sorts/rangs détectés. Si absent, noter précisément le diagnostic.
+2. Apprendre réellement un rang chez un maître, puis `/wc spells` : il doit figurer comme nouveauté observée.
+3. Ouvrir `/wc` → Conseils : suggestion de vérifier les barres d'action pendant dix minutes, sans notification chat automatique.
+4. Si le grimoire est temporairement indisponible, ne pas afficher de conseil fondé sur une lecture incomplète.
+5. `/wc reset` réinitialise la référence du grimoire et n'annonce pas les sorts déjà connus comme nouvellement appris.
