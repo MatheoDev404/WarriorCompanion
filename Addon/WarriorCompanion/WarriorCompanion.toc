@@ -1,0 +1,12 @@
+## Interface: 16001
+## Title: Warrior Companion
+## Notes: Observateur et conseiller de progression pour WoW Forever
+## Author: Warrior Companion
+## Version: 0.1.0-dev
+## SavedVariables: WC_DB
+
+Core.lua
+Diagnostics.lua
+Observer.lua
+Advisor.lua
+Dashboard.lua
