@@ -3,6 +3,32 @@ local WC={}
 local playerLevel=33
 function UnitLevel() return playerLevel end
 assert(loadfile("Addon/WarriorCompanion/TalentPlan.lua"))("WarriorCompanion",WC)
+local valid,reason=WC:ValidateTalentPlan()
+assert(valid and reason==nil,"parcours 10-60 doit respecter tous les paliers")
+local order=WC.talentPlan
+local old=order[25]
+order[25]={level=25,key="Improved Whirlwind",rank=1}
+valid,reason=WC:ValidateTalentPlan()
+assert(not valid and reason:find("Palier",1,true),
+  "interdire un talent de palier trop profond")
+order[25]=old
+old=order[30]
+order[30]={level=30,key="Booming Voice",rank=1}
+valid,reason=WC:ValidateTalentPlan()
+assert(not valid and reason:find("Prerequis",1,true),
+  "Bloodthirst doit exiger Death Wish")
+order[30]=old
+local saved={}
+for level=41,43 do
+  saved[level]=order[level]
+  order[level]={level=level,key="Booming Voice",rank=level-40}
+end
+valid,reason=WC:ValidateTalentPlan()
+assert(not valid and reason:find("Prerequis",1,true),
+  "Gore Drinker doit exiger Blood Craze 3/3")
+for level=41,43 do order[level]=saved[level] end
+valid,reason=WC:ValidateTalentPlan()
+assert(valid and reason==nil,"le parcours restaure reste valide")
 assert(WC:TalentPlanLevel(9)==nil and WC:TalentPlanLevel(61)==nil)
 local totals={}
 for level=10,60 do
