@@ -1,22 +1,24 @@
 # Warrior Companion
 
-Addon autonome d'observation et de conseils pour **WoW Forever**.
+Addon **autonome** pour WoW Forever : il observe la session et conseille sans imposer d'itineraire.
 
-## Objectif
-Observer les événements accessibles au client (niveau, expérience, combats, morts, équipement), produire des indicateurs fiables, puis afficher des **alertes prioritaires discrètes** et un **tableau de bord consultable à la demande**.
+## Version 0.2.0 - premiere version a tester
+- Mesure XP de session et XP/h depuis le chargement ou la remise a zero
+- Morts, variation d'argent et nombre d'entrees de quetes
+- Alerte automatique pour les points de talent non depenses (seulement si l'API est disponible), jamais pendant le combat, repetee au maximum toutes les 5 minutes
+- Conseils moins urgents dans un panneau ouvrable avec `/wc`
+- Journal de diagnostic opt-in (maximum 100 entrees en RAM, efface lorsque desactive)
+- Aucun trafic reseau, aucune copie d'un guide tiers
 
-Ce projet ne reprend pas le code de PexGuide et ne suit pas de parcours de quêtes imposé.
+## Installation
+Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/WarriorCompanion` de votre client Forever. Verifier le repertoire effectivement utilise et la version d'interface `16001`.
 
-## Principes
-- Mode mixte : alertes importantes automatiques, autres conseils dans le tableau de bord
-- Pas d'alerte répétée pendant un combat
-- Résultats incertains signalés comme tels
-- Logs désactivables et limités ; pas de journalisation intrusive
-- Un commit par fonctionnalité et des tests avant chaque version
-- Les tests sur WoW Forever doivent être réalisés séparément des simulations
+## Commandes
+`/wc` (ouvrir/fermer), `/wc status`, `/wc reset`,
+`/wc debug on`, `/wc debug off`, `/wc logs`, `/wc clear`,
+`/wc alerts on`, `/wc alerts off`, `/wc help`.
 
-## Statut
-Projet initialisé. API cliente, démarrage et interface à valider en jeu. La compatibilité n'est pas encore démontrée.
+## Validation
+`python3 tests/check_structure.py` puis `lua5.4 tests/test_addon.lua`, ou GitHub Actions.
 
-## Structure visée
-`Addon/WarriorCompanion/` : fichiers chargés par WoW ; `tests/` : tests hors jeu ; `docs/` : documentation et scénarios de validation.
+**Attention :** cette version a des tests automatises simulant les API ; elle n'a pas encore ete confirmee sur le client WoW Forever. Les controles de sorts, Premiers secours, armes et quetes rentables viendront seulement apres verification de leurs API.

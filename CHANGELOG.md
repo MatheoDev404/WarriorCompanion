@@ -1,10 +1,11 @@
-# Journal des versions
+# Changelog
 
-## 0.1.0-dev — socle initial
-- Observateur XP, niveaux et morts
-- Conseiller prudent : alerte uniquement pour les points de talent non dépensés si l'API le permet
-- Tableau de bord à la demande et messages prioritaires en chat hors combat
-- Diagnostic désactivable et tampon de 80 traces
-- Tests structurels et protocole de test en jeu
+## 0.2.0 - test initial
+- Corrige chargement, gestion des commandes et compteur d'XP lors des transitions de niveau
+- Ajoute observation des morts, monnaie et journal de quetes
+- Ajoute conseils informatifs et alerte de talent a delai de rappel 5 minutes hors combat
+- Interface plus informative et diagnostics effacables
+- Tests Lua simules, controle du TOC, compilation de syntaxe et workflow GitHub Actions
 
-**Statut :** prototype ; tests dans WoW Forever non effectués.
+## 0.1.0-dev
+- Prototype initial : observateur, conseils, interface et diagnostics

@@ -1,69 +1,111 @@
 local _, WC = ...
-local function safeNumber(fn)
+local function playerNumber(fn)
   if type(fn) ~= "function" then return nil end
-  local ok, value = pcall(fn, "player")
-  if ok and type(value) == "number" then return value end
+  local ok, n = pcall(fn, "player")
+  if ok and type(n) == "number" then return n end
+  return nil
+end
+local function plainNumber(fn)
+  if type(fn) ~= "function" then return nil end
+  local ok, n = pcall(fn)
+  if ok and type(n) == "number" then return n end
   return nil
 end
 
 function WC:InitObserver()
   local m = self.metrics
-  m.lastLevel = safeNumber(UnitLevel)
-  m.lastXP = safeNumber(UnitXP)
-  m.lastXPMax = safeNumber(UnitXPMax)
-  self:Trace("observer", "initialise")
+  m.started = self:Now()
+  m.lastLevel = playerNumber(UnitLevel)
+  m.lastXP = playerNumber(UnitXP)
+  m.lastXPMax = playerNumber(UnitXPMax)
+  m.moneyStart = plainNumber(GetMoney)
+  m.moneyNow = m.moneyStart
+  m.questCount = self:ReadQuestCount()
+  self:Trace("observer", "session demarree")
 end
 
-function WC:RecordXP()
+function WC:RecordXP(event, newLevel)
   local m = self.metrics
-  local level, xp, max = safeNumber(UnitLevel), safeNumber(UnitXP), safeNumber(UnitXPMax)
-  if not (level and xp and max and max > 0) then
-    self:Trace("observer", "XP indisponible")
+  local level, xp, xpMax = playerNumber(UnitLevel), playerNumber(UnitXP), playerNumber(UnitXPMax)
+  if not (level and xp and xpMax and xpMax > 0) then
+    self:Trace("xp", "API indisponible")
     return
   end
-  if m.lastLevel and m.lastXP and m.lastXPMax then
+  local beforeLevel, beforeXP, beforeMax = m.lastLevel, m.lastXP, m.lastXPMax
+  if beforeLevel and beforeXP and beforeMax then
     local gain = 0
-    if level == m.lastLevel then
-      if xp >= m.lastXP then gain = xp - m.lastXP end
-    elseif level == m.lastLevel + 1 then
-      gain = math.max(0, m.lastXPMax - m.lastXP) + math.max(0, xp)
+    if level == beforeLevel and xp >= beforeXP then
+      gain = xp - beforeXP
+    elseif level == beforeLevel + 1 then
+      gain = math.max(0, beforeMax - beforeXP) + math.max(0, xp)
+    elseif event == "PLAYER_LEVEL_UP" and type(newLevel) == "number" and newLevel == beforeLevel + 1 then
+      -- L'API peut encore afficher l'ancien niveau dans cet evenement.
+      self:Trace("xp", "transition de niveau en attente")
+      return
     else
-      self:Trace("observer", "saut de niveau : gain non calcule")
+      self:Trace("xp", "transition ambigue : aucun gain estime")
     end
     if gain > 0 then
       m.xpGained = m.xpGained + gain
       self:Trace("xp", "+" .. tostring(gain))
     end
   end
-  m.lastLevel, m.lastXP, m.lastXPMax = level, xp, max
+  m.lastLevel, m.lastXP, m.lastXPMax = level, xp, xpMax
 end
 
-function WC:OnObservedEvent(event)
+function WC:ReadQuestCount()
+  if type(GetNumQuestLogEntries) ~= "function" then return nil end
+  local ok, count = pcall(GetNumQuestLogEntries)
+  if ok and type(count) == "number" then return count end
+  return nil
+end
+
+function WC:OnObservedEvent(event, ...)
+  local m = self.metrics
   if event == "PLAYER_XP_UPDATE" or event == "PLAYER_LEVEL_UP" then
-    self:RecordXP()
+    self:RecordXP(event, ...)
   elseif event == "PLAYER_DEAD" then
-    self.metrics.deaths = self.metrics.deaths + 1
-    self:Trace("death", "mort detectee")
+    m.deaths = m.deaths + 1
+    self:Trace("death", "mort")
+  elseif event == "PLAYER_MONEY" then
+    m.moneyNow = plainNumber(GetMoney)
+    self:Trace("money", "mise a jour")
+  elseif event == "QUEST_LOG_UPDATE" then
+    local count = self:ReadQuestCount()
+    if count ~= m.questCount then
+      m.questCount = count
+      self:Trace("quests", "journal actualise")
+    end
   elseif event == "PLAYER_EQUIPMENT_CHANGED" then
     self:Trace("equipment", "changement d'equipement")
-  elseif event == "PLAYER_ENTERING_WORLD" then
-    self:RecordXP()
-  elseif event == "PLAYER_TALENT_UPDATE" then
+  elseif event == "PLAYER_TALENT_UPDATE" or event == "CHARACTER_POINTS_CHANGED" then
     self:Trace("talents", "mise a jour")
+  elseif event == "SKILL_LINES_CHANGED" then
+    self:Trace("skills", "competences actualisees")
+  elseif event == "PLAYER_ENTERING_WORLD" then
+    self:RecordXP(event)
   end
 end
 
 function WC:ResetSession()
-  self.metrics.xpGained = 0
-  self.metrics.deaths = 0
-  self.metrics.started = self:Now()
+  local m = self.metrics
+  m.xpGained, m.deaths = 0, 0
   self:InitObserver()
   self:Trace("observer", "session reinitialisee")
+  self:Print("Session reinitialisee.")
   self:Refresh()
 end
 
 function WC:XPPerHour()
-  local elapsed = self:Now() - (self.metrics.started or self:Now())
+  local m = self.metrics
+  if not m.started then return nil end
+  local elapsed = self:Now() - m.started
   if elapsed < 60 then return nil end
-  return math.floor(self.metrics.xpGained * 3600 / elapsed + 0.5)
+  return math.floor(m.xpGained * 3600 / elapsed + 0.5)
+end
+
+function WC:MoneyDelta()
+  local m = self.metrics
+  if type(m.moneyStart) ~= "number" or type(m.moneyNow) ~= "number" then return nil end
+  return m.moneyNow - m.moneyStart
 end

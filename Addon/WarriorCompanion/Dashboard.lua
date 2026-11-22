@@ -1,15 +1,18 @@
 local _, WC = ...
-local function makeText(parent, size)
-  local label = parent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  label:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", size)
-  label:SetJustifyH("LEFT")
-  return label
+local function makeLabel(parent, font, x, y, width, height)
+  local text = parent:CreateFontString(nil, "OVERLAY", font)
+  text:SetPoint("TOPLEFT", parent, "TOPLEFT", x, y)
+  text:SetWidth(width)
+  text:SetHeight(height)
+  text:SetJustifyH("LEFT")
+  text:SetJustifyV("TOP")
+  return text
 end
 
 function WC:CreateDashboard()
   if self.dashboard then return end
   local f = CreateFrame("Frame", "WarriorCompanionDashboard", UIParent)
-  f:SetSize(310, 188)
+  f:SetSize(350, 238)
   f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   f:SetFrameStrata("DIALOG")
   f:EnableMouse(true)
@@ -17,50 +20,39 @@ function WC:CreateDashboard()
   f:RegisterForDrag("LeftButton")
   f:SetScript("OnDragStart", function(frame) frame:StartMoving() end)
   f:SetScript("OnDragStop", function(frame) frame:StopMovingOrSizing() end)
-  local bg = f:CreateTexture(nil, "BACKGROUND")
-  bg:SetAllPoints(f)
-  bg:SetTexture("Interface\\Buttons\\WHITE8X8")
-  bg:SetVertexColor(0.06, 0.08, 0.12, 0.94)
-
-  local title = makeText(f, 14)
-  title:SetPoint("TOPLEFT", f, "TOPLEFT", 12, -14)
-  title:SetText("Warrior Companion")
-  local subtitle = makeText(f, 11)
-  subtitle:SetPoint("TOPLEFT", f, "TOPLEFT", 12, -43)
-  subtitle:SetWidth(286)
-  local stats = makeText(f, 12)
-  stats:SetPoint("TOPLEFT", f, "TOPLEFT", 12, -68)
-  stats:SetWidth(286)
-  local advice = makeText(f, 11)
-  advice:SetPoint("TOPLEFT", f, "TOPLEFT", 12, -109)
-  advice:SetWidth(286)
-  advice:SetHeight(56)
-  advice:SetJustifyV("TOP")
-
+  local background = f:CreateTexture(nil, "BACKGROUND")
+  background:SetAllPoints(f)
+  background:SetTexture("Interface\\Buttons\\WHITE8X8")
+  background:SetVertexColor(0.05, 0.07, 0.10, 0.94)
+  makeLabel(f, "GameFontNormalLarge", 12, -14, 310, 22):SetText("Warrior Companion")
+  self.dashboardStats = makeLabel(f, "GameFontHighlight", 12, -51, 320, 70)
+  self.dashboardAdvice = makeLabel(f, "GameFontHighlightSmall", 12, -137, 320, 78)
   local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
   close:SetScript("OnClick", function() f:Hide() end)
   f:Hide()
   self.dashboard = f
-  self.dashboardSubtitle = subtitle
-  self.dashboardStats = stats
-  self.dashboardAdvice = advice
 end
 
 function WC:RefreshDashboard()
   if not self.dashboard then return end
+  local m = self.metrics
   local xp = self:XPPerHour()
-  self.dashboardSubtitle:SetText("Session en cours - " .. self.version)
-  self.dashboardStats:SetText("XP gagnee : " .. tostring(self.metrics.xpGained) ..
-    "  |  XP/h : " .. (xp and tostring(xp) or "attente") ..
-    "\nMorts : " .. tostring(self.metrics.deaths))
-  local first = self.alerts and self.alerts[1]
-  self.dashboardAdvice:SetText(first and first.message or
-    "Aucun conseil prioritaire verifie pour l'instant.")
+  local money = self:MoneyDelta()
+  self.dashboardStats:SetText(
+    "XP gagnee : " .. tostring(m.xpGained) ..
+    "   |   XP/h : " .. (xp and tostring(xp) or "attente") ..
+    "\nMorts : " .. tostring(m.deaths) ..
+    "   |   Quetes (journal) : " .. (m.questCount and tostring(m.questCount) or "inconnu") ..
+    "\nVariation d'argent : " .. (money and tostring(money) .. " cuivre" or "indisponible"))
+  self.dashboardAdvice:SetText("Conseils :\n" .. self:AdviceLines())
 end
 
 function WC:ToggleDashboard()
-  if not self.dashboard then return end
+  if not self.dashboard then
+    self:Print("Interface non initialise.")
+    return
+  end
   if self.dashboard:IsShown() then self.dashboard:Hide()
   else self:RefreshDashboard(); self.dashboard:Show() end
 end
