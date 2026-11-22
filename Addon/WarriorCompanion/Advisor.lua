@@ -24,6 +24,14 @@ function WC:UpdateAdvice()
       message = tostring(points) .. " point(s) de talent non depense(s)."
     }
   end
+  local health = self.health and self.health.percent
+  if health and not self.inCombat and health > 0 and health < 35 then
+    alerts[#alerts + 1] = {
+      id = "health-low",
+      priority = "info",
+      message = "Vie basse (" .. tostring(health) .. "%) : recupere avant un nouveau combat."
+    }
+  end
   local deaths = self.metrics.deaths
   if deaths >= 3 then
     alerts[#alerts + 1] = {
