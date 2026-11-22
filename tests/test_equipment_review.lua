@@ -15,13 +15,14 @@ function WC:IsWarrior() return true end
 assert(loadfile("Addon/WarriorCompanion/EquipmentReview.lua"))("WarriorCompanion",WC)
 local report=WC:ReadEquipmentReview()
 assert(report and #report.rows>=3)
-assert(report.rows[1].reason=="emplacement vide","emplacement epaules manquant")
+assert(report.rows[1].reason=="emplacement vide","emplacement vide")
 local text=WC:EquipmentReviewText()
 assert(text:find("Torse",1,true) and text:find("Jambes",1,true))
 assert(text:find("pistes",1,true),"n'affirme pas une vraie amelioration")
 local list={}
 WC:AddEquipmentReviewAdvice(list)
 assert(#list==1 and list[1].id=="equipment-review")
+ids[2]=502; info[502]={"Collier",2,30}
 ids[3]=503; info[503]={"Epaules",2,30}
 info[505]={"Torse correct",2,30};info[507]={"Jambes correctes",2,30}
 report=WC:ReadEquipmentReview()
