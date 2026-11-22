@@ -77,7 +77,7 @@ local function tab(parent, key, y, iconPath, name)
   end)
   frame:SetScript("OnLeave", function()
     if WC.dashboardPage~=key then
-      frame.base:SetVertexColor(unpack(COLORS.darkPlate))
+      frame.base:SetVertexColor(COLORS.darkPlate[1],COLORS.darkPlate[2],COLORS.darkPlate[3],COLORS.darkPlate[4])
     end
   end)
   return frame
@@ -374,8 +374,8 @@ local function refreshGuideButtons(self)
   for key,b in pairs(self.dashboardQuestButtons) do
     local color=key==active and COLORS.blood or COLORS.darkPlate
     local accent=key==active and COLORS.gold or COLORS.ridge
-    b.base:SetVertexColor(unpack(color))
-    b.accent:SetVertexColor(unpack(accent))
+    b.base:SetVertexColor(color[1],color[2],color[3],color[4])
+    b.accent:SetVertexColor(accent[1],accent[2],accent[3],accent[4])
   end
 end
 
