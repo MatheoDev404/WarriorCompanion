@@ -69,6 +69,17 @@ local function classify(row, playerLevel)
 end
 
 function WC:ScanQuestLog()
+  -- Refuser de classer des quetes pour l'autre faction ou classe.
+  if not self.IsWarrior or not self:IsWarrior() then
+    return nil, "Classe guerrier non confirmee"
+  end
+  if type(UnitFactionGroup) ~= "function" then
+    return nil, "Faction du joueur indisponible"
+  end
+  local factionOK, faction = pcall(UnitFactionGroup,"player")
+  if not factionOK or not readable(faction,"string") or faction ~= "Horde" then
+    return nil, "Conseils reserves a la Horde"
+  end
   local api = C_QuestLog
   if type(api) ~= "table" or type(api.GetNumQuestLogEntries) ~= "function"
       or type(api.GetInfo) ~= "function" then
@@ -162,7 +173,7 @@ function WC:QuestAdviceLines()
     lines[#lines+1]="["..tostring(row.level).."] "..row.name..
       " (#"..tostring(row.id)..") - "..labels[row.category]
   end
-  lines[#lines+1]="Journal accepte = accessible, pas preuve Horde-exclusive. "..
+  lines[#lines+1]="Journal du joueur Horde, pas preuve de quete Horde-exclusive. "..
     "Niveau de quete != niveau des ennemis; temps et recompenses inconnus."
   return table.concat(lines,"\n")
 end
