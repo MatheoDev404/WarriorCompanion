@@ -1,6 +1,6 @@
 local addonName, WC = ...
 _G.WarriorCompanion = WC
-WC.version = "0.2.0"
+WC.version = "0.2.1"
 WC.metrics = { xpGained = 0, deaths = 0, started = nil, lastXP = nil, lastXPMax = nil, lastLevel = nil, moneyStart = nil, moneyNow = nil, questCount = nil }
 WC.alerts = {}
 WC.inCombat = false

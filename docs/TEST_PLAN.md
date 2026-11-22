@@ -1,15 +1,24 @@
-# Premier test en jeu - WoW Forever
+# Vérification sur WoW Forever
 
-1. Installer le dossier `Addon/WarriorCompanion` dans le dossier `Interface/AddOns/` du jeu.
-2. Executer `/console scriptErrors 1` puis `/reload`.
-3. Executer `/wc status` ; noter quelles API sont presentes.
-4. Executer `/wc` ; la fenetre doit s'ouvrir, afficher les metriques et se fermer avec le bouton X.
-5. Executer `/wc debug on`, gagner de l'XP, puis `/wc logs`. Verifier le gain.
-6. Observer un passage de niveau si possible ; ne pas accepter un double comptage XP.
-7. Changer d'argent ou de journal de quetes et verifier l'affichage.
-8. Verifier qu'une alerte de talent (si l'API existe et des points sont libres) ne se repete pas immediatement, ni en combat.
-9. Executer `/wc reset`, puis `/wc debug off` pour effacer le journal.
+## Référence de l’audit
 
-Envoyer les messages d'erreur Lua et le resultat de `/wc status` pour corriger les incompatibilites.
+Le point de départ est la version 0.2.0, commit `c1d15f9`. La revue couvre les cinq modules Lua, le TOC, les deux tests, le workflow, les fichiers de documentation et les exclusions Git. La référence technique est l’export de l’interface Blizzard pour Forever 1.60.1, build 71037, commit `734f065`. [Arbre de référence](https://github.com/Gethe/wow-ui-source/tree/734f065329cff4992835b01a84f210a297db91b6/Interface/AddOns)
 
-**Limites connues :** XP/h est une moyenne de session, pas un indicateur glissant ; apres un saut de plusieurs niveaux les gains inconnus ne sont pas estimes ; les quetes et competences restent des observations basiques, pas des conseils prescriptifs.
+| Sujet | Contrat consulté |
+| --- | --- |
+| Quêtes | `C_QuestLog.GetNumQuestLogEntries()` renvoie les lignes affichées, puis le nombre de quêtes. L’interface Camelot utilise le deuxième résultat pour son compteur. [Interface du journal](https://github.com/Gethe/wow-ui-source/blob/734f065329cff4992835b01a84f210a297db91b6/Interface/AddOns/Blizzard_UIPanels_Game/Camelot/QuestMapFrameUtils.lua#L16) |
+| Talents | `C_ClassTalents.HasUnspentTalentPoints()` renvoie un booléen, les points de classe et les points de spécialisation. [Signature](https://github.com/Gethe/wow-ui-source/blob/734f065329cff4992835b01a84f210a297db91b6/Interface/AddOns/Blizzard_APIDocumentationGenerated/ClassTalentsDocumentation.lua#L195) |
+| XP et niveau | `UnitXP`, `UnitXPMax` et `UnitLevel` lisent le joueur. `PLAYER_LEVEL_UP` transporte le nouveau niveau. L’ordre de mise à jour de ces lectures reste à vérifier sur le client. [Fonctions et événements](https://github.com/Gethe/wow-ui-source/blob/734f065329cff4992835b01a84f210a297db91b6/Interface/AddOns/Blizzard_APIDocumentationGenerated/UnitDocumentation.lua) |
+| Combat et lectures restreintes | L’initialisation lit `InCombatLockdown()`. Les lecteurs écartent les valeurs signalées par `issecretvalue`. [État de combat](https://github.com/Gethe/wow-ui-source/blob/734f065329cff4992835b01a84f210a297db91b6/Interface/AddOns/Blizzard_APIDocumentationGenerated/RestrictedActionsDocumentation.lua#L45) · [Valeurs secrètes](https://github.com/Gethe/wow-ui-source/blob/734f065329cff4992835b01a84f210a297db91b6/Interface/AddOns/Blizzard_APIDocumentationGenerated/FrameScriptDocumentation.lua#L287) |
+| Monnaie | `GetMoney()` fournit une valeur numérique. La variation requiert une première lecture exploitable. [Signature](https://github.com/Gethe/wow-ui-source/blob/734f065329cff4992835b01a84f210a297db91b6/Interface/AddOns/Blizzard_APIDocumentationGenerated/PlayerScriptDocumentation.lua#L642) |
+
+## Essai en jeu à effectuer
+
+1. Installer l’addon, activer les erreurs avec `/console scriptErrors 1`, puis faire `/reload`. Relever le build dans `/dump GetBuildInfo()`, la version dans `/wc status` et les API signalées.
+2. Ouvrir `/wc`, déplacer la fenêtre et la fermer avec la croix. Vérifier que le tableau reste fermé lors d’un gain d’XP et que les conseils courants sont présents à sa réouverture.
+3. Exécuter `/wc reset`, puis `/wc debug on`. Noter l’XP et le seuil avant un gain ordinaire et avant un passage de niveau. Après un seul niveau, comparer le gain au seuil précédent moins l’XP précédente, plus la nouvelle XP. Comparer à nouveau après un changement de zone. Noter toute divergence et les messages de `/wc logs`. Une barre inactive ou un saut de plusieurs niveaux peut laisser une partie du gain non mesurée.
+4. Replier une catégorie dans le journal de quêtes puis accepter et rendre une quête. Le repli doit garder le même total. Comparer aussi le solde d’argent avant et après un achat.
+5. Avec un point de talent disponible, comparer le message au panneau du personnage. Lors d’un rechargement en combat, vérifier que l’alerte attend la sortie du combat. Dépenser le point et vérifier que le conseil disparaît. Avec `/wc alerts off`, vérifier que le tableau reste consultable sans notification.
+6. Après trois morts, chercher le conseil dans le tableau. Changer un objet équipé et observer les traces. Avec `/wc debug off` puis `/wc logs`, vérifier que le journal est vide. Finir avec `/wc reset` et contrôler les compteurs.
+
+Consigner le build, la version de l’addon, l’action, le résultat attendu, le résultat observé et la première erreur Lua éventuelle. Le rendu, les restrictions réelles du client et l’ordre des événements nécessitent cet essai. Aucun résultat en jeu n’a été consigné pour la version 0.2.1.
