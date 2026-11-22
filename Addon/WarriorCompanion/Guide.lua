@@ -171,6 +171,12 @@ local function readableStep(self, step)
   return value
 end
 
+-- Le tracker et la vue detaillee partagent les memes traductions prudentes.
+function WC:GuideStepText(step)
+  if type(step)~="table" then return "" end
+  return readableStep(self,step)
+end
+
 local function shortLocation(step)
   if type(step.zone) ~= "string" or step.zone == "" then return nil end
   local place = step.zone
