@@ -56,6 +56,7 @@ function WC:AddFuryAdvice(items)
         newest.name .. "). Verifie tes barres d'action et son utilisation."
     }
   end
+  if self.AddWeaponAdvice then self:AddWeaponAdvice(items) end
   -- Ne pas deduire la specialisation reelle, le DPS des armes ou la maitrise de
   -- Premiers secours d'une API non validee.
 end
