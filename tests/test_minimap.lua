@@ -3,6 +3,10 @@ local function mkframe()
   local f={shown=false,scripts={}}
   function f:SetSize(w,h) self.w,self.h=w,h end
   function f:SetPoint(...) self.anchor={...} end
+  function f:ClearAllPoints() self.anchor=nil end
+  function f:RegisterForDrag(...) self.dragButtons={...} end
+  function f:GetCenter() return 100, 100 end
+  function f:GetEffectiveScale() return 1 end
   function f:SetFrameStrata(s) self.strata=s end
   function f:EnableMouse(x) self.mouse=x end
   function f:RegisterForClicks(...) self.clicks={...} end
@@ -34,6 +38,8 @@ function tooltip:AddLine(value) self.line=value end
 function tooltip:Show() self.shown=true end
 function tooltip:Hide() self.shown=false end
 GameTooltip=tooltip
+local cursorX,cursorY=200,100
+function GetCursorPosition() return cursorX,cursorY end
 
 local opts={autoOpen=true}
 local wc={dashboard=mkframe(),traceCalls=0}
@@ -48,9 +54,29 @@ assert(loadfile("Addon/WarriorCompanion/Minimap.lua"))("WarriorCompanion",wc)
 local button=wc:CreateMinimapButton()
 assert(button and button.parent==Minimap and button.w==33 and button.h==33)
 assert(button.name=="WarriorCompanionMinimapButton")
-assert(button.anchor[1]=="TOPRIGHT" and button.anchor[2]==Minimap,"anchor at minimap edge")
+assert(button.anchor[1]=="CENTER" and button.anchor[2]==Minimap,"anchor at minimap center")
+assert(button.dragButtons[1]=="LeftButton","draggable")
+assert(math.abs(button.anchor[4]-55.15)<0.1 and math.abs(button.anchor[5]-55.15)<0.1,"default 45 degree placement")
 assert(button.clicks[1]=="LeftButtonUp")
 assert(wc:CreateMinimapButton()==button,"no duplicate")
+button.scripts.OnDragStart(button)
+assert(button.dragging and math.abs(opts.minimapAngle-0)<0.001)
+cursorX,cursorY=100,200
+button.scripts.OnUpdate(button,0.1)
+assert(math.abs(opts.minimapAngle-90)<0.001)
+assert(math.abs(button.anchor[4])<0.01 and math.abs(button.anchor[5]-78)<0.01)
+cursorX,cursorY=0,100
+button.scripts.OnDragStop(button)
+assert(not button.dragging and math.abs(opts.minimapAngle-180)<0.001)
+button.scripts.OnClick(button,"LeftButton")
+assert(not wc.dashboard:IsShown(),"drag should not click")
+button.scripts.OnMouseDown(button)
+-- Position remains saved through recreation of the minimap button.
+local saved=opts.minimapAngle
+wc.minimapButton=nil
+button=wc:CreateMinimapButton()
+assert(opts.minimapAngle==saved and button.anchor[4] < -77, "saved position used on rebuild")
+
 button.scripts.OnClick(button,"LeftButton")
 assert(wc.dashboard:IsShown(),"minimap click opens")
 button.scripts.OnClick(button,"RightButton")
@@ -84,4 +110,4 @@ Minimap=nil
 assert(wc2:CreateMinimapButton()==nil,"minimap absence guarded")
 Minimap=mkframe()
 assert(wc2:CreateMinimapButton()~=nil,"retry once loaded")
-print("OK: minimap toggle, tooltip, no duplicates, auto start and deferred minimap")
+print("OK: minimap dragging, saved position, click after drag, tooltip, autostart, retry")

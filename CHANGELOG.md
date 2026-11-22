@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.4-rc1 — bouton de minimap standard et deplacable
+
+- Bouton librement déplaçable autour du bord de la minimap, par glisser-déposer.
+- Position angulaire sauvegardée et restaurée à la prochaine connexion.
+- Protection contre les clics accidentels après déplacement ; ouverture auto inchangée.
+- Tests Lua 5.1 et 5.4 du déplacement, des quatre quadrants et de la persistance.
+
 ## 0.5.3-rc1 — minimap et lancement automatique
 
 - Bouton guerrier sur le bord de la minimap : clic gauche pour ouvrir et fermer le tableau.
