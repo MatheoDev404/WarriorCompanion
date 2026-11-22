@@ -86,11 +86,11 @@ end
 local function tab(parent, key, y, iconPath, name)
   local frame = CreateFrame("Button", nil, parent)
   frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, y)
-  frame:SetSize(55, 61)
-  frame.base = rectangle(frame, 0, 0, 55, 60, COLORS.darkPlate)
-  frame.accent = rectangle(frame, 0, 0, 3, 60, COLORS.ridge)
-  picture(frame, iconPath, 14, -6, 27, 27)
-  text(frame, "GameFontNormalSmall", 2, -38, 52, 19,
+  frame:SetSize(55, 52)
+  frame.base = rectangle(frame, 0, 0, 55, 51, COLORS.darkPlate)
+  frame.accent = rectangle(frame, 0, 0, 3, 51, COLORS.ridge)
+  picture(frame, iconPath, 16, -5, 23, 23)
+  text(frame, "GameFontNormalSmall", 2, -31, 52, 17,
     tint(name, "DAB68E"))
   frame:SetScript("OnClick", function() WC:ShowDashboardPage(key) end)
   return frame
@@ -147,14 +147,15 @@ function WC:CreateDashboard()
 
   self.dashboardPages = {
     overview = contentPage(), combat = contentPage(),
-    advice = contentPage(), activity = contentPage()
+    advice = contentPage(), activity = contentPage(), quests = contentPage()
   }
   self.dashboardTabs = {}
   local tabs = {
-    {"overview", -66, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
-    {"combat", -138, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
-    {"advice", -210, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
-    {"activity", -282, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
+    {"overview", -62, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
+    {"combat", -120, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
+    {"advice", -178, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
+    {"activity", -236, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
+    {"quests", -294, "Interface\\Icons\\INV_Misc_Map_01", "QUETES"},
   }
   for _, item in ipairs(tabs) do
     self.dashboardTabs[item[1]] = tab(f, item[1], item[2], item[3], item[4])
@@ -206,6 +207,33 @@ function WC:CreateDashboard()
   self.dashboardActivityDetail = createSubPage(
     self.dashboardPages.activity, "JOURNAL DE SESSION",
     "Interface\\Icons\\INV_Misc_Note_01")
+
+  local questPage = self.dashboardPages.quests
+  noteBox(questPage, 0, -4, 512, 237, "PLAN DE LEVELING",
+    "Interface\\Icons\\INV_Misc_Map_01")
+  local options = {
+    {"journal", "JOURNAL", 11, 111},
+    {"discover", "A PRENDRE", 130, 117},
+    {"route", "PARCOURS", 255, 117},
+  }
+  self.dashboardQuestButtons = {}
+  for _, data in ipairs(options) do
+    local button = CreateFrame("Button", nil, questPage)
+    button:SetSize(data[4], 26)
+    button:SetPoint("TOPLEFT", questPage, "TOPLEFT", data[3], -40)
+    rectangle(button, 0, 0, data[4], 26, COLORS.ridge)
+    rectangle(button, 2, -2, data[4]-4, 22, COLORS.darkPlate)
+    text(button, "GameFontNormalSmall", 7, -5, data[4]-12, 18,
+      tint(data[2], "F0C58A"))
+    local mode = data[1]
+    button:SetScript("OnClick", function() WC:SelectQuestPlan(mode) end)
+    self.dashboardQuestButtons[mode] = button
+  end
+  self.dashboardQuestTitle = text(questPage, "GameFontNormalSmall", 13, -77,
+    484, 17, tint("Choisis une vue de quetes", "E9C58D"))
+  self.dashboardQuestDetail = text(questPage, "GameFontHighlightSmall", 13,
+    -99, 484, 139, "Journal, quetes a prendre, ou departs regroupes.\n" ..
+      "Les parcours ne sont pas encore des itinéraires verifies.")
 
   text(f, "GameFontHighlightSmall", 75, -343, 507, 15,
     tint("/wc help     /wc reset     /wc performance", "C1A08A"))
@@ -294,6 +322,7 @@ function WC:RefreshDashboard()
   self.dashboardAdviceDetail:SetText(advice)
   self.dashboardActivity:SetText(activityLines(self.activity, 2))
   self.dashboardActivityDetail:SetText(activityLines(self.activity, 8))
+  -- Donnees des quetes mises a jour uniquement au clic explicite.
 end
 
 function WC:ToggleDashboard()

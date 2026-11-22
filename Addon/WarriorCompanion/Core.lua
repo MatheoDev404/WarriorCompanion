@@ -1,6 +1,6 @@
 local addonName, WC = ...
 _G.WarriorCompanion = WC
-WC.version = "0.6.2-rc1"
+WC.version = "0.6.3-rc1"
 WC.metrics = { xpGained = 0, deaths = 0, started = nil, lastXP = nil, lastXPMax = nil, lastLevel = nil, moneyStart = nil, moneyNow = nil, questCount = nil }
 WC.alerts = {}
 WC.inCombat = false
@@ -131,10 +131,10 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "weapons" then WC:ShowWeaponStatus()
   elseif msg == "gear" then WC:ShowGearQuestStatus()
   elseif msg == "talents" then WC:ShowTalentStatus()
-  elseif msg == "quests" then WC:UpdateQuestAdvice(); WC:ShowQuestAdvice()
+  elseif msg == "quests" then WC:OpenQuestPlan("journal")
   elseif msg == "questie" then WC:BindQuestie(); WC:ShowQuestieStatus()
-  elseif msg == "discover" then WC:ShowQuestDiscovery()
-  elseif msg == "route" then WC:ShowQuestClusters()
+  elseif msg == "discover" then WC:OpenQuestPlan("discover")
+  elseif msg == "route" then WC:OpenQuestPlan("route")
   elseif msg == "minimap reset" then WC:ResetMinimapPosition()
   elseif msg == "autostart on" then
     WC:Profile().autoOpen = true; WC:Print("Ouverture automatique activee a la connexion.")

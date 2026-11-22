@@ -27,6 +27,14 @@ local entries={
     requiredRaces=16,requiredClasses=1,startedBy={{11}},questFlags=0},
  [109]={name="Candidat secondaire",requiredLevel=22,questLevel=20,
     requiredRaces=0,requiredClasses=0,startedBy={{12}},questFlags=0},
+ [81730]={name="Duskwood Mission I: Defeat Worgen",requiredLevel=23,questLevel=27,
+    requiredRaces=0,requiredClasses=0,startedBy={{221471}},questFlags=0},
+ [81731]={name="Duskwood Mission II: Defeat Ogres",requiredLevel=23,questLevel=27,
+    requiredRaces=0,requiredClasses=0,startedBy={{221471}},questFlags=0},
+ [81747]={name="Duskwood Mission XVIII: Rescue",requiredLevel=23,questLevel=27,
+    requiredRaces=0,requiredClasses=0,startedBy={{221471}},questFlags=0},
+ [120]={name="Autre quete Elite",requiredLevel=23,questLevel=22,
+    requiredRaces=16,requiredClasses=1,startedBy={{12}},questFlags=0},
  [110]={name="Quete a recompense conditionnelle",requiredLevel=23,questLevel=22,
     requiredRaces=16,requiredClasses=1,startedBy={{12}},questFlags=0,
     requiredSkill={164,100}},
@@ -34,7 +42,13 @@ local entries={
 local fields={requiredLevel=true,questLevel=true,requiredRaces=true,requiredClasses=true,
   startedBy=true,name=true}
 local complete={[105]=true}
-C_QuestLog={IsQuestFlaggedCompleted=function(id) return complete[id]==true end}
+C_QuestLog={
+ IsQuestFlaggedCompleted=function(id) return complete[id]==true end,
+ GetQuestTagInfo=function(id)
+   if id==120 then return {isElite=true,tagID=0} end
+   return nil
+ end
+}
 local ids={}
 for id in pairs(entries) do ids[#ids+1]=id end
 table.sort(ids)
@@ -68,6 +82,10 @@ end
 assert(loadfile("Addon/WarriorCompanion/QuestDiscovery.lua"))("WarriorCompanion",WC)
 local result,reason=WC:DiscoverQuests()
 assert(result and not reason and result.matched==2 and #result.rows==2)
+for _,row in ipairs(result.rows) do
+  assert(row.id<81730 or row.id>81747,"elite Duskwood incursions excluded")
+  assert(row.id~=120,"explicit elite tag excluded")
+end
 assert(result.rows[1].id==100 and result.rows[2].id==109,
   "must rank closer to player level minus two")
 WC:ShowQuestDiscovery()

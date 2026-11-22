@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.3-rc1 — correctif de sécurité des recommandations de quêtes
+
+- Les missions d'incursion du Bois de la Pénombre (IDs 81730–81747, vérifiées Élite) ne sont plus proposées comme pistes solo.
+- Les tags de difficulté élite/donjon/groupe lus explicitement dans le client sont exclus quand disponibles.
+- Les regroupements de PNJ de départ sont affichés comme **pistes à vérifier**, pas comme itinéraires ou quêtes solo garanties.
+- Régression issue d'une capture en jeu d'un guerrier Horde niveau 33 ; tests Lua 5.1/5.4.
+
+
+
 ## 0.6.2-rc1 — regroupement des PNJ de départ
 
 - Nouvelle commande `/wc route` : regroupe des pistes `/wc discover` par zone et proximité de PNJ de départ vérifiés via QuestieDB.
