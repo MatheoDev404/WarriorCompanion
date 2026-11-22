@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.5-rc1 — les fonctions joueur dans les onglets
+
+- La fenêtre complète conserve un **Guide**, des **Conseils** et un onglet **Combat**, avec un quatrième onglet **Réglages** pour les options courantes.
+- Sous-vues **Conseils / Équipement / Santé / Armes / Sorts** dans Conseils.
+- Sous-vues **Combats / Performance** dans Combat, dont les taux XP/h de session et des dix dernières minutes.
+- **Réglages** permet de modifier l'ouverture automatique, les notifications et de réinitialiser les compteurs de session après un double clic de confirmation.
+- Les anciennes commandes utilisateur `/wc gear`, `health`, `weapons`, `spells`, `combat` et `performance` ouvrent directement les pages correspondantes. Les autres commandes de navigation sont conservées comme raccourcis.
+- Les outils de diagnostic et de développement restent dans le chat : `status`, `fury`, `questie`, `history`, `debug`, `logs`, `clear`.
+- Les trois pages de Guide **Étapes / Talents / Mes quêtes** et **À prendre** restent inchangées.
+- Tests automatisés de navigation, mises à jour de réglages, et compatibilité Lua 5.1/5.4.
+
 ## 0.6.4-rc1 — nettoyage et recentrage sur le leveling
 
 - Suppression du module `QuestClusters.lua`, de la commande `/wc route`, de la vue temporaire de regroupement de PNJ et de leur test obsolète.
