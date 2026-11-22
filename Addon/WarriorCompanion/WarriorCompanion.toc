@@ -19,6 +19,7 @@ QuestAdvisor.lua
 QuestDiscovery.lua
 QuestClusters.lua
 QuestPlan.lua
+Guide.lua
 QuestieBridge.lua
 WeaponTargets.lua
 FuryAdvisor.lua
