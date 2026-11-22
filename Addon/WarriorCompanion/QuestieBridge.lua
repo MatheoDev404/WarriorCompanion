@@ -56,6 +56,6 @@ function WC:ShowQuestieStatus()
   else
     self:Print("Questie absent ou interface publique inaccessible. Journal WoW utilise.")
   end
-  self:Print("Warrior Companion classe uniquement les quetes acceptees lues sur le client ; "..
-    "pas de liste de quetes disponibles garantie ni de nouveaux marqueurs.")
+  self:Print("Warrior Companion classe les quetes acceptees et recherche sur demande "..
+    "des pistes non acceptees avec QuestieDB ; aucun nouveau marqueur.")
 end

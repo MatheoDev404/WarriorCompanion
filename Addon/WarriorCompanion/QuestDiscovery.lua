@@ -67,7 +67,7 @@ local function starterExists(value)
   return false
 end
 
-function WC:DiscoverQuests()
+function WC:DiscoverQuests(limit)
   if not self.IsWarrior or not self:IsWarrior()
       or type(UnitFactionGroup)~="function"
       or type(UnitRace)~="function"
@@ -159,8 +159,12 @@ function WC:DiscoverQuests()
     if a.level~=b.level then return a.level<b.level end
     return a.id<b.id
   end)
+  local maxRows=MAX_RESULTS
+  if type(limit)=="number" and limit==math.floor(limit) and limit>=1 and limit<=40 then
+    maxRows=limit
+  end
   local top={}
-  for i=1,math.min(MAX_RESULTS,#result) do top[i]=result[i] end
+  for i=1,math.min(maxRows,#result) do top[i]=result[i] end
   return {rows=top,matched=#result,level=level,scanned=examined},nil
 end
 
