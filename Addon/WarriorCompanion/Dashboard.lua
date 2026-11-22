@@ -473,11 +473,11 @@ function WC:RefreshSettingsPanel()
   local alerts=options.showAlerts and "ACTIVES" or "DESACTIVEES"
   self.dashboardSettingsInfo:SetText(
     "|cffEBC487DEMARRAGE AUTOMATIQUE|r   "..auto..
-    "\\nLe mini-bilan s'ouvre a la connexion si active."..
-    "\\n\\n|cffEBC487NOTIFICATIONS|r   "..alerts..
-    "\\nAlertes importantes dans le chat, jamais en combat."..
+    "\nLe mini-bilan s'ouvre a la connexion si active."..
+    "\n\n|cffEBC487NOTIFICATIONS|r   "..alerts..
+    "\nAlertes importantes dans le chat, jamais en combat."..
     (self.settingsResetMessage and
-      ("\\n\\n|cff75D38A"..self.settingsResetMessage.."|r") or ""))
+      ("\n\n|cff75D38A"..self.settingsResetMessage.."|r") or ""))
 end
 function WC:AdviceViewText()
   local mode=self.adviceMode or "advice"
@@ -488,65 +488,65 @@ function WC:AdviceViewText()
   if mode=="health" then
     local h=self.health
     if not h or h.percent==nil then
-      return "POINTS DE VIE\\n\\nLecture indisponible ou protegee."
+      return "POINTS DE VIE\n\nLecture indisponible ou protegee."
     end
-    return "|cffEBC487POINTS DE VIE|r\\n\\n"..
+    return "|cffEBC487POINTS DE VIE|r\n\n"..
       tostring(h.current).." / "..tostring(h.maximum)..
       "   ("..tostring(h.percent).." %)"..
-      "\\n\\nSoigne-toi et recupere entre les combats."
+      "\n\nSoigne-toi et recupere entre les combats."
   end
   if mode=="weapons" then
     local w=self.weapons
     if not w or not w.available then
-      return "ARMES\\n\\nLecture indisponible : "..
+      return "ARMES\n\nLecture indisponible : "..
         tostring(w and w.reason or "non initialisee")
     end
-    return "|cffEBC487MAIN DROITE|r\\n"..tostring(w.main or "Vide")..
+    return "|cffEBC487MAIN DROITE|r\n"..tostring(w.main or "Vide")..
       "  -  "..tostring(w.mainType or w.mainReason or "Type inconnu")..
-      "\\n\\n|cffEBC487MAIN GAUCHE|r\\n"..tostring(w.off or "Vide")..
+      "\n\n|cffEBC487MAIN GAUCHE|r\n"..tostring(w.off or "Vide")..
       "  -  "..tostring(w.offType or w.offReason or "Type inconnu")..
-      "\\n\\nLe type d'arme ne suffit pas pour evaluer son DPS."
+      "\n\nLe type d'arme ne suffit pas pour evaluer son DPS."
   end
   if mode=="spells" then
     local book=self.spellbook
     if not book or not book.known then
-      return "SORTS\\n\\nGrimoire non disponible : "..
+      return "SORTS\n\nGrimoire non disponible : "..
         tostring(book and book.reason or "non initialise")
     end
     local count=0
     for _ in pairs(book.known) do count=count+1 end
     local latest=book.learned and book.learned[#book.learned]
-    return "|cffEBC487GRIMOIRE OBSERVE|r\\n\\n"..
+    return "|cffEBC487GRIMOIRE OBSERVE|r\n\n"..
       count.." sorts et rangs identifies"..
-      "\\n\\nNouveaux pendant la session : "..
+      "\n\nNouveaux pendant la session : "..
       tostring(book.learned and #book.learned or 0)..
-      (latest and ("\\nDernier : "..latest.name) or "")..
-      "\\n\\nLes sorts a acheter au maitre ne sont pas deduits."
+      (latest and ("\nDernier : "..latest.name) or "")..
+      "\n\nLes sorts a acheter au maitre ne sont pas deduits."
   end
   local advice=self:AdviceLines(false)
-  return "|cffF0CA90PRIORITES|r\\n"..advice..
-    "\\n\\nConsulte EQUIPEMENT pour les objets a comparer."
+  return "|cffF0CA90PRIORITES|r\n"..advice..
+    "\n\nConsulte EQUIPEMENT pour les objets a comparer."
 end
 function WC:CombatViewText()
   if self.combatMode=="performance" then
     local total=self.XPPerHour and self:XPPerHour()
     local recent=self.RecentXPPerHour and self:RecentXPPerHour()
-    return "|cffEBC487PERFORMANCE XP|r\\n\\n"..
+    return "|cffEBC487PERFORMANCE XP|r\n\n"..
       "XP/h session : "..(total and tostring(total) or "indisponible")..
-      "\\nXP/h sur les 10 dernieres minutes : "..
+      "\nXP/h sur les 10 dernieres minutes : "..
       (recent and tostring(recent) or "indisponible")..
-      "\\n\\nCe sont des moyennes, pas une mesure de quete ou de monstre."
+      "\n\nCe sont des moyennes, pas une mesure de quete ou de monstre."
   end
   local combat=self:GetCombatSummary()
   local status=combat.active and tint("EN COMBAT", "FC7A67")
     or tint("HORS COMBAT", "75D483")
   return "|cffF0CA90ETAT ACTUEL|r  "..status..
-    "\\n\\nCombats observes : "..fmt(combat.completed,"0")..
-    "\\nCombats interrompus : "..fmt(combat.interrupted,"0")..
-    "\\nDuree moyenne : "..(combat.average and
+    "\n\nCombats observes : "..fmt(combat.completed,"0")..
+    "\nCombats interrompus : "..fmt(combat.interrupted,"0")..
+    "\nDuree moyenne : "..(combat.average and
       tostring(combat.average).." secondes" or "non mesuree")..
-    "\\nMorts en combat : "..fmt(combat.deathsInCombat,"0")..
-    "\\n\\n|cffBAA18FUn intervalle de combat n'est pas un monstre tue.|r"
+    "\nMorts en combat : "..fmt(combat.deathsInCombat,"0")..
+    "\n\n|cffBAA18FUn intervalle de combat n'est pas un monstre tue.|r"
 end
 
 function WC:RefreshDashboard()
