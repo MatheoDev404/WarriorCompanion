@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.8-rc1 — Réglages finalisés
+
+- Trois cartes dédiées dans l'onglet **Réglages** : démarrage automatique, notifications, réinitialisation de la session.
+- Interrupteurs visuels **ON/OFF**, reliés aux options persistantes existantes, avec indicateur mobile et survol.
+- Réinitialisation protégée par un second clic sur **Confirmer** ; une navigation hors de Réglages annule la confirmation.
+- Confirmation de succès affichée dans la carte ; progression du guide et préférences préservées.
+- Tests unitaires des bascules, de la position de l'indicateur, de l'annulation et de la confirmation.
+
 ## 0.6.7-rc1 — Guide de leveling sur le modèle de PexGuide
 
 - Étude de l'archive PexGuide fournie par l'utilisateur (notamment `Theme.lua` et `UI.lua`) : séparation titre/étapes/progression, cartes compactes, couleurs ardoise et or et polices du client.
