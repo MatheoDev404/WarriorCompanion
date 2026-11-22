@@ -24,4 +24,26 @@ assert(WC:GuideMove(1) and WC.guideIndex==3)
 assert(not WC:GuideMove(2))
 assert(not WC:GuideLoad({id="bad",title="Bad",source="source",steps={{text=""}}}))
 assert(WC.activeGuide==sample, "un mauvais pack ne remplace pas le guide")
-print("OK: guide source, navigation, bornes et reprise")
+local questGuide = {
+  id="quest-test", title="Test journal", source="Source test",
+  steps={
+    {text="Accepter", action="accept", questID=100},
+    {text="Terminer", action="complete", questID=100},
+    {text="Rendre", action="turnin", questID=100},
+    {text="Etape manuelle"},
+  }
+}
+assert(WC:GuideLoad(questGuide))
+assert(not WC:GuideAdvanceFromJournal(), "journal absent")
+WC.questAdvice={rows={{id=100,complete=false}}}
+assert(WC:GuideAdvanceFromJournal() and WC.guideIndex==2)
+assert(not WC:GuideAdvanceFromJournal(), "pas encore terminee")
+WC.questAdvice.rows[1].complete=true
+assert(WC:GuideAdvanceFromJournal() and WC.guideIndex==3)
+C_QuestLog={IsQuestFlaggedCompleted=function() return false end}
+assert(not WC:GuideAdvanceFromJournal(), "rendu non confirme")
+C_QuestLog.IsQuestFlaggedCompleted=function() return true end
+assert(WC:GuideAdvanceFromJournal() and WC.guideIndex==4)
+assert(not WC:GuideAdvanceFromJournal(), "etape manuelle")
+assert(settings.guideProgress.id=="quest-test" and settings.guideProgress.index==4)
+print("OK: guide source, navigation, reprise, validation du journal")
