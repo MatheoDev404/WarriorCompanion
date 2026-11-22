@@ -57,3 +57,14 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 4. Déplacer la fenêtre, fermer avec la croix, rouvrir : aucun nouvel avertissement de talent ne doit être envoyé uniquement à cause de l'ouverture.
 5. Vérifier la lisibilité du texte lors d'un combat et après `/wc reset`.
 6. En cas de valeur indisponible, le tableau doit afficher un remplacement plutôt qu'une erreur Lua.
+
+
+## HUD moderne D — test visuel v0.4.1-rc1
+
+1. Installer l'addon, `/reload` puis `/wc` : HUD compact avec bandeau rouge Horde et barre latérale.
+2. Cliquer sur les quatre icônes Bilan, Combat, Conseils, Journal : seule la vue choisie doit être visible.
+3. Déplacer la fenêtre, la fermer avec la croix et la rouvrir. Aucune erreur Lua ni nouvelle alerte déclenchée par la seule navigation.
+4. Vérifier les trois icônes natives **or / argent / cuivre** et une variation de session après achat, butin ou vente.
+5. Tester les valeurs : +0, +1 or 23 argent 45 cuivre, et une variation négative. Aucun champ ne doit afficher un nombre négatif isolé en argent ou cuivre.
+6. Contrôler les tailles de police et les débordements à l'échelle UI habituelle et sur petit écran.
+7. Vérifier le rafraîchissement des valeurs après un gain d'XP et l'absence de notifications supplémentaires provoquées par les mises à jour graphiques.
