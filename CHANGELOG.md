@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1-dev — XP/heure récente
+
+- Calcul glissant XP/h sur dix minutes et comparaison à la session via `/wc performance`.
+- Échantillons bornés, protection contre les lectures d'XP indisponibles et les mesures tronquées.
+- Tests de fenêtres temporelles, périodes sans XP, réinitialisation et saturation du tampon.
+
 ## 0.3.0-dev — mesures de combat prudentes
 
 - Compte les intervalles d'etat de combat terminés et leur durée, sans prétendre compter les ennemis.

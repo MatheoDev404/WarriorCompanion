@@ -40,3 +40,11 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 4. Changer de zone pendant un combat (si possible sans danger) : l'intervalle en cours doit être classé interrompu.
 5. Faire `/wc reset` : les métriques de combat doivent revenir à zéro.
 6. Le module ne mesure pas les dégâts et n'attribue pas l'XP au dernier ennemi ; ces informations restent à valider avec le client.
+
+## Test additionnel — performance glissante 0.3.1-dev
+
+1. `/wc reset` puis `/wc performance` : taux récents indisponibles pendant la première minute.
+2. Gagner de l'XP et attendre au moins 60 secondes depuis le reset : les taux doivent devenir disponibles.
+3. Après dix minutes, une XP gagnée il y a plus de dix minutes ne doit plus entrer dans le taux récent.
+4. Après `/wc reset`, l'historique de performance doit repartir de zéro.
+5. Comparer `/wc`, `/wc performance` et `/wc status`. Les taux peuvent différer légitimement, car les fenêtres sont différentes.
