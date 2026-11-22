@@ -2,13 +2,13 @@ local _, WC = ...
 local function playerNumber(fn)
   if type(fn) ~= "function" then return nil end
   local ok, n = pcall(fn, "player")
-  if ok and type(n) == "number" then return n end
+  if ok and WC:IsReadableNumber(n) then return n end
   return nil
 end
 local function plainNumber(fn)
   if type(fn) ~= "function" then return nil end
   local ok, n = pcall(fn)
-  if ok and type(n) == "number" then return n end
+  if ok and WC:IsReadableNumber(n) then return n end
   return nil
 end
 
@@ -54,9 +54,10 @@ function WC:RecordXP(event, newLevel)
 end
 
 function WC:ReadQuestCount()
-  if type(GetNumQuestLogEntries) ~= "function" then return nil end
-  local ok, count = pcall(GetNumQuestLogEntries)
-  if ok and type(count) == "number" then return count end
+  local read = C_QuestLog and C_QuestLog.GetNumQuestLogEntries
+  if type(read) ~= "function" then return nil end
+  local ok, _, count = pcall(read)
+  if ok and self:IsReadableNumber(count) and count >= 0 then return count end
   return nil
 end
 

@@ -3,9 +3,13 @@ local lastShown = {}
 local cooldown = 300
 
 local function unspentPoints()
-  if type(GetUnspentTalentPoints) == "function" then
-    local ok, n = pcall(GetUnspentTalentPoints)
-    if ok and type(n) == "number" then return n end
+  local read = C_ClassTalents and C_ClassTalents.HasUnspentTalentPoints
+  if type(read) ~= "function" then return nil end
+  local ok, hasPoints, class, spec = pcall(read)
+  if ok and not (issecretvalue and issecretvalue(hasPoints)) and hasPoints == true
+      and WC:IsReadableNumber(class) and WC:IsReadableNumber(spec)
+      and class >= 0 and spec >= 0 then
+    return class + spec
   end
   return nil
 end

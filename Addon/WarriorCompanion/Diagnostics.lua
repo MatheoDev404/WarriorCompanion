@@ -36,8 +36,9 @@ function WC:Status()
     " | XP/h: " .. (xp and tostring(xp) or "attente") ..
     " | morts: " .. self.metrics.deaths)
   local checks = {
-    {"XP", UnitXP}, {"Niveau", UnitLevel},
-    {"Talents", GetUnspentTalentPoints}, {"Quetes", GetNumQuestLogEntries},
+    {"XP", UnitXP}, {"XP maximum", UnitXPMax}, {"Niveau", UnitLevel},
+    {"Talents", C_ClassTalents and C_ClassTalents.HasUnspentTalentPoints},
+    {"Quetes", C_QuestLog and C_QuestLog.GetNumQuestLogEntries},
     {"Argent", GetMoney}
   }
   for _, check in ipairs(checks) do

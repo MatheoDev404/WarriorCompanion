@@ -15,6 +15,10 @@ function WC:Profile()
   return options
 end
 
+function WC:IsReadableNumber(value)
+  return type(value) == "number" and not (issecretvalue and issecretvalue(value))
+end
+
 function WC:Now()
   if type(GetTime) == "function" then return GetTime() end
   return 0
@@ -40,6 +44,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
   if event == "PLAYER_LOGIN" then
     if WC.ready then return end
     WC:Profile()
+    WC.inCombat = InCombatLockdown()
     WC:InitObserver()
     WC:CreateDashboard()
     WC.ready = true
