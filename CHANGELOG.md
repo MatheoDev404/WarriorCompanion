@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.6-rc1 — diagnostic des armes guerrier Furie
+
+- Observation des mains droite/gauche, du type équipé (arme à une main, deux mains, bouclier) avec lectures protégées.
+- Conseil informatif de double maniement conditionnel si niveau 20+, arme à une main et main gauche vide ; pas de recommandation erronée pour une arme à deux mains.
+- Conseil informatif si bouclier ou accessoire porté en main gauche, sans prétendre que cela soit toujours mauvais.
+- Commande `/wc weapons` et tests Lua simulés sous 5.1 et 5.4.
+
 ## 0.5.5-rc1 — apparence de minimap WoW standard
 
 - Remplacement de l'écusson carré par une icône guerrier native 20 px à l'intérieur de la bordure circulaire Blizzard.
