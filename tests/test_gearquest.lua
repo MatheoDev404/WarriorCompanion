@@ -10,27 +10,36 @@ function WC:Print(s) messages[#messages+1]=s end
 function WC:IsWarrior() return true end
 assert(loadfile("Addon/WarriorCompanion/WeaponTargets.lua"))("WarriorCompanion",WC)
 assert(WC:GearQuestAvailability()==true)
+function WC:Now() return self.now or 100 end
 local empty={}
 WC:AddGearQuestAdvice(empty)
-assert(#empty==0,"no unsolicited recommendations")
-local actionable={{id="fury-offhand-empty",priority="info"}}
-WC:AddGearQuestAdvice(actionable)
-assert(#actionable==2 and actionable[2].id=="gearquest-review")
-assert(actionable[2].message:find("/gq",1,true))
-assert(actionable[2].message:find("Aucun gain ni prix",1,true))
-assert(not actionable[2].message:find("Wingblade",1,true))
+assert(#empty==0,"no unprompted full-gear reminder")
+WC:ObserveGearReviewEvent("PLAYER_EQUIPMENT_CHANGED")
+WC:AddGearQuestAdvice(empty)
+assert(#empty==1 and empty[1].id=="gearquest-review")
+assert(empty[1].message:find("tous les emplacements",1,true))
+assert(empty[1].message:find("armure",1,true))
+assert(empty[1].message:find("bijoux",1,true))
+assert(empty[1].priority=="info")
+assert(empty[1].message:find("Aucun gain ni prix",1,true))
 WC:ShowGearQuestStatus()
 assert(messages[#messages]:find("n'importe aucun score",1,true))
-WC:AddGearQuestAdvice(actionable)
-assert(#actionable==3,"decision based on real source observations")
 WC.inCombat=true
-WC:AddGearQuestAdvice(actionable)
-assert(#actionable==3,"no new reminder in combat")
+local during={}
+WC:AddGearQuestAdvice(during)
+assert(#during==0,"no additional in-combat notice")
 WC.inCombat=false
+WC.now=701
+WC:AddGearQuestAdvice(during)
+assert(#during==0,"short-lived advice")
+WC.now=710
+WC:ObserveGearReviewEvent("PLAYER_LEVEL_UP")
+WC:AddGearQuestAdvice(during)
+assert(#during==1 and during[1].message:find("changement de niveau",1,true))
 loaded=false
-local absent={{id="fury-slow-combat"}}
+local absent={}
 WC:AddGearQuestAdvice(absent)
-assert(#absent==1,"missing GearQuest cannot supply items")
+assert(#absent==0,"no GearQuest no claimed recommendations")
 WC:ShowGearQuestStatus()
 assert(messages[#messages]:find("non charge",1,true))
 C_AddOns.IsAddOnLoaded=function() error("API unavailable") end
@@ -43,11 +52,12 @@ assert(messages[#messages]:find("inconnu",1,true))
 IsAddOnLoaded=function(name) return name=="GearQuestForever" end
 assert(WC:GearQuestAvailability()==true,"legacy fallback")
 WC.IsWarrior=function() return false end
-local notWarrior={{id="fury-offhand-empty"}}
+local notWarrior={}
+WC:ObserveGearReviewEvent("PLAYER_LEVEL_UP")
 WC:AddGearQuestAdvice(notWarrior)
-assert(#notWarrior==1)
+assert(#notWarrior==0)
 WC.IsWarrior=function() return true end
 IsAddOnLoaded=function() return 987654 end
 issecretvalue=function(x) return x==987654 end
 assert(WC:GearQuestAvailability()==nil,"no secret assumptions")
-print("OK: GearQuest optional, no third-party copied data, source gating, no fake weapons")
+print("OK: GearQuest optional, whole-equipment suggestions, event gating, no false recommendations")

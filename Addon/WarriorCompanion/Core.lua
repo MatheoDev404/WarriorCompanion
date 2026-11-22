@@ -83,6 +83,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
     end
     WC:RecordPerformanceGain(WC.metrics.xpGained - priorXP)
     WC:OnActivityEvent(event, priorXP, priorQuests, ...)
+    WC:ObserveGearReviewEvent(event)
     WC:OnCombatObservedEvent(event)
     if event == "SPELLS_CHANGED" or event == "LEARNED_SPELL_IN_SKILL_LINE" then
       WC:ObserveSpellbook()

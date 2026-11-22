@@ -5,6 +5,7 @@ local _, WC = ...
 -- Les seuls faits affiches viennent de l'etat de chargement de l'addon.
 
 local ADDON = "GearQuestForever"
+local ADVICE_WINDOW = 600
 
 local function safeBool(value)
   if type(value) ~= "boolean" then return nil end
@@ -24,34 +25,44 @@ function WC:GearQuestAvailability()
   return safeBool(result)
 end
 
+function WC:ObserveGearReviewEvent(event)
+  if event ~= "PLAYER_LEVEL_UP" and event ~= "PLAYER_EQUIPMENT_CHANGED" then return end
+  if not self.IsWarrior or not self:IsWarrior() then return end
+  if event == "PLAYER_LEVEL_UP" then
+    self.gearReviewCause = "level"
+  else
+    self.gearReviewCause = "equipment"
+  end
+  local now = self:Now()
+  if type(now) ~= "number" then return end
+  self.gearReviewTime = now
+end
+
 function WC:AddGearQuestAdvice(items)
   if type(items) ~= "table" or self.inCombat
       or not self.IsWarrior or not self:IsWarrior() then return end
   if self:GearQuestAvailability() ~= true then return end
-  -- Ne pas transformer l'existence de GearQuest en faux classement.
-  -- Le rappel est pertinent uniquement quand un besoin d'arme est observe.
-  local needsReview = false
-  for _,item in ipairs(items) do
-    if item.id == "fury-offhand-empty"
-        or item.id == "fury-offhand-not-weapon"
-        or item.id == "fury-slow-combat" then
-      needsReview = true
-      break
-    end
-  end
-  if not needsReview then return end
+  local now = self:Now()
+  if type(now) ~= "number" then return end
+  local eventTime = self.gearReviewTime
+  if type(eventTime) ~= "number" or now < eventTime
+      or now - eventTime > ADVICE_WINDOW then return end
+  local cause = self.gearReviewCause == "level"
+      and "apres ton changement de niveau"
+      or "apres ton changement d'equipement"
   items[#items+1] = {
     id = "gearquest-review", priority = "info",
-    message = "Pour comparer tes armes au niveau actuel en Furie, " ..
-      "ouvre GearQuest (/gq), choisis Guerrier / Furie et consulte " ..
-      "les armes et leurs sources. Aucun gain ni prix n'est garanti."
+    message = "Guerrier Furie : "..cause..
+      ", passe en revue tous les emplacements dans GearQuest (/gq) : "..
+      "armes, armure, bijoux et accessoires. Compare chaque proposition "..
+      "a ton objet actuel et verifie sa source. Aucun gain ni prix n'est garanti."
   }
 end
 
 function WC:ShowGearQuestStatus()
   local loaded = self:GearQuestAvailability()
   if loaded == true then
-    self:Print("GearQuest Forever est charge. Ouvre /gq pour voir " ..
+    self:Print("GearQuest Forever est charge. Ouvre /gq pour examiner TOUS les emplacements et voir " ..
       "les recommandations selon niveau, specialisation et equipement.")
     self:Print("Warrior Companion n'importe aucun score, source d'objet " ..
       "ou prix sans interface de donnees publique verifiable.")
