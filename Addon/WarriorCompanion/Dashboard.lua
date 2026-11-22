@@ -150,7 +150,7 @@ function WC:CreateDashboard()
     tint("HORDE  /  RAPPORT DE CAMPAGNE", "D49A7D"))
   local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, -2)
-  close:SetScript("OnClick", function() f:Hide() end)
+  close:SetScript("OnClick", function() WC:ShowCompact() end)
 
   local function contentPage()
     local p = CreateFrame("Frame", nil, f)
