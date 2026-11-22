@@ -77,29 +77,12 @@ function WC:BuildQuestPlan(mode)
     return "Quetes a prendre",table.concat(lines,"\n")
   end
   if mode=="route" then
-    local found,reason=self:DiscoverQuests(40)
-    if not found then return "Parcours / pistes","Indisponible : "..tostring(reason) end
-    local groups,why=self:BuildQuestClusters(found)
-    if not groups then return "Parcours / pistes","Indisponible : "..tostring(why) end
-    if #groups==0 then
-      return "Parcours / pistes","Aucun regroupement de PNJ confirme par QuestieDB."
-    end
-    local lines={"DEPARTS REGROUPES - pas encore un itineraire d'objectifs"}
-    local guide=guideNote()
-    if guide then lines[#lines+1]=guide end
-    for i=1,math.min(3,#groups) do
-      local g=groups[i]
-      lines[#lines+1]="Zone #"..tostring(g.zone)..
-        " : "..tostring(#g.rows).." piste(s) a confirmer"
-      for j=1,math.min(2,#g.rows) do
-        local q=g.rows[j]
-        lines[#lines+1]="  ["..tostring(q.level).."] "..q.name
-      end
-    end
-    lines[#lines+1]="Pas de garantie solo, de distance ou de temps de trajet."
-    return "Parcours / pistes",table.concat(lines,"\n")
+    return "Pistes de quetes",
+      "Cette vue n'est pas un trajet : elle regroupe uniquement des PNJ possibles.\\n"..
+      "Pour savoir ou aller et quoi faire, ouvre l'onglet GUIDE.\\n"..
+      "Les points de depart de quetes peuvent etre retrouves sur la carte Questie."
   end
-  return "Plan de leveling","Choisis Journal, A prendre ou Parcours."
+  return "Plan de leveling","Choisis GUIDE pour suivre une route, Journal pour tes quetes ou A prendre."
 end
 
 function WC:SelectQuestPlan(mode)
