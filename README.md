@@ -2,7 +2,7 @@
 
 Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau ni itinéraire de quêtes. Le tableau de bord reste fermé jusqu’à la commande `/wc`.
 
-## Ce que mesure la version 0.3.1-dev
+## Ce que mesure la version 0.4.0-rc1
 
 | Activité | Comportement |
 | --- | --- |
@@ -15,6 +15,10 @@ Warrior Companion observe la session de ton guerrier dans WoW Forever. Il foncti
 L'analyse XP/h récente utilise une fenêtre glissante de 10 minutes, après au moins une minute d'observation, et inclut les périodes sans gain d'XP. Sa mémoire est limitée à 600 échantillons ; si cette limite masque un échantillon encore pertinent, le taux reste indisponible jusqu'à retrouver une fenêtre complète. Aucun conseil causal n'est déduit de ce chiffre.
 
 L'historique d'activité conserve en mémoire vive les 60 derniers événements utiles : XP mesurée, niveaux, morts, modifications d'équipement, mises à jour des compétences et changements du nombre de quêtes. Il ne déduit ni l'objet obtenu ni la quête terminée. Utiliser `/wc history` pour afficher les 12 derniers événements. Un gain mesuré au changement de zone apparaît une seule fois. Pour l’équipement, deux emplacements lisibles distincts peuvent apparaître dans la même seconde. Les répétitions de la même description d’équipement ou de compétences sont filtrées pendant huit secondes parmi les entrées conservées. Le journal des activités est distinct du journal de debug et est effacé à `/wc reset`.
+
+## Tableau de bord — Horde guerrier
+
+La fenêtre `/wc` utilise désormais un thème rouge sang, acier noirci et bronze, avec l'icône guerrier fournie par le client. Les quatre sections PROGRESSION, COMBAT, CONSEILS DU GUERRIER et DERNIERES ACTIVITES évitent l'accumulation de valeurs dans un seul paragraphe. Les éléments restent en jeu, sans textures externes. Le panneau est déplaçable, fermé par défaut, et l'affichage des valeurs se rafraîchit toutes les trois secondes lorsqu'il est ouvert. Cette présentation nécessite une validation visuelle sur le client réel (lisibilité, taille, échelle UI, cadres et contrôle de la souris).
 
 ## Installation et commandes
 
@@ -35,7 +39,7 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 
 ## Compatibilité et tests
 
-Les signatures ont été vérifiées dans les sources d’interface de Forever 1.60.1, build 71037. Les essais automatisés chargent les modules dans l’ordre du TOC et simulent les appels du client. La validation en jeu de la version 0.3.1-dev reste à faire. [Sources consultées et protocole en jeu](docs/TEST_PLAN.md)
+Les signatures ont été vérifiées dans les sources d’interface de Forever 1.60.1, build 71037. Les essais automatisés chargent les modules dans l’ordre du TOC et simulent les appels du client. La validation en jeu de la version 0.4.0-rc1 reste à faire. [Sources consultées et protocole en jeu](docs/TEST_PLAN.md)
 
 Pour reproduire les contrôles de GitHub Actions depuis la racine du dépôt, installer Python 3, Lua 5.1 et Lua 5.4, puis exécuter le bloc dans un shell POSIX.
 
@@ -50,5 +54,6 @@ for version in 5.1 5.4; do
   "lua$version" tests/test_activity.lua
   "lua$version" tests/test_combat.lua
   "lua$version" tests/test_performance.lua
+  "lua$version" tests/test_dashboard.lua
 done
 ```

@@ -48,3 +48,12 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 3. Après dix minutes, une XP gagnée il y a plus de dix minutes ne doit plus entrer dans le taux récent.
 4. Après `/wc reset`, l'historique de performance doit repartir de zéro.
 5. Comparer `/wc`, `/wc performance` et `/wc status`. Les taux peuvent différer légitimement, car les fenêtres sont différentes.
+
+## Test en jeu : style Horde guerrier (0.4.0-rc1)
+
+1. `/wc` doit afficher un cadre acier sombre, bandeau rouge, bordures bronze et icône guerrier intégrée.
+2. Contrôler titres, chiffres, couleur et retours à la ligne à plusieurs échelles d'interface, sans chevauchement.
+3. Vérifier que les quatre sections montrent XP/heure session, XP/heure 10 minutes, combat, conseils, et deux dernières activités (si observées).
+4. Déplacer la fenêtre, fermer avec la croix, rouvrir : aucun nouvel avertissement de talent ne doit être envoyé uniquement à cause de l'ouverture.
+5. Vérifier la lisibilité du texte lors d'un combat et après `/wc reset`.
+6. En cas de valeur indisponible, le tableau doit afficher un remplacement plutôt qu'une erreur Lua.
