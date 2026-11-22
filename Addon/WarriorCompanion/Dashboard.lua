@@ -268,8 +268,9 @@ function WC:CreateDashboard()
   }
   -- Ne jamais superposer ces cellules aux textes du guide.
   for row=1,7 do
-    text(questPage,"GameFontNormalSmall",20,-150-(row-1)*24,
-      17,18,tint(tostring(row),"A98F73"))
+    local rowTitle=text(questPage,"GameFontNormalSmall",20,
+      -150-(row-1)*24,17,18,tint(tostring(row),"A98F73"))
+    self.dashboardTalentWidgets[#self.dashboardTalentWidgets+1]=rowTitle
   end
   for row=1,7 do
     for column=1,4 do
