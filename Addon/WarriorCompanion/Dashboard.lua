@@ -397,6 +397,10 @@ function WC:ShowDashboardPage(page)
     self:SelectQuestPlan("guide")
   end
   self.dashboardPage = page
+  if page~="settings" and self.settingsResetPending then
+    self.settingsResetPending=false
+    self.settingsResetMessage=nil
+  end
   for key, frame in pairs(self.dashboardPages) do
     if key == page then frame:Show() else frame:Hide() end
     local tabFrame = self.dashboardTabs[key]
