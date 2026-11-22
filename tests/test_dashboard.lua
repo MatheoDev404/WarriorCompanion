@@ -153,7 +153,11 @@ WC.dashboardSettingsButtons.alerts.handlers.OnClick()
 assert(settings.showAlerts==false and
   WC.dashboardSettingsInfo.text:find("DESACTIVEES",1,true))
 WC.dashboardSettingsButtons.reset.handlers.OnClick()
-assert(WC.sessionReset==1)
+assert(WC.sessionReset==nil and WC.settingsResetPending,
+  "premier clic demande confirmation")
+WC.dashboardSettingsButtons.reset.handlers.OnClick()
+assert(WC.sessionReset==1 and not WC.settingsResetPending,
+  "second clic reinitialise la session")
 WC.dashboardTabs.quests.handlers.OnClick()
 assert(WC.dashboardPage=="quests" and WC.dashboardPages.quests:IsShown())
 WC.dashboardQuestButtons.guide.handlers.OnClick()
