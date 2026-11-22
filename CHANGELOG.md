@@ -6,6 +6,9 @@
 - Remplacement du grand bloc vide de l'onglet **Guide → Étapes** par un suivi compact : carte principale plus haute (texte sur plusieurs lignes), trois prochaines actions, compteur et barre de progression.
 - Ajout d'une texture **RoundedPanel.tga originale** et d'un moteur de panneaux 9-slice propres à Warrior Companion, sans copier les images ni le code de PexGuide.
 - Amélioration du rendu des textes importés : suppression des préfixes techniques de zone `>>`, traductions prudentes des mouvements courants.
+- Navigation principale replacée dans une **rangée horizontale de quatre onglets** sous le bandeau ; ancienne colonne verticale supprimée.
+- Fenêtre complète rééquilibrée à **720 × 520** pour laisser place à la progression et aux boutons d'étapes.
+- Les panneaux des autres rubriques réutilisent désormais le même skin à coins arrondis, et pas seulement l'onglet Guide.
 - Les modes **Talents, Mes quêtes, À prendre**, le mini-bilan, les conseils et les réglages sont conservés.
 - Dépendance graphique locale uniquement, contrôlée par les tests ; tests de navigation, de progression et de lecture des étapes.
 - La refonte concerne la présentation, sans promettre une validation des parcours ou de l'API des talents en jeu.
