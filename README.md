@@ -50,13 +50,13 @@ Pour vérifier l'intégration, utiliser `/wc gear` puis ouvrir GearQuest avec `/
 
 Références : [GearQuest Forever](https://github.com/Henrik8210/gear-quest-forever) et [fiche de l'addon](https://www.curseforge.com/wow/addons/gearquest-forever).
 
-## Points de talents (0.6.1-rc1)
+## Points de talents (0.6.2-rc1)
 
 Le module `TalentObserver.lua` utilise `C_ClassTalents.HasUnspentTalentPoints` lorsque disponible pour afficher les points disponibles (classe + spécialisation). Il retient les changements observés après des événements de talents, sans les présenter comme un talent précis dépensé : une respécialisation ou une mise à jour serveur peut aussi expliquer la différence. Si la lecture échoue, aucun chiffre n'est inventé.
 
 Commande `/wc talents` pour vérifier les compteurs et le nombre de changements observés. Le rappel déjà existant des points non dépensés continue de fonctionner. **L'arbre Furie et la recommandation d'un talent précis ne sont pas encore validés dans le client Forever.**
 
-## Conseiller de quêtes Horde Furie (0.6.1-rc1)
+## Conseiller de quêtes Horde Furie (0.6.2-rc1)
 
 Le module `QuestAdvisor.lua` classe **les quêtes déjà acceptées** et présentes dans le journal du personnage guerrier Horde. Il distingue les quêtes prêtes à rendre, les candidates solo en dessous du niveau du joueur, les quêtes proches du niveau nécessitant de la prudence, les quêtes plus hautes, et les marqueurs explicitement signalés groupe/donjon/élite. Si le client ne fournit pas un type fiable, le statut reste **inconnu**, sans être converti en solo.
 
@@ -82,6 +82,16 @@ La recherche n'a lieu qu'à la demande via `/wc discover`, hors combat : aucun p
 
 Sources de contrat : [API QuestieDB](https://github.com/Questie/QuestieDB/blob/main/docs/api.md), [schéma des quêtes](https://github.com/Questie/QuestieDB/blob/main/src/meta/questMeta.lua) et [limites des données Forever](https://github.com/Questie/QuestieDB/blob/main/docs/forever.md).
 
+## Regroupement des départs de quêtes — V0.6.2
+
+La commande **`/wc route`** regroupe les quêtes candidates déjà filtrées par `/wc discover` selon la **zone QuestieDB** et les **positions des PNJ de départ proches**. La lecture utilise l'API publique de QuestieDB pour `Quest.startedBy`, `Npc.friendlyToFaction` et `Npc.spawns`. Seuls les PNJ de départ qui acceptent la Horde sont retenus, avec coordonnées numériques vérifiables. Le calcul compare des pourcentages de carte dans **une même zone**, jamais des kilomètres ni un temps de trajet.
+
+L'algorithme privilégie les groupes contenant le plus de quêtes, puis les quêtes de niveau proche de `niveau du joueur − 2`. Il ne déplace pas les marqueurs de Questie et ne calcule pas encore l'itinéraire des objectifs ou la marche entre zones. **PNJ de départ proches ≠ objectifs proches ou quêtes solo sûres** : disponibilité réelle, donjon/élite, niveau des ennemis, distances et récompenses restent à confirmer. Les données absentes ne génèrent pas de position inventée.
+
+Recherche sur commande seulement, **hors combat**, limitée à 40 pistes et 4 groupes affichés. Si QuestieDB ou ses positions sont indisponibles, un message explicite remplace les recommandations.
+
+Références : [API publique QuestieDB](https://github.com/Questie/QuestieDB/blob/main/docs/api.md), [schéma PNJ](https://github.com/Questie/QuestieDB/blob/main/src/meta/npcMeta.lua), [limites Forever](https://github.com/Questie/QuestieDB/blob/main/docs/forever.md).
+
 ## Installation et commandes
 
 Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Forever. Le fichier `WarriorCompanion.toc` doit se trouver directement dans `Interface/AddOns/WarriorCompanion/`. L’interface ciblée est `16001`.
@@ -94,6 +104,7 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 | `/wc reset` | Recommencer les mesures et effacer l'historique de session |
 | `/wc performance` | Comparer XP/h globale et XP/h des dix dernières minutes |
 | `/wc minimap reset` | Replacer le bouton sur le bord de la minimap à sa position par défaut |
+| `/wc route` | Regrouper les PNJ de départ de quêtes Horde proches dans la même zone |
 | `/wc discover` | Proposer jusqu'à sept pistes de quêtes non acceptées avec les filtres QuestieDB stricts |
 | `/wc quests` | Classement prudent des quêtes du journal du guerrier Horde |
 | `/wc questie` | Vérifier l'état de l'intégration optionnelle avec Questie |

@@ -182,3 +182,12 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 5. Changer de niveau et relancer `/wc discover` : la sélection doit être recalculée sur les nouvelles données et rester limitée.
 6. En combat, aucune analyse du catalogue ne doit être déclenchée.
 7. Confirmer que les marqueurs Questie fonctionnent et qu'aucun marqueur Warrior Companion supplémentaire n'a été créé.
+
+## Vérification V0.6.2 — regroupement des PNJ QuestieDB
+
+1. Avec Questie et QuestieDB compatibles Forever, utiliser `/wc route` hors combat et comparer les zones et PNJ aux marqueurs réels de Questie.
+2. Vérifier qu'aucun PNJ Alliance n'est recommandé et que seuls les PNJ de départ disposant de positions exploitables sont groupés.
+3. Les quêtes d'une même zone peuvent être regroupées seulement si les PNJ sont à proximité ; ne pas confondre avec une proximité des objectifs de quêtes.
+4. Comparer le classement avec un guerrier à deux niveaux différents et vérifier que les quêtes dangereuses ou à prérequis incertains ne sont pas promues.
+5. Sans QuestieDB ni coordonnées, la commande doit indiquer l'indisponibilité plutôt qu'inventer une route.
+6. Vérifier qu'aucune exécution de `/wc route` n'est faite automatiquement au login ou en combat, et que les marqueurs Questie restent inchangés.
