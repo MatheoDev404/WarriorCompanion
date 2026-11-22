@@ -98,6 +98,9 @@ function WC:SelectQuestPlan(mode)
   end
   -- Affichage etape par etape pour GUIDE, texte libre pour les autres vues.
   if self.dashboardGuideLocation and self.dashboardGuideNextText then
+    if self.dashboardQuestDetail and self.dashboardQuestDetail.SetHeight then
+      self.dashboardQuestDetail:SetHeight(mode=="guide" and 77 or 163)
+    end
     if mode=="guide" and self.GetGuideView then
       local view=self:GetGuideView()
       self.dashboardQuestDetail:SetText(view and
