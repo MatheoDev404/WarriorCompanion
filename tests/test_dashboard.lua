@@ -32,6 +32,9 @@ local function frame()
     function t:SetJustifyH() end
     function t:SetJustifyV() end
     function t:SetText(value) self.text=value end
+    function t:Show() self.shown=true end
+    function t:Hide() self.shown=false end
+    function t:IsShown() return self.shown~=false end
     return t
   end
   return f
