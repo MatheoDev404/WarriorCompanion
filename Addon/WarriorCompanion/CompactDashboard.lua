@@ -109,6 +109,7 @@ function WC:ShowCompact()
 end
 function WC:OpenFullDashboard()
   if not self.dashboard then return end
+  if self.UpdateAdvice then self:UpdateAdvice() end
   if self.compactDashboard then self.compactDashboard:Hide() end
   self.dashboard:Show()
   self:Profile().displayMode="full"
