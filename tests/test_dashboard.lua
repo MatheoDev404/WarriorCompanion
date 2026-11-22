@@ -140,6 +140,16 @@ WC.dashboardTabs.advice.handlers.OnClick()
 WC.dashboardAdviceButtons.equipment.handlers.OnClick()
 assert(WC.adviceMode=="equipment" and
   WC.dashboardAdviceDetail.text:find("Objet a examiner",1,true))
+assert(WC.dashboardAdviceButtons.equipment.accent.color[1]>0.7,
+  "sous-onglet selectionne bronze")
+assert(WC.dashboardAdviceButtons.advice.accent.color[1]<0.5,
+  "sous-onglet inactif discret")
+WC.dashboardAdviceButtons.health.handlers.OnEnter()
+assert(WC.dashboardAdviceButtons.health.base.color[1]>0.2,
+  "survol sous-onglet")
+WC.dashboardAdviceButtons.health.handlers.OnLeave()
+assert(WC.dashboardAdviceButtons.health.base.color[1]<0.2,
+  "fin du survol")
 WC.dashboardAdviceButtons.health.handlers.OnClick()
 assert(WC.dashboardAdviceDetail.text:find("75 %",1,true))
 WC.dashboardAdviceButtons.weapons.handlers.OnClick()
@@ -157,6 +167,8 @@ assert(WC.dashboardSettingsInfo.text:find("ACTIF",1,true))
 WC.dashboardSettingsButtons.autostart.handlers.OnClick()
 assert(settings.autoOpen==false and
   WC.dashboardSettingsInfo.text:find("INACTIF",1,true))
+assert(WC.dashboardSettingsButtons.autostart.accent.color[1]<0.5,
+  "option inactive grisee")
 WC.dashboardSettingsButtons.alerts.handlers.OnClick()
 assert(settings.showAlerts==false and
   WC.dashboardSettingsInfo.text:find("DESACTIVEES",1,true))
@@ -178,4 +190,4 @@ WC.dashboard.handlers.OnUpdate(WC.dashboard,3.1)
 assert(notices==0,"rafraichissement sans conseil notifie")
 WC:CreateDashboard()
 assert(WC.dashboard.w==720,"pas de duplication")
-print("OK: interface 720x460, trois onglets, guide par defaut, combat, conseils")
+print("OK: interface anthracite et bronze, 4 onglets, etats actifs, survol, guide et conseils")
