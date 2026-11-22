@@ -196,9 +196,10 @@ function WC:CreateDashboard()
   text(questPage, "GameFontNormalLarge", 62, -17, 535, 26,
     tint("GUIDE DE LEVELING - HORDE", "F1C98D"))
   local options = {
-    {"guide", "ETAPES DU GUIDE", 15, 166},
-    {"journal", "MES QUETES", 190, 126},
-    {"discover", "A PRENDRE", 326, 126},
+    {"guide", "ETAPES", 15, 150},
+    {"talents", "TALENTS", 174, 114},
+    {"journal", "MES QUETES", 297, 130},
+    {"discover", "A PRENDRE", 436, 142},
   }
   self.dashboardQuestButtons = {}
   for _, data in ipairs(options) do
@@ -219,9 +220,15 @@ function WC:CreateDashboard()
     b:SetSize(106, 25)
     rectangle(b, 0, 0, 106, 25, COLORS.ridge)
     rectangle(b, 2, -2, 102, 21, COLORS.darkPlate)
-    text(b, "GameFontNormalSmall", 7, -5, 96, 18, tint(label, "F0C58A"))
+    b.labelText = text(b, "GameFontNormalSmall", 7, -5, 96, 18,
+      tint(label, "F0C58A"))
     b:SetScript("OnClick", function()
-      if WC.GuideMove and WC:GuideMove(direction) then
+      if WC.questPlanMode=="talents" and WC.SetTalentPlanLevel then
+        local level=WC.talentPlanSelection or WC:CurrentTalentPlanLevel()
+        if WC:SetTalentPlanLevel(level+direction) then
+          WC:SelectQuestPlan("talents")
+        end
+      elseif WC.GuideMove and WC:GuideMove(direction) then
         WC:SelectQuestPlan("guide")
       end
     end)
@@ -241,6 +248,29 @@ function WC:CreateDashboard()
     -225, 554, 36)
   self.dashboardGuideNextText = text(questPage, "GameFontHighlightSmall", 24,
     -265, 554, 33)
+  -- Vue d'arbre de talents simplifiee, partageant le panneau GUIDE.
+  self.dashboardTalentHeader = text(questPage, "GameFontNormalLarge", 24,
+    -93, 552, 26)
+  self.dashboardTalentCurrent = text(questPage, "GameFontHighlight", 24,
+    -130, 558, 28)
+  self.dashboardTalentDistribution = text(questPage, "GameFontHighlightSmall", 24,
+    -161, 555, 25)
+  self.dashboardTalentRanks = text(questPage, "GameFontHighlight", 32,
+    -190, 544, 108)
+  self.dashboardTalentNext = text(questPage, "GameFontHighlight", 264,
+    -302, 326, 27)
+  self.dashboardTalentNotice = text(questPage, "GameFontHighlightSmall", 24,
+    -328, 568, 22)
+  self.dashboardTalentWidgets = {
+    self.dashboardTalentHeader,self.dashboardTalentCurrent,
+    self.dashboardTalentDistribution,self.dashboardTalentRanks,
+    self.dashboardTalentNext,self.dashboardTalentNotice,
+  }
+  for _,widget in ipairs(self.dashboardTalentWidgets) do widget:Hide() end
+  self.dashboardQuestWidgets = {
+    self.dashboardQuestTitle,self.dashboardQuestDetail,
+    self.dashboardGuideLocation,self.dashboardGuideNextText,
+  }
 
   text(f, "GameFontHighlightSmall", 89, -439, 615, 15,
     tint("/wc help     /wc reset     /wc performance", "C1A08A"))
@@ -296,6 +326,35 @@ local function activityLines(list, limit)
     "Aucune activite enregistree."
 end
 
+function WC:RefreshTalentGuidePanel()
+  if not self.dashboardTalentWidgets then return end
+  local active=self.questPlanMode=="talents"
+  for _,t in ipairs(self.dashboardTalentWidgets) do
+    if active then t:Show() else t:Hide() end
+  end
+  for _,t in ipairs(self.dashboardQuestWidgets) do
+    if active then t:Hide() else t:Show() end
+  end
+  if self.dashboardGuidePrev and self.dashboardGuidePrev.labelText then
+    self.dashboardGuidePrev.labelText:SetText(
+      tint(active and "< Niveau" or "< Precedente","F0C58A"))
+    self.dashboardGuideNext.labelText:SetText(
+      tint(active and "Niveau >" or "Suivante >","F0C58A"))
+  end
+  if not active or not self.TalentPlanText then return end
+  local view=self:TalentPlanText()
+  if not view then return end
+  self.dashboardTalentHeader:SetText("|cffEBC487TALENTS - FURIE AMBIDEXTRE|r")
+  self.dashboardTalentCurrent:SetText(
+    "|cff75D38APOINT CONSEILLE|r  "..view.current)
+  self.dashboardTalentDistribution:SetText(view.distribution)
+  self.dashboardTalentRanks:SetText(
+    "|cffEBC487REPARTITION (RANGS CUMULES)|r\n"..view.recent)
+  self.dashboardTalentNext:SetText("|cffA9C8E9ENSUITE|r  "..view.next)
+  self.dashboardTalentNotice:SetText(
+    "|cffB6AA9C"..view.notice.."|r")
+end
+
 function WC:RefreshDashboard()
   if not self.dashboard or not self.dashboard:IsShown() then return end
   local combat=self:GetCombatSummary()
@@ -318,6 +377,7 @@ function WC:RefreshDashboard()
     (advice~="" and ("|cffF0CA90PRIORITES|r\n"..advice.."\n\n") or "")..
     (gear and ("|cffF0CA90EQUIPEMENT A VERIFIER|r\n"..gear) or
       "Aucun conseil verifie pour le moment."))
+  if self.RefreshTalentGuidePanel then self:RefreshTalentGuidePanel() end
   if self.questPlanMode=="guide" and self.GetGuideView then
     local view=self:GetGuideView()
     self.dashboardQuestTitle:SetText(view and view.title or "Guide Horde")
