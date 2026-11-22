@@ -20,13 +20,20 @@ Ce protocole concerne **l'interface actuellement maintenue**, et remplace les an
 
 ## 3. Grande fenêtre (720 × 460)
 
-- **Trois onglets principaux seulement** : **Combat**, **Conseils**, **Guide**.
+- **Quatre onglets principaux seulement** : **Guide**, **Conseils**, **Combat**, **Réglages**.
 - Le contenu ne dépasse pas et la taille des caractères reste lisible.
 - Le bouton X revient au mini-bilan, sans ouvrir de fenêtre supplémentaire.
-- **Combat** présente les mesures réellement suivies et ne confond pas durée de combat et nombre de monstres tués.
+- **Combat → Combats** présente les mesures réellement suivies et ne confond pas durée de combat et nombre de monstres tués.
+- **Combat → Performance** montre les XP/h session et dix dernières minutes (inconnues si mesure impossible).
 - **Conseils** rassemble les alertes et l'équipement pertinent, sans répéter deux fois les mêmes messages.
 
-## 4. Guide et quêtes
+## 4. Commandes et onglets
+
+Vérifier que les commandes historiques ouvrent désormais les onglets correspondants, sans spammer le chat : `/wc combat`, `/wc performance`, `/wc gear`, `/wc health`, `/wc weapons`, `/wc spells`, `/wc guide`, `/wc talents`, `/wc quests` et `/wc discover`.
+
+Les diagnostics `/wc status`, `/wc fury`, `/wc questie`, `/wc history`, `/wc logs`, `/wc debug` et `/wc clear` restent des commandes techniques, sans pages supplémentaires. Les options courantes sont cliquables dans Réglages.
+
+## 5. Guide et quêtes
 
 - **Guide** : étapes du parcours Horde, action courante, destination si connue, étape suivante, boutons précédent/suivant, progression restaurée après `/reload`.
 - Reprise possible au niveau actuel sans forcer le joueur à recommencer au niveau 1.
@@ -34,7 +41,7 @@ Ce protocole concerne **l'interface actuellement maintenue**, et remplace les an
 - **À prendre** : découvertes QuestieDB à la demande, hors combat ; ne jamais prétendre qu'une quête est certainement disponible ni solo.
 - Vérifier les transitions de sections et les étapes importantes directement en jeu, notamment les noms français des quêtes.
 
-## 5. Talents Furie — priorité
+## 6. Talents Furie — priorité
 
 1. Ouvrir `/wc talents` ; contrôler la présence de la grille de **7 paliers / 18 talents** et des niveaux 10–60.
 2. Comparer les noms affichés au **texte français de l'arbre WoW Forever**. Les noms retournés par le jeu doivent prendre priorité sur les noms de secours.
@@ -44,7 +51,7 @@ Ce protocole concerne **l'interface actuellement maintenue**, et remplace les an
 6. Tester `/reload`, les changements de talents et une lecture indisponible ; aucune erreur Lua.
 7. L'addon **ne doit jamais dépenser de point**.
 
-## 6. Qualité et non-régression
+## 7. Qualité et non-régression
 
 GitHub Actions exécute sur Lua **5.1** et **5.4** :
 
