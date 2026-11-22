@@ -31,3 +31,12 @@ Consigner le build, la version de l’addon, l’action, le résultat attendu, l
 4. Exécuter `/wc debug off`, puis consulter `/wc logs` et `/wc history`. Le diagnostic doit être vide et les activités doivent encore être présentes. Vérifier ensuite leur effacement avec `/wc reset`.
 
 Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.2 de l’addon sur le client Forever reste à consigner.
+
+## Test du module Combat (0.3.0-dev)
+
+1. Faire `/wc combat` avant tout combat : 0 intervalle terminé.
+2. Engager un ennemi, sortir du combat puis `/wc combat` : un intervalle et une durée plausibles.
+3. Engager deux ennemis à la suite sans sortie de combat : un intervalle (et non deux ennemis) doit être compté.
+4. Changer de zone pendant un combat (si possible sans danger) : l'intervalle en cours doit être classé interrompu.
+5. Faire `/wc reset` : les métriques de combat doivent revenir à zéro.
+6. Le module ne mesure pas les dégâts et n'attribue pas l'XP au dernier ennemi ; ces informations restent à valider avec le client.

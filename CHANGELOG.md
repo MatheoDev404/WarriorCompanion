@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0-dev — mesures de combat prudentes
+
+- Compte les intervalles d'etat de combat terminés et leur durée, sans prétendre compter les ennemis.
+- Distingue les interruptions par mort, chargement ou durée incohérente.
+- Nouveau panneau et commande `/wc combat`, avec tests Lua 5.1/5.4.
+- Exclut volontairement les dégâts et l'XP par ennemi en l'absence de validation du journal de combat Forever.
+
 ## 0.2.2 — historique de session
 
 - Historique borné des événements effectivement observés, disponible via `/wc history`.
