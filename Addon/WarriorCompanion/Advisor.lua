@@ -58,6 +58,7 @@ function WC:UpdateAdvice()
   end
   -- Les conseils Furie sont exclusivement informatifs et demandent une classe verifiee.
   if self.AddFuryAdvice then self:AddFuryAdvice(alerts) end
+  if self.AddEquipmentReviewAdvice then self:AddEquipmentReviewAdvice(alerts) end
   -- Une condition non verifiable ne devient jamais une alerte certaine.
   self.alerts = alerts
 end
@@ -77,9 +78,14 @@ function WC:NotifyImportant()
   end
 end
 
-function WC:AdviceLines()
+function WC:AdviceLines(includeEquipment)
   local lines = {}
-  for _, alert in ipairs(self.alerts) do lines[#lines + 1] = alert.message end
+  for _, alert in ipairs(self.alerts) do
+    if includeEquipment ~= false or
+        (alert.id ~= "equipment-review" and alert.id ~= "bag-upgrades") then
+      lines[#lines + 1] = alert.message
+    end
+  end
   if #lines == 0 then
     lines[1] = "Aucun conseil verifie pour le moment."
   end

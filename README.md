@@ -1,6 +1,6 @@
 # Warrior Companion
 
-Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau ni itinéraire de quêtes. Le tableau de bord **s'ouvre automatiquement à la connexion**, et un bouton portant l'écusson du guerrier est disponible sur le bord de la minimap pour le rouvrir ou le fermer.
+Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau, avec un parcours de leveling Horde 1–60 intégré depuis un guide existant. Le **mini-bilan de 304 × 88 pixels** s'ouvre automatiquement à la connexion. Son bouton `>>` ouvre le tableau complet, et la fermeture du tableau revient au mini-bilan. **Aucun bouton de minimap n'est créé.**
 
 ## Ce que mesure la version 0.5.6-rc1
 
@@ -28,17 +28,15 @@ Le **Bilan** montre simultanément quatre statistiques, les quêtes, la variatio
 
 Les textures n'utilisent pas de code propriétaire de tiers. Le rendu exact, les proportions et la prise en charge TGA de Forever doivent être vérifiés en jeu : la CI ne teste pas le moteur graphique WoW.
 
-## Fenêtre compacte et recalage minimap
+## Deux affichages : mini-bilan et interface complète
 
-Le tableau est désormais dessiné en **600 × 360 unités WoW** (contre 710 × 448), avec les mêmes statistiques et onglets. Les espacements et éléments décoratifs ont été réduits ; les conseils complets restent consultables dans l'onglet **Conseils**. L'écran Bilan montre seulement la première ligne du conseil pour éviter l'encombrement.
+Le mini-bilan mesure **304 × 88 pixels** et présente uniquement l'XP gagnée, le temps écoulé de session au format HH:MM:SS, les morts, la balance nette de la session (gains moins dépenses), en or, argent et cuivre avec les icônes WoW et un code couleur : vert pour gain, rouge pour perte, gris clair pour zéro, ainsi qu'une ligne de conseil. Il est déplaçable, avec position mémorisée. Le bouton `>>` agrandit vers la fenêtre complète **720 × 460** ; le bouton X de celle-ci revient au mini-bilan. La fenêtre complète ne comporte plus que **Combat, Conseils et Guide** ; Bilan et Journal ne figurent plus parmi les onglets. Le Guide inspiré de RestedXP est sélectionné par défaut et présente une action, la position connue, la prochaine étape et les boutons précédent/suivant. Dans la même vue, le sous-onglet **TALENTS** affiche désormais une **grille graphique de 7 paliers et 18 talents Furie** (rangs prévus `0/5`, `3/5`, etc.), avec le talent du niveau courant en surbrillance, et une navigation niveau par niveau de 10 à 60. Les colonnes sont une mise en page simplifiée de Warrior Companion ; elles ne prétendent pas reproduire les emplacements exacts du client WoW. Les points non dépensés sont affichés si le client les fournit ; la vérification des rangs effectivement choisis en jeu reste à développer.
 
-La position du bouton tient compte de la taille réelle de la minimap lorsque l'API est disponible. Une ancienne position peut être remise à l'angle de départ avec `/wc minimap reset`. Le glisser-déposer et la persistance sont conservés.
+Le mode compact est affiché au premier démarrage. Le choix compact/complet et la position du mini-bilan sont enregistrés dans WC_DB. La commande `/wc` alterne les deux vues, `/wc mini` force la vue réduite et `/wc full` force la vue complète. Aucun bouton de minimap n'est installé.
 
-## Démarrage et icône de minimap
+## Démarrage automatique
 
-Le tableau de bord s'ouvre automatiquement **une fois à la connexion** (pas à chaque changement de zone). Une icône circulaire de 31 pixels s’attache au bord de la minimap comme les boutons des autres addons. Maintiens le clic gauche et glisse-la autour de la minimap pour choisir sa position ; elle est sauvegardée. Un clic gauche normal ouvre ou ferme la fenêtre. L'icône est créée au chargement, puis une nouvelle tentative est faite lors de l'entrée dans le monde si la minimap n'était pas encore disponible.
-
-Le bouton utilise une icône guerrier native recadrée à 20 pixels, la bordure et le survol standard WoW ; il respecte aussi les minimaps carrées lorsque `GetMinimapShape` est disponible. Le démarrage automatique est activé par défaut. L'option est sauvegardée et peut être désactivée avec `/wc autostart off`, puis réactivée avec `/wc autostart on`. La commande `/wc` reste toujours disponible. Décocher l'addon dans l'écran AddOns empêche naturellement son chargement.
+L'affichage sauvegardé est rétabli une fois à la connexion. L'ouverture automatique est activée par défaut, et se contrôle avec `/wc autostart on` et `/wc autostart off`.
 
 ## Provenance des armes (GearQuest Forever)
 
@@ -115,11 +113,11 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 | Commande | Effet |
 | --- | --- |
 | `/wc autostart on`, `/wc autostart off` | Activer/désactiver l'ouverture automatique à la prochaine connexion |
-| `/wc` | Ouvrir ou fermer le tableau des mesures et conseils |
+| `/wc` | Basculer entre mini-bilan et interface complète |
 | `/wc status` | Afficher la version, les mesures, les options et la présence des fonctions d’API |
 | `/wc reset` | Recommencer les mesures et effacer l'historique de session |
 | `/wc performance` | Comparer XP/h globale et XP/h des dix dernières minutes |
-| `/wc minimap reset` | Replacer le bouton sur le bord de la minimap à sa position par défaut |
+| `/wc mini`, `/wc full` | Choisir directement la vue réduite ou complète |
 | `/wc route` | Regrouper les PNJ de départ de quêtes Horde proches dans la même zone |
 | `/wc discover` | Proposer jusqu'à sept pistes de quêtes non acceptées avec les filtres QuestieDB stricts |
 | `/wc quests` | Classement prudent des quêtes du journal du guerrier Horde |

@@ -33,6 +33,17 @@ local function validLine(value)
 end
 
 function WC:BuildQuestPlan(mode)
+  if mode=="talents" then
+    local view=self.TalentPlanText and self:TalentPlanText()
+    return "Talents - Furie",view and view.current or "Plan de talents indisponible."
+  end
+  if mode=="guide" then
+    local view=self.GetGuideView and self:GetGuideView()
+    if not view then
+      return "Guide de leveling", "Aucun guide source verifie n'est encore charge.\nLes vues Journal et A prendre restent disponibles."
+    end
+    return view.title, (view.status or "").."\n\n"..(view.steps or "")
+  end
   if self.inCombat then return "En combat","Preparation du parcours uniquement hors combat." end
   if mode=="journal" then
     self:UpdateQuestAdvice()
@@ -54,8 +65,8 @@ function WC:BuildQuestPlan(mode)
     lines[#lines+1]="Niveau de quete ~= niveau des ennemis ; confirmer dans Questie."
     return "Mon journal",table.concat(lines,"\n")
   end
-  self:UpdateQuestAdvice()
   if mode=="discover" then
+    self:UpdateQuestAdvice()
     local found,reason=self:DiscoverQuests(7)
     if not found then return "Quetes a prendre","Indisponible : "..tostring(reason) end
     if #found.rows==0 then
@@ -70,29 +81,12 @@ function WC:BuildQuestPlan(mode)
     return "Quetes a prendre",table.concat(lines,"\n")
   end
   if mode=="route" then
-    local found,reason=self:DiscoverQuests(40)
-    if not found then return "Parcours / pistes","Indisponible : "..tostring(reason) end
-    local groups,why=self:BuildQuestClusters(found)
-    if not groups then return "Parcours / pistes","Indisponible : "..tostring(why) end
-    if #groups==0 then
-      return "Parcours / pistes","Aucun regroupement de PNJ confirme par QuestieDB."
-    end
-    local lines={"DEPARTS REGROUPES - pas encore un itineraire d'objectifs"}
-    local guide=guideNote()
-    if guide then lines[#lines+1]=guide end
-    for i=1,math.min(3,#groups) do
-      local g=groups[i]
-      lines[#lines+1]="Zone #"..tostring(g.zone)..
-        " : "..tostring(#g.rows).." piste(s) a confirmer"
-      for j=1,math.min(2,#g.rows) do
-        local q=g.rows[j]
-        lines[#lines+1]="  ["..tostring(q.level).."] "..q.name
-      end
-    end
-    lines[#lines+1]="Pas de garantie solo, de distance ou de temps de trajet."
-    return "Parcours / pistes",table.concat(lines,"\n")
+    return "Pistes de quetes",
+      "Cette vue n'est pas un trajet : elle regroupe uniquement des PNJ possibles.\\n"..
+      "Pour savoir ou aller et quoi faire, ouvre l'onglet GUIDE.\\n"..
+      "Les points de depart de quetes peuvent etre retrouves sur la carte Questie."
   end
-  return "Plan de leveling","Choisis Journal, A prendre ou Parcours."
+  return "Plan de leveling","Choisis GUIDE pour suivre une route, Journal pour tes quetes ou A prendre."
 end
 
 function WC:SelectQuestPlan(mode)
@@ -106,11 +100,32 @@ function WC:SelectQuestPlan(mode)
   if self.dashboardQuestTitle then
     self.dashboardQuestTitle:SetText(self.questPlanTitle)
   end
+  if self.RefreshTalentGuidePanel then self:RefreshTalentGuidePanel() end
+  -- Affichage etape par etape pour GUIDE, texte libre pour les autres vues.
+  if self.dashboardGuideLocation and self.dashboardGuideNextText then
+    if self.dashboardQuestDetail and self.dashboardQuestDetail.SetHeight then
+      self.dashboardQuestDetail:SetHeight(mode=="guide" and 77 or 163)
+    end
+    if mode=="guide" and self.GetGuideView then
+      local view=self:GetGuideView()
+      self.dashboardQuestDetail:SetText(view and
+        ("|cffEBC487A FAIRE MAINTENANT|r\n"..(view.actionText or "")) or
+        "Aucun guide disponible.")
+      self.dashboardGuideLocation:SetText(view and
+        ("|cffA0C8EEOU ALLER|r  "..(view.locationText or "")) or "")
+      self.dashboardGuideNextText:SetText(view and
+        ("|cffBAAA91ENSUITE|r  "..(view.nextText or "")) or "")
+    else
+      self.dashboardGuideLocation:SetText("")
+      self.dashboardGuideNextText:SetText("")
+    end
+  end
 end
 
 function WC:OpenQuestPlan(mode)
   if not self.dashboard then return end
-  if not self.dashboard:IsShown() then self.dashboard:Show() end
+  if self.OpenFullDashboard then self:OpenFullDashboard()
+  elseif not self.dashboard:IsShown() then self.dashboard:Show() end
   self:ShowDashboardPage("quests")
   self:SelectQuestPlan(mode or "journal")
 end

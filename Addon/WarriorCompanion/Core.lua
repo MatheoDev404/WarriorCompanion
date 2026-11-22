@@ -57,9 +57,10 @@ frame:SetScript("OnEvent", function(_, event, ...)
     WC:InitWeaponObserver()
     WC:InitTalentObserver()
     WC:UpdateQuestAdvice()
+    if WC.GuideStart then WC:GuideStart() end
     WC:BindQuestie()
     WC:CreateDashboard()
-    WC:CreateMinimapButton()
+    WC:CreateCompactDashboard()
     WC.ready = true
     WC:Trace("core", "initialise")
     WC:Refresh()
@@ -82,14 +83,14 @@ frame:SetScript("OnEvent", function(_, event, ...)
     if event == "PLAYER_EQUIPMENT_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
       WC:ReadWeapons()
     end
-    if event == "PLAYER_ENTERING_WORLD" and not WC.minimapButton then
-      WC:CreateMinimapButton()
-    end
     WC:RecordPerformanceGain(WC.metrics.xpGained - priorXP)
     WC:OnActivityEvent(event, priorXP, priorQuests, ...)
     WC:ObserveGearReviewEvent(event)
     if event == "QUEST_LOG_UPDATE" or event == "PLAYER_LEVEL_UP" then
       WC:UpdateQuestAdvice()
+      if event == "QUEST_LOG_UPDATE" and WC.GuideAdvanceFromJournal then
+        WC:GuideAdvanceFromJournal()
+      end
     end
     if event == "PLAYER_TALENT_UPDATE" or event == "CHARACTER_POINTS_CHANGED" then
       WC:ObserveTalents(true)
@@ -129,13 +130,17 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "fury" then WC:ShowFuryStatus()
   elseif msg == "spells" then WC:ShowSpellbookStatus()
   elseif msg == "weapons" then WC:ShowWeaponStatus()
-  elseif msg == "gear" then WC:ShowGearQuestStatus()
+  elseif msg == "gear" then
+    WC:OpenFullDashboard()
+    WC:ShowDashboardPage("advice")
   elseif msg == "talents" then WC:ShowTalentStatus()
   elseif msg == "quests" then WC:OpenQuestPlan("journal")
   elseif msg == "questie" then WC:BindQuestie(); WC:ShowQuestieStatus()
   elseif msg == "discover" then WC:OpenQuestPlan("discover")
   elseif msg == "route" then WC:OpenQuestPlan("route")
-  elseif msg == "minimap reset" then WC:ResetMinimapPosition()
+  elseif msg == "guide" then WC:OpenQuestPlan("guide")
+  elseif msg == "mini" then WC:ShowCompact()
+  elseif msg == "full" then WC:OpenFullDashboard()
   elseif msg == "autostart on" then
     WC:Profile().autoOpen = true; WC:Print("Ouverture automatique activee a la connexion.")
   elseif msg == "autostart off" then
@@ -147,6 +152,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | route | minimap reset | autostart on/off | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | route | guide | mini | full | autostart on/off | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end

@@ -5,10 +5,10 @@ local _, WC = ...
 local ROOT = "Interface\\AddOns\\WarriorCompanion\\Textures\\"
 local COLORS = {
   black = {0.035, 0.029, 0.034, 0.98},
-  steel = {0.090, 0.083, 0.087, 0.97},
+  steel = {0.083, 0.062, 0.064, 0.97},
   darkPlate = {0.13, 0.096, 0.101, 0.97},
-  ridge = {0.34, 0.235, 0.20, 1},
-  copper = {0.69, 0.40, 0.24, 1},
+  ridge = {0.39, 0.278, 0.235, 1},
+  copper = {0.72, 0.48, 0.31, 1},
   gold = {0.85, 0.64, 0.36, 1},
   blood = {0.46, 0.062, 0.050, 1},
   litBlood = {0.65, 0.115, 0.080, 1},
@@ -48,16 +48,25 @@ end
 
 -- Armature noire bordée de métal : feuillets empilés, bronze, rivets et angles.
 local function metalPlate(parent, x, y, width, height, active)
-  rectangle(parent, x, y, width, height, COLORS.ridge)
-  rectangle(parent, x + 2, y - 2, width - 4, height - 4, COLORS.black)
-  rectangle(parent, x + 4, y - 4, width - 8, height - 8,
+  -- Bordure en acier sombre, double liseré cuivre et petits rivets :
+  -- le cadre garde la géométrie de la maquette sans texture propriétaire.
+  rectangle(parent, x, y, width, height, COLORS.black)
+  rectangle(parent, x, y, width, 2, COLORS.copper)
+  rectangle(parent, x, y-height+2, width, 2, COLORS.ridge)
+  rectangle(parent, x, y, 2, height, COLORS.copper)
+  rectangle(parent, x+width-2, y, 2, height, COLORS.ridge)
+  rectangle(parent, x+3, y-3, width-6, height-6, COLORS.ridge)
+  rectangle(parent, x+5, y-5, width-10, height-10,
     active and COLORS.darkPlate or COLORS.steel)
-  rectangle(parent, x + 4, y - 4, width - 8, 2,
+  rectangle(parent, x+7, y-7, width-14, height-14, COLORS.black)
+  rectangle(parent, x+9, y-9, width-18, height-18,
+    active and COLORS.darkPlate or COLORS.steel)
+  rectangle(parent, x+5, y-5, width-10, 2,
     active and COLORS.litBlood or COLORS.copper)
-  rectangle(parent, x + 4, y - height + 5, width - 8, 2, COLORS.faded)
-  for _, dx in ipairs({8, width - 12}) do
-    rectangle(parent, x + dx, y - 8, 4, 4, COLORS.gold, "ARTWORK")
-    rectangle(parent, x + dx, y - height + 12, 4, 4, COLORS.ridge, "ARTWORK")
+  rectangle(parent, x+5, y-height+7, width-10, 2, COLORS.faded)
+  for _, dx in ipairs({10, width-14}) do
+    rectangle(parent, x+dx, y-10, 4, 4, COLORS.gold, "ARTWORK")
+    rectangle(parent, x+dx, y-height+14, 4, 4, COLORS.ridge, "ARTWORK")
   end
 end
 
@@ -74,24 +83,28 @@ function WC:MoneyParts(value)
     math.floor(n / 10000), math.floor(n % 10000 / 100), n % 100
 end
 
+-- Grande carte de statistiques centree, comme dans la maquette.
 local function stat(parent, x, heading, imagePath)
-  metalPlate(parent, x, -4, 121, 57)
-  if imagePath then picture(parent, imagePath, x + 9, -12, 19, 19) end
-  local offset = imagePath and 32 or 10
-  text(parent, "GameFontNormalSmall", x + offset, -11, 90, 17,
-    tint(heading, "E5B776"))
-  return text(parent, "GameFontHighlightLarge", x + 10, -31, 106, 25)
+  metalPlate(parent, x, -1, 120, 57)
+  rectangle(parent, x + 8, -10, 104, 1, COLORS.ridge, "ARTWORK")
+  if imagePath then picture(parent, imagePath, x + 12, -13, 28, 28) end
+  local value = text(parent, "GameFontHighlightLarge",
+    x + 43, -12, 74, 29)
+  text(parent, "GameFontNormalSmall", x + 9, -43, 108, 17,
+    tint(heading, "E7C19A"))
+  return value
 end
 
 local function tab(parent, key, y, iconPath, name)
   local frame = CreateFrame("Button", nil, parent)
   frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, y)
-  frame:SetSize(55, 52)
-  frame.base = rectangle(frame, 0, 0, 55, 51, COLORS.darkPlate)
-  frame.accent = rectangle(frame, 0, 0, 3, 51, COLORS.ridge)
-  picture(frame, iconPath, 16, -5, 23, 23)
-  text(frame, "GameFontNormalSmall", 2, -31, 52, 17,
-    tint(name, "DAB68E"))
+  frame:SetSize(55, 54)
+  frame.base = rectangle(frame, 0, 0, 55, 53, COLORS.darkPlate)
+  frame.accent = rectangle(frame, 0, 0, 3, 53, COLORS.ridge)
+  rectangle(frame, 6, -5, 43, 41, COLORS.black)
+  picture(frame, iconPath, 15, -7, 25, 25)
+  text(frame, "GameFontNormalSmall", 2, -35, 52, 16,
+    tint(name, "E8C99A"))
   frame:SetScript("OnClick", function() WC:ShowDashboardPage(key) end)
   return frame
 end
@@ -111,7 +124,7 @@ end
 function WC:CreateDashboard()
   if self.dashboard then return end
   local f = CreateFrame("Frame", "WarriorCompanionDashboard", UIParent)
-  f:SetSize(600, 360)
+  f:SetSize(720, 460)
   f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
   f:SetFrameStrata("DIALOG")
   f:EnableMouse(true)
@@ -120,14 +133,15 @@ function WC:CreateDashboard()
   f:SetScript("OnDragStart", function(frame) frame:StartMoving() end)
   f:SetScript("OnDragStop", function(frame) frame:StopMovingOrSizing() end)
 
-  rectangle(f, 0, 0, 600, 360, COLORS.ridge)
-  rectangle(f, 3, -3, 594, 354, COLORS.black)
-  rectangle(f, 4, -4, 592, 48, COLORS.darkPlate)
-  picture(f, ROOT .. "HordeSky", 322, -4, 274, 48)
-  rectangle(f, 4, -51, 592, 3, COLORS.litBlood)
-  rectangle(f, 3, -55, 60, 300, COLORS.darkPlate)
-  rectangle(f, 63, -55, 2, 300, COLORS.ridge)
-  rectangle(f, 3, -356, 594, 4, COLORS.copper)
+  rectangle(f, 0, 0, 720, 460, COLORS.ridge)
+  rectangle(f, 3, -3, 714, 454, COLORS.black)
+  rectangle(f, 4, -4, 712, 48, COLORS.darkPlate)
+  picture(f, ROOT .. "HordeSky", 468, -4, 248, 48)
+  picture(f, ROOT .. "HeaderPlate", 53, -2, 326, 52, "ARTWORK")
+  rectangle(f, 4, -51, 712, 3, COLORS.litBlood)
+  rectangle(f, 3, -55, 73, 397, COLORS.darkPlate)
+  rectangle(f, 76, -55, 2, 397, COLORS.ridge)
+  rectangle(f, 3, -456, 714, 4, COLORS.copper)
 
   picture(f, ROOT .. "Warcrest", 8, -4, 48, 48)
   text(f, "GameFontNormalLarge", 63, -9, 257, 22,
@@ -136,85 +150,56 @@ function WC:CreateDashboard()
     tint("HORDE  /  RAPPORT DE CAMPAGNE", "D49A7D"))
   local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, -2)
-  close:SetScript("OnClick", function() f:Hide() end)
+  close:SetScript("OnClick", function() WC:ShowCompact() end)
 
   local function contentPage()
     local p = CreateFrame("Frame", nil, f)
-    p:SetSize(515, 285)
-    p:SetPoint("TOPLEFT", f, "TOPLEFT", 72, -61)
+    p:SetSize(626, 380)
+    p:SetPoint("TOPLEFT", f, "TOPLEFT", 84, -61)
     return p
   end
 
   self.dashboardPages = {
-    overview = contentPage(), combat = contentPage(),
-    advice = contentPage(), activity = contentPage(), quests = contentPage()
+    combat = contentPage(), advice = contentPage(), quests = contentPage()
   }
   self.dashboardTabs = {}
   local tabs = {
-    {"overview", -62, "Interface\\Icons\\INV_Misc_Book_11", "BILAN"},
-    {"combat", -120, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
-    {"advice", -178, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
-    {"activity", -236, "Interface\\Icons\\INV_Misc_Note_01", "JOURNAL"},
-    {"quests", -294, "Interface\\Icons\\INV_Misc_Map_01", "QUETES"},
+    {"combat", -72, "Interface\\Icons\\Ability_Warrior_Charge", "COMBAT"},
+    {"advice", -146, "Interface\\Icons\\Ability_Warrior_BattleShout", "CONSEILS"},
+    {"quests", -220, "Interface\\Icons\\INV_Misc_Map_01", "GUIDE"},
   }
   for _, item in ipairs(tabs) do
     self.dashboardTabs[item[1]] = tab(f, item[1], item[2], item[3], item[4])
   end
 
-  local p = self.dashboardPages.overview
-  self.dashboardXP = stat(p, 0, "XP GAGNEE", "Interface\\Icons\\INV_Misc_Book_11")
-  self.dashboardSessionRate = stat(p, 130, "XP/H SESSION",
-    "Interface\\Icons\\Spell_Holy_BorrowedTime")
-  self.dashboardRecentRate = stat(p, 260, "XP/H 10 MIN",
-    "Interface\\Icons\\Spell_Holy_BorrowedTime")
-  self.dashboardDeaths = stat(p, 390, "MORTS",
-    "Interface\\Icons\\Ability_Rogue_FeignDeath")
-
-  metalPlate(p, 0, -68, 511, 38)
-  picture(p, "Interface\\Icons\\INV_Misc_Note_01", 10, -76, 20, 20)
-  text(p, "GameFontNormalSmall", 36, -74, 71, 20,
-    tint("QUETES", "E6BC81"))
-  self.dashboardQuests = text(p, "GameFontHighlight", 98, -74, 45, 20)
-  text(p, "GameFontNormalSmall", 151, -74, 62, 20,
-    tint("ARGENT", "E6BC81"))
-  self.dashboardMoney = { digits = {} }
-  self.dashboardMoney.sign = text(p, "GameFontHighlight", 208, -74, 22, 20)
-  for i, coin in ipairs({"Gold", "Silver", "Copper"}) do
-    local px = 233 + (i-1)*90
-    self.dashboardMoney.digits[i] =
-      text(p, "GameFontHighlight", px, -74, 55, 20)
-    picture(p, "Interface\\MoneyFrame\\UI-"..coin.."Icon",
-      px + 49, -74, 18, 18)
-  end
-
-  noteBox(p, 0, -115, 249, 94, "COMBAT",
-    "Interface\\Icons\\Ability_Warrior_Charge")
-  self.dashboardCombat = text(p, "GameFontHighlight", 13, -147, 229, 59)
-  noteBox(p, 259, -115, 252, 94, "CONSEIL DU GUERRIER",
-    "Interface\\Icons\\Ability_Warrior_BattleShout")
-  self.dashboardAdvice = text(p, "GameFontHighlightSmall", 271, -147, 230, 59)
-
-  noteBox(p, 0, -218, 511, 65, "DERNIERES ACTIVITES",
-    "Interface\\Icons\\INV_Misc_Note_01")
-  self.dashboardActivity = text(p, "GameFontHighlightSmall", 13, -247, 485, 34)
-
-  self.dashboardCombatDetail = createSubPage(
-    self.dashboardPages.combat, "RAPPORT DE COMBAT",
-    "Interface\\Icons\\Ability_Warrior_Charge")
-  self.dashboardAdviceDetail = createSubPage(
-    self.dashboardPages.advice, "CONSEILS DU GUERRIER",
-    "Interface\\Icons\\Ability_Warrior_BattleShout")
-  self.dashboardActivityDetail = createSubPage(
-    self.dashboardPages.activity, "JOURNAL DE SESSION",
-    "Interface\\Icons\\INV_Misc_Note_01")
+  local combatPage = self.dashboardPages.combat
+  metalPlate(combatPage, 0, -4, 620, 344)
+  picture(combatPage, "Interface\\Icons\\Ability_Warrior_Charge", 18, -16, 35, 35)
+  text(combatPage, "GameFontNormalLarge", 62, -19, 510, 26,
+    tint("COMBAT - BILAN ET SECURITE", "F1C98D"))
+  rectangle(combatPage, 18, -60, 582, 2, COLORS.ridge, "ARTWORK")
+  self.dashboardCombatDetail = text(combatPage, "GameFontHighlight",
+    23, -78, 566, 245)
+  local advicePage = self.dashboardPages.advice
+  metalPlate(advicePage, 0, -4, 620, 344)
+  picture(advicePage, "Interface\\Icons\\Ability_Warrior_BattleShout",
+    18, -16, 35, 35)
+  text(advicePage, "GameFontNormalLarge", 62, -19, 520, 26,
+    tint("CONSEILS - GUERRIER FURIE", "F1C98D"))
+  rectangle(advicePage, 18, -60, 582, 2, COLORS.ridge, "ARTWORK")
+  self.dashboardAdviceDetail = text(advicePage, "GameFontHighlight",
+    23, -77, 566, 245)
 
   local questPage = self.dashboardPages.quests
-  noteBox(questPage, 0, -4, 512, 237, "PLAN DE LEVELING",
-    "Interface\\Icons\\INV_Misc_Map_01")
+  metalPlate(questPage, 0, -4, 620, 344)
+  picture(questPage, "Interface\\Icons\\INV_Misc_Map_01", 18, -13, 34, 34)
+  text(questPage, "GameFontNormalLarge", 62, -17, 535, 26,
+    tint("GUIDE DE LEVELING - HORDE", "F1C98D"))
   local options = {
-    {"journal", "JOURNAL", 11, 111},
-    {"discover", "A PRENDRE", 130, 117},
-    {"route", "PARCOURS", 255, 117},
+    {"guide", "ETAPES", 15, 150},
+    {"talents", "TALENTS", 174, 114},
+    {"journal", "MES QUETES", 297, 130},
+    {"discover", "A PRENDRE", 436, 142},
   }
   self.dashboardQuestButtons = {}
   for _, data in ipairs(options) do
@@ -229,16 +214,96 @@ function WC:CreateDashboard()
     button:SetScript("OnClick", function() WC:SelectQuestPlan(mode) end)
     self.dashboardQuestButtons[mode] = button
   end
-  self.dashboardQuestTitle = text(questPage, "GameFontNormalSmall", 13, -77,
-    484, 17, tint("Choisis une vue de quetes", "E9C58D"))
-  self.dashboardQuestDetail = text(questPage, "GameFontHighlightSmall", 13,
-    -99, 484, 139, "Journal, quetes a prendre, ou departs regroupes.\n" ..
-      "Les parcours ne sont pas encore des itinéraires verifies.")
+  local function stepButton(label, x, direction)
+    local b = CreateFrame("Button", nil, questPage)
+    b:SetPoint("TOPLEFT", questPage, "TOPLEFT", x, -348)
+    b:SetSize(106, 25)
+    rectangle(b, 0, 0, 106, 25, COLORS.ridge)
+    rectangle(b, 2, -2, 102, 21, COLORS.darkPlate)
+    b.labelText = text(b, "GameFontNormalSmall", 7, -5, 96, 18,
+      tint(label, "F0C58A"))
+    b:SetScript("OnClick", function()
+      if WC.questPlanMode=="talents" and WC.SetTalentPlanLevel then
+        local level=WC.talentPlanSelection or WC:CurrentTalentPlanLevel()
+        if WC:SetTalentPlanLevel(level+direction) then
+          WC:SelectQuestPlan("talents")
+        end
+      elseif WC.GuideMove and WC:GuideMove(direction) then
+        WC:SelectQuestPlan("guide")
+      end
+    end)
+    return b
+  end
+  self.dashboardGuidePrev = stepButton("< Precedente", 20, -1)
+  self.dashboardGuideNext = stepButton("Suivante >", 138, 1)
+  rectangle(questPage, 18, -78, 582, 2, COLORS.ridge, "ARTWORK")
+  self.dashboardQuestTitle = text(questPage, "GameFontNormalLarge", 24, -91,
+    557, 26, tint("Etape en cours", "E9C58D"))
+  rectangle(questPage, 18, -123, 582, 91, COLORS.darkPlate)
+  rectangle(questPage, 18, -123, 4, 91, COLORS.litBlood, "ARTWORK")
+  self.dashboardQuestDetail = text(questPage, "GameFontHighlight", 33,
+    -135, 540, 77, "Ouvre le guide pour voir la prochaine action.")
+  rectangle(questPage, 18, -220, 582, 2, COLORS.ridge, "ARTWORK")
+  self.dashboardGuideLocation = text(questPage, "GameFontHighlight", 24,
+    -225, 554, 36)
+  self.dashboardGuideNextText = text(questPage, "GameFontHighlightSmall", 24,
+    -265, 554, 33)
+  -- Grille graphique de sept paliers, lisible sans ouvrir l'arbre Blizzard.
+  -- Les rangs affiches correspondent au PLAN, pas aux talents observes.
+  self.dashboardTalentHeader = text(questPage, "GameFontNormalLarge",
+    24, -87, 552, 24)
+  self.dashboardTalentCurrent = text(questPage, "GameFontHighlight",
+    24, -111, 562, 23)
+  self.dashboardTalentDistribution = text(questPage, "GameFontHighlightSmall",
+    24, -133, 558, 16)
+  self.dashboardTalentNext = text(questPage, "GameFontHighlightSmall",
+    272, -318, 316, 17)
+  self.dashboardTalentNotice = text(questPage, "GameFontHighlightSmall",
+    24, -335, 560, 15)
+  self.dashboardTalentGrid = {}
+  self.dashboardTalentWidgets = {
+    self.dashboardTalentHeader,self.dashboardTalentCurrent,
+    self.dashboardTalentDistribution,self.dashboardTalentNext,
+    self.dashboardTalentNotice,
+  }
+  -- Ne jamais superposer ces cellules aux textes du guide.
+  for row=1,7 do
+    local rowTitle=text(questPage,"GameFontNormalSmall",20,
+      -150-(row-1)*24,17,18,tint(tostring(row),"A98F73"))
+    self.dashboardTalentWidgets[#self.dashboardTalentWidgets+1]=rowTitle
+  end
+  for row=1,7 do
+    for column=1,4 do
+      local x=39+(column-1)*138
+      local y=-149-(row-1)*24
+      local cell=CreateFrame("Frame",nil,questPage)
+      cell:SetPoint("TOPLEFT",questPage,"TOPLEFT",x,y)
+      cell:SetSize(131,22)
+      local background=rectangle(cell,0,0,131,22,COLORS.darkPlate)
+      local stripe=rectangle(cell,0,0,3,22,COLORS.ridge,"ARTWORK")
+      local name=text(cell,"GameFontNormalSmall",7,-3,96,16)
+      local rank=text(cell,"GameFontNormalSmall",104,-3,26,16)
+      cell.background=background
+      cell.stripe=stripe
+      cell.name=name
+      cell.rank=rank
+      self.dashboardTalentGrid[#self.dashboardTalentGrid+1]=cell
+      self.dashboardTalentWidgets[#self.dashboardTalentWidgets+1]=cell
+    end
+  end
+  for _,widget in ipairs(self.dashboardTalentWidgets) do widget:Hide() end
+  
+  self.dashboardQuestWidgets = {
+    self.dashboardQuestTitle,self.dashboardQuestDetail,
+    self.dashboardGuideLocation,self.dashboardGuideNextText,
+  }
 
-  text(f, "GameFontHighlightSmall", 75, -343, 507, 15,
+  text(f, "GameFontHighlightSmall", 89, -439, 615, 15,
     tint("/wc help     /wc reset     /wc performance", "C1A08A"))
   self.dashboard = f
-  self:ShowDashboardPage("overview")
+  self.questPlanMode = "guide"
+  if self.SelectQuestPlan then self:SelectQuestPlan("guide") end
+  self:ShowDashboardPage("quests")
   f:Hide()
 
   -- Rafraichissement visuel uniquement, sans relancer les notifications.
@@ -255,6 +320,9 @@ end
 
 function WC:ShowDashboardPage(page)
   if not self.dashboardPages or not self.dashboardPages[page] then return end
+  if page=="quests" and not self.questPlanMode and self.SelectQuestPlan then
+    self:SelectQuestPlan("guide")
+  end
   self.dashboardPage = page
   for key, frame in pairs(self.dashboardPages) do
     if key == page then frame:Show() else frame:Hide() end
@@ -284,57 +352,102 @@ local function activityLines(list, limit)
     "Aucune activite enregistree."
 end
 
+function WC:RefreshTalentGuidePanel()
+  if not self.dashboardTalentWidgets then return end
+  local active=self.questPlanMode=="talents"
+  for _,t in ipairs(self.dashboardTalentWidgets) do
+    if active then t:Show() else t:Hide() end
+  end
+  for _,t in ipairs(self.dashboardQuestWidgets) do
+    if active then t:Hide() else t:Show() end
+  end
+  if self.dashboardGuidePrev and self.dashboardGuidePrev.labelText then
+    self.dashboardGuidePrev.labelText:SetText(
+      tint(active and "< Niveau" or "< Precedente","F0C58A"))
+    self.dashboardGuideNext.labelText:SetText(
+      tint(active and "Niveau >" or "Suivante >","F0C58A"))
+  end
+  if not active or not self.TalentPlanText then return end
+  local view=self:TalentPlanText()
+  if not view then return end
+  self.dashboardTalentHeader:SetText(
+    "|cffEBC487ARBRE FURIE|r  |cffCDBB9B- Niveau "..view.plan.level.."|r")
+  self.dashboardTalentCurrent:SetText(
+    "|cff75D38APOINT A PLACER|r  "..view.current)
+  self.dashboardTalentDistribution:SetText(
+    view.distribution.."  |  Paliers 1 a 7")
+  self.dashboardTalentNext:SetText("|cffA9C8E9ENSUITE|r  "..view.next)
+  self.dashboardTalentNotice:SetText("|cffB6AA9C"..view.notice.."|r")
+  local nodes=self:TalentTreeGrid(view.plan.level)
+  if not nodes then return end
+  local cells=self.dashboardTalentGrid
+  for _,cell in ipairs(cells) do
+    cell.name:SetText("")
+    cell.rank:SetText("")
+    cell.background:SetVertexColor(
+      COLORS.darkPlate[1],COLORS.darkPlate[2],
+      COLORS.darkPlate[3],COLORS.darkPlate[4])
+    cell.stripe:SetVertexColor(
+      COLORS.ridge[1],COLORS.ridge[2],
+      COLORS.ridge[3],COLORS.ridge[4])
+  end
+  for _,node in ipairs(nodes) do
+    local index=(node.row-1)*4+node.column
+    local cell=cells[index]
+    if cell then
+      local color=node.status=="current" and "F7D392" or
+        (node.rank>0 and "8FD7A4" or "918A85")
+      local tintColor=node.status=="current" and COLORS.gold or
+        (node.rank>0 and {0.30,0.56,0.39,1} or COLORS.ridge)
+      cell.name:SetText(tint(node.label,color))
+      cell.rank:SetText(tint(node.rank.."/"..node.maximum,color))
+      cell.stripe:SetVertexColor(
+        tintColor[1],tintColor[2],tintColor[3],tintColor[4])
+      if node.status=="current" then
+        cell.background:SetVertexColor(0.29,0.19,0.10,1)
+      end
+    end
+  end
+end
+
 function WC:RefreshDashboard()
   if not self.dashboard or not self.dashboard:IsShown() then return end
-  local m = self.metrics
-  local recent = self:RecentXPPerHour()
-  local session = self:XPPerHour()
-  local combat = self:GetCombatSummary()
-  local coins = self:MoneyDelta()
-  self.dashboardXP:SetText(fmt(m.xpGained, "0"))
-  self.dashboardSessionRate:SetText(fmt(session, m.xpAvailable and "calcul..." or "--"))
-  self.dashboardRecentRate:SetText(fmt(recent, "--"))
-  self.dashboardDeaths:SetText(fmt(m.deaths, "0"))
-  self.dashboardQuests:SetText(fmt(m.questCount))
-
-  local sign, gold, silver, copper = self:MoneyParts(coins)
-  self.dashboardMoney.sign:SetText(sign or "")
-  self.dashboardMoney.digits[1]:SetText(fmt(gold))
-  self.dashboardMoney.digits[2]:SetText(fmt(silver))
-  self.dashboardMoney.digits[3]:SetText(fmt(copper))
-
-  local combatText = "Intervalles : " .. fmt(combat.completed, "0") ..
-    "     Duree moy. : " ..
-    (combat.average and tostring(combat.average) .. " s" or "--") ..
-    "\nInterrompus : " .. fmt(combat.interrupted, "0") ..
-    "     Etat : " ..
-    (combat.active and tint("En combat", "FC7A67") or tint("Repos", "75D483"))
-  self.dashboardCombat:SetText(combatText)
-  self.dashboardCombatDetail:SetText(combatText ..
-    "\nMorts en combat : " .. fmt(combat.deathsInCombat, "0") ..
-    "\n\nUn intervalle n'est pas necessairement un ennemi tue.")
-
-  local advice = self:AdviceLines()
-  if type(advice) ~= "string" or advice == "" then
-    advice = "Aucun conseil verifie pour le moment."
-  end
-  self.dashboardAdvice:SetText((advice:match("([^\n]+)")) or advice)
-  self.dashboardAdviceDetail:SetText(advice)
-  self.dashboardActivity:SetText(activityLines(self.activity, 2))
-  self.dashboardActivityDetail:SetText(activityLines(self.activity, 8))
-  -- Donnees des quetes mises a jour uniquement au clic explicite.
-end
-
-function WC:ToggleDashboard()
-  if not self.dashboard then
-    self:Print("Interface non initialise.")
-    return
-  end
-  if self.dashboard:IsShown() then
-    self.dashboard:Hide()
-  else
-    self:UpdateAdvice()
-    self.dashboard:Show()
-    self:RefreshDashboard()
+  local combat=self:GetCombatSummary()
+  local status=combat.active and tint("EN COMBAT", "FC7A67")
+    or tint("HORS COMBAT", "75D483")
+  self.dashboardCombatDetail:SetText(
+    "|cffF0CA90ETAT ACTUEL|r  "..status..
+    "\n\nCombats observes : "..fmt(combat.completed,"0")..
+    "\nCombats interrompus : "..fmt(combat.interrupted,"0")..
+    "\nDuree moyenne : "..(combat.average and
+      tostring(combat.average).." secondes" or "non mesuree")..
+    "\nMorts en combat : "..fmt(combat.deathsInCombat,"0")..
+    "\n\n|cffBAA18FLes intervalles observes ne sont pas des ennemis tues."..
+    "\nEn guerrier Furie, privilegie des combats prudents et"..
+    "\nrecupere tes points de vie entre les affrontements.|r")
+  local advice=self:AdviceLines(false)
+  local gear=self.EquipmentReviewText and self:EquipmentReviewText()
+  if advice=="Aucun conseil verifie pour le moment." and gear then advice="" end
+  self.dashboardAdviceDetail:SetText(
+    (advice~="" and ("|cffF0CA90PRIORITES|r\n"..advice.."\n\n") or "")..
+    (gear and ("|cffF0CA90EQUIPEMENT A VERIFIER|r\n"..gear) or
+      "Aucun conseil verifie pour le moment."))
+  if self.RefreshTalentGuidePanel then self:RefreshTalentGuidePanel() end
+  if self.questPlanMode=="guide" and self.GetGuideView then
+    local view=self:GetGuideView()
+    self.dashboardQuestTitle:SetText(view and view.title or "Guide Horde")
+    self.dashboardQuestDetail:SetText(view and
+      ("|cffEBC487A FAIRE MAINTENANT|r\n"..(view.actionText or view.steps or "")) or
+      "Aucun parcours charge.")
+    if self.dashboardGuideLocation then
+      self.dashboardGuideLocation:SetText(view and
+        ("|cffA0C8EEOU ALLER|r  "..(view.locationText or "")) or "")
+    end
+    if self.dashboardGuideNextText then
+      self.dashboardGuideNextText:SetText(view and
+        ("|cffBAAA91ENSUITE|r  "..(view.nextText or "")) or "")
+    end
   end
 end
+
+-- Le basculement compact / complet est porte par CompactDashboard.lua.
