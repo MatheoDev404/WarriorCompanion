@@ -22,3 +22,7 @@ Le point de départ est la version 0.2.0, commit `c1d15f9`. La revue couvre les 
 6. Après trois morts, chercher le conseil dans le tableau. Changer un objet équipé et observer les traces. Avec `/wc debug off` puis `/wc logs`, vérifier que le journal est vide. Finir avec `/wc reset` et contrôler les compteurs.
 
 Consigner le build, la version de l’addon, l’action, le résultat attendu, le résultat observé et la première erreur Lua éventuelle. Le rendu, les restrictions réelles du client et l’ordre des événements nécessitent cet essai. Aucun résultat en jeu n’a été consigné pour la version 0.2.1.
+
+## Test additionnel — historique 0.2.2
+
+Activer `/wc history` juste après connexion : l'historique est vide. Gagner de l'XP, changer une pièce d'équipement puis ouvrir `/wc history` : chaque changement détecté doit apparaître, sans nom d'objet inventé. Après `/wc reset`, `/wc history` doit de nouveau être vide. Le journal `/wc logs` reste séparé et désactivé par défaut.
