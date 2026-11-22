@@ -49,17 +49,20 @@ function WC:CreateGuideTracker(page)
   root.count=label(root,464,-5,98,23,11,C.muted)
   rect(root,10,-31,550,1,C.border)
   root.rows={}
-  for n=1,5 do
+  local positions={-39,-108,-149,-190}
+  for n=1,4 do
     local row=CreateFrame("Frame",nil,root)
-    row:SetSize(548,34)
-    row:SetPoint("TOPLEFT",root,"TOPLEFT",11,-39-(n-1)*37)
-    row.bg=rect(row,0,0,548,34,C.card)
-    row.accent=rect(row,0,0,3,34,C.border)
-    row.number=label(row,12,-3,30,27,12,C.muted)
-    row.title=label(row,48,-3,488,27,12,C.white)
+    local height=n==1 and 65 or 37
+    row:SetSize(548,height)
+    row:SetPoint("TOPLEFT",root,"TOPLEFT",11,positions[n])
+    row.bg=rect(row,0,0,548,height,C.card)
+    row.accent=rect(row,0,0,3,height,C.border)
+    row.number=label(row,12,-5,30,height-10,n==1 and 14 or 12,C.muted)
+    row.title=label(row,48,-5,488,height-10,n==1 and 13 or 12,C.white)
+    if row.title.SetWordWrap then row.title:SetWordWrap(true) end
     root.rows[n]=row
   end
-  root.location=label(root,12,-228,540,17,11,C.muted)
+  root.location=label(root,12,-230,540,17,11,C.muted)
   root.progressBack=rect(root,12,-250,546,4,C.border)
   root.progressFill=rect(root,12,-250,1,4,C.gold)
   self.guideTracker=root
