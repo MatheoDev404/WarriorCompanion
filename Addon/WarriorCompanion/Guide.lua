@@ -128,21 +128,83 @@ function WC:GuideAdvanceFromJournal()
   return self:GuideMove(1)
 end
 
+-- Traduction de l'action et nom officiel de quete si le client le fournit.
+-- Ne jamais inventer une traduction de nom propre ou de PNJ.
+local function localQuestTitle(self, id)
+  if type(id) ~= "number" then return nil end
+  if self.questAdvice and type(self.questAdvice.rows) == "table" then
+    for _, row in ipairs(self.questAdvice.rows) do
+      if row.id == id and type(row.name) == "string" and row.name ~= "" then
+        return row.name
+      end
+    end
+  end
+  if type(C_QuestLog) == "table" and type(C_QuestLog.GetTitleForQuestID) == "function" then
+    local ok, title = pcall(C_QuestLog.GetTitleForQuestID, id)
+    if ok and type(title) == "string" and title ~= "" then return title end
+  end
+  return nil
+end
+
+local actionsFR = {
+  accept = "Accepter",
+  complete = "Faire les objectifs de",
+  turnin = "Rendre",
+}
+
+local function readableStep(self, step)
+  if step.questID and actionsFR[step.action] then
+    local title = localQuestTitle(self, step.questID)
+    if title then return actionsFR[step.action] .. " : " .. title end
+  end
+  -- Le texte de source reste visible si aucune traduction fiable n'existe.
+  local value = step.text or ""
+  value = value:gsub("^Talk to ", "Parler a ")
+    :gsub("^Kill ", "Eliminer ")
+    :gsub("^Loot ", "Ramasser ")
+    :gsub("^Travel to ", "Aller a ")
+    :gsub("^Go to ", "Aller a ")
+    :gsub("^Get to ", "Rejoindre ")
+    :gsub("^Accept ", "Accepter ")
+    :gsub("^Turn in ", "Rendre ")
+    :gsub("^Get the ", "Recuperer ")
+  return value
+end
+
+local function shortLocation(step)
+  if type(step.zone) ~= "string" or step.zone == "" then return nil end
+  local place = step.zone
+  if type(step.x) == "number" and type(step.y) == "number" then
+    return place .. " (" .. math.floor(step.x + 0.5) .. ", " ..
+      math.floor(step.y + 0.5) .. ")"
+  end
+  return place
+end
+
 function WC:GetGuideView()
   local guide = self.activeGuide
   if not guide then return nil end
   local i = math.max(1, math.min(#guide.steps, self.guideIndex or 1))
-  local lines = {}
-  for n = math.max(1,i-1),math.min(#guide.steps,i+2) do
-    local prefix = n < i and "  " or (n == i and "> " or "  ")
-    local line = tostring(n)..". "..guide.steps[n].text
-    if n == i then line = "|cffEBC487"..prefix..line.."|r"
-    else line = prefix..line end
-    lines[#lines+1] = line
+  local step = guide.steps[i]
+  local nextStep = guide.steps[i + 1]
+  local lines = {
+    "|cffEBC487A FAIRE MAINTENANT|r",
+    readableStep(self, step),
+  }
+  local location = shortLocation(step)
+  if location then
+    lines[#lines+1] = "|cffA0C8EEPosition source : " .. location .. "|r"
+  else
+    lines[#lines+1] = "|cffBB9999Position non precisee par le guide|r"
   end
+  if nextStep then
+    lines[#lines+1] = ""
+    lines[#lines+1] = "|cffBAAA91ENSUITE :|r " .. readableStep(self, nextStep)
+  end
+  local area = guide.title or "Parcours Horde"
   return {
-    title = guide.title,
-    status = "Etape "..i.."/"..#guide.steps.."  |  Source : "..guide.source,
-    steps = table.concat(lines, "\n\n"),
+    title = area,
+    status = "Etape "..i.."/"..#guide.steps.."  - Guide Horde 1-60",
+    steps = table.concat(lines, "\n"),
   }
 end
