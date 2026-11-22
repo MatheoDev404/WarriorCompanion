@@ -36,7 +36,7 @@ function CreateFrame()
   local f=frame();frames[#frames+1]=f;return f
 end
 UIParent={GetCenter=function()return 500,500 end}
-local options={}
+local options={autoOpen=true}
 local WC={metrics={xpGained=120,deaths=2,questCount=19,xpAvailable=true}}
 function WC:Profile() return options end
 function WC:XPPerHour() return 3456 end
