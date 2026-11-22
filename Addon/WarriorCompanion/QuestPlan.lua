@@ -33,7 +33,6 @@ local function validLine(value)
 end
 
 function WC:BuildQuestPlan(mode)
-  if self.inCombat then return "En combat","Preparation du parcours uniquement hors combat." end
   if mode=="guide" then
     local view=self.GetGuideView and self:GetGuideView()
     if not view then
@@ -41,6 +40,7 @@ function WC:BuildQuestPlan(mode)
     end
     return view.title, (view.status or "").."\n\n"..(view.steps or "")
   end
+  if self.inCombat then return "En combat","Preparation du parcours uniquement hors combat." end
   if mode=="journal" then
     self:UpdateQuestAdvice()
     local snapshot=self.questAdvice
