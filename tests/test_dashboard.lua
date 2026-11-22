@@ -70,76 +70,43 @@ assert(sign=="" and g==0 and s==0 and c==0, "zero")
 assert(WC:MoneyParts(nil)==nil and WC:MoneyParts(0/0)==nil)
 
 WC:CreateDashboard()
-assert(WC.dashboard.w==600 and WC.dashboard.h==360,"dimensions")
-assert(not WC.dashboard:IsShown(),"ferme au depart")
-assert(WC.dashboardPage=="overview")
-assert(WC.dashboardPages.overview:IsShown())
-assert(WC.dashboardPages.overview.w==515 and WC.dashboardPages.overview.h==285,
-  "overview fits inside compact window")
-local sky, crest, header, adviceArt, gold, silver, copper=false,false,false,false,false,false,false
-for _, t in ipairs(textures) do
-  if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\HordeSky" then sky=true end
-  if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\Warcrest" then crest=true end
-  if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\HeaderPlate" then header=true end
-  if t.path=="Interface\\AddOns\\WarriorCompanion\\Textures\\AdviceArt" then adviceArt=true end
-  if t.path=="Interface\\MoneyFrame\\UI-GoldIcon" then gold=true end
-  if t.path=="Interface\\MoneyFrame\\UI-SilverIcon" then silver=true end
-  if t.path=="Interface\\MoneyFrame\\UI-CopperIcon" then copper=true end
+assert(WC.dashboard.w==720 and WC.dashboard.h==460,"grande fenetre lisible")
+assert(not WC.dashboard:IsShown())
+assert(WC.dashboardPage=="quests","guide par defaut")
+assert(WC.dashboardPages.quests.w==626 and WC.dashboardPages.quests.h==380)
+assert(WC.dashboardPages.combat and WC.dashboardPages.advice)
+assert(not WC.dashboardPages.overview and not WC.dashboardPages.activity,
+  "bilan et journal retires de la grande fenetre")
+assert(not WC.dashboardTabs.overview and not WC.dashboardTabs.activity)
+local sky,crest,header=false,false,false
+for _,t in ipairs(textures) do
+  if t.path=="Interface\\\\AddOns\\\\WarriorCompanion\\\\Textures\\\\HordeSky" then sky=true end
+  if t.path=="Interface\\\\AddOns\\\\WarriorCompanion\\\\Textures\\\\Warcrest" then crest=true end
+  if t.path=="Interface\\\\AddOns\\\\WarriorCompanion\\\\Textures\\\\HeaderPlate" then header=true end
 end
-assert(sky and crest and header and adviceArt,"textures HUD de la maquette")
-assert(gold and silver and copper,"icones monnaie natives")
-assert(#buttons>=9,"five navigation tabs, quest filters and close")
+assert(sky and crest and header,"theme visuel Horde conserve")
+assert(#buttons>=8,"3 onglets et boutons du guide")
 WC:ToggleDashboard()
 assert(WC.dashboard:IsShown() and notices==1)
-assert(WC.dashboardXP.text=="516")
-assert(WC.dashboardSessionRate.text=="10961")
-assert(WC.dashboardRecentRate.text=="10800")
-assert(WC.dashboardQuests.text=="32")
-assert(WC.dashboardMoney.sign.text=="-")
-assert(WC.dashboardMoney.digits[1].text=="123")
-assert(WC.dashboardMoney.digits[2].text=="45")
-assert(WC.dashboardMoney.digits[3].text=="67")
-assert(WC.dashboardCombat.text:find("28 s",1,true))
-assert(WC.dashboardAdvice.text:find("talents",1,true))
-assert(WC.dashboardActivity.text:find("+285 XP",1,true))
-assert(WC.dashboardActivity.text:find("+231 XP",1,true))
+assert(WC.dashboardQuestButtons.guide and WC.dashboardQuestButtons.journal
+  and WC.dashboardQuestButtons.discover and not WC.dashboardQuestButtons.route)
+assert(WC.dashboardGuidePrev and WC.dashboardGuideNext)
 WC.dashboardTabs.combat.handlers.OnClick()
-assert(WC.dashboardPages.combat:IsShown() and not WC.dashboardPages.overview:IsShown())
-assert(WC.dashboardCombatDetail.text:find("Interrompus",1,true))
+assert(WC.dashboardPage=="combat" and WC.dashboardPages.combat:IsShown())
+assert(WC.dashboardCombatDetail.text:find("Combats",1,true))
+assert(WC.dashboardCombatDetail.text:find("28 secondes",1,true))
 WC.dashboardTabs.advice.handlers.OnClick()
 assert(WC.dashboardAdviceDetail.text:find("talents",1,true))
 WC.dashboardTabs.quests.handlers.OnClick()
-assert(WC.dashboardPages.quests:IsShown())
-assert(WC.dashboardQuestButtons.journal and WC.dashboardQuestButtons.discover
-  and WC.dashboardQuestButtons.route and WC.dashboardQuestButtons.guide)
+assert(WC.dashboardPage=="quests" and WC.dashboardPages.quests:IsShown())
 WC.dashboardQuestButtons.guide.handlers.OnClick()
 assert(WC.dashboardQuestTitle.text:find("Guide",1,true))
-assert(WC.dashboardGuidePrev and WC.dashboardGuideNext)
-WC.dashboardTabs.activity.handlers.OnClick()
-assert(WC.dashboardActivityDetail.text:find("+285 XP",1,true))
-WC:ShowDashboardPage("invalid")
-assert(WC.dashboardPage=="activity")
 WC:ShowDashboardPage("overview")
-WC.metrics.xpGained=999
-WC.dashboard.handlers.OnUpdate(WC.dashboard,1)
-assert(WC.dashboardXP.text=="516","3 secondes")
-WC.dashboard.handlers.OnUpdate(WC.dashboard,2.2)
-assert(WC.dashboardXP.text=="999")
-assert(notices==1,"rafraichissement sans notification")
-
-WC:ToggleDashboard()
-WC.activity={}
-WC.metrics.questCount=nil
-WC.metrics.xpAvailable=false
-WC.XPPerHour=function() return nil end
-WC.RecentXPPerHour=function() return nil end
-WC.MoneyDelta=function() return nil end
-WC:ToggleDashboard()
-assert(WC.dashboardSessionRate.text=="--")
-assert(WC.dashboardRecentRate.text=="--")
-assert(WC.dashboardMoney.sign.text=="")
-assert(WC.dashboardMoney.digits[1].text=="--")
-assert(WC.dashboardActivity.text:find("Aucune activite",1,true))
+assert(WC.dashboardPage=="quests","ancien onglet inaccessible")
+WC:ShowDashboardPage("activity")
+assert(WC.dashboardPage=="quests","journal masque")
+WC.dashboard.handlers.OnUpdate(WC.dashboard,3.1)
+assert(notices==1,"rafraichissement sans conseil notifie")
 WC:CreateDashboard()
-assert(WC.dashboard.w==600,"pas de duplication")
-print("OK: art Horde, navigation, combat, argent, valeurs absentes, cadence et regression")
+assert(WC.dashboard.w==720,"pas de duplication")
+print("OK: interface 720x460, trois onglets, guide par defaut, combat, conseils")
