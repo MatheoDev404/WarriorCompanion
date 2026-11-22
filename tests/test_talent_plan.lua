@@ -17,6 +17,34 @@ for level=10,60 do
   if level<60 then assert(plan.next and plan.next.level==level+1) end
   totals[plan.current.english]=(totals[plan.current.english] or 0)+1
 end
+local early=WC:TalentTreeGrid(10)
+assert(#early==18,"grille de 18 talents Furie")
+local names={}
+for _,node in ipairs(early) do
+  assert(node.row>=1 and node.row<=7 and node.column>=1 and node.column<=4)
+  assert(node.rank>=0 and node.rank<=node.maximum)
+  assert(not names[node.key],"aucun talent en double")
+  names[node.key]=true
+end
+assert(names["Bloodthirst"] and names["Gore Drinker"] and names["Enrage"])
+assert(WC:TalentTreeGrid(9)==nil and WC:TalentTreeGrid(61)==nil)
+local at33=WC:TalentTreeGrid(33)
+local current,planned,future=0,0,0
+for _,node in ipairs(at33) do
+  if node.status=="current" then
+    current=current+1
+    assert(node.key=="Enrage" and node.rank==5)
+  elseif node.status=="planned" then planned=planned+1
+  else
+    future=future+1
+    assert(node.rank==0)
+  end
+end
+assert(current==1 and planned>0 and future>0)
+local endTree=WC:TalentTreeGrid(60)
+local spent=0
+for _,node in ipairs(endTree) do spent=spent+node.rank end
+assert(spent==51,"51 points visibles dans l'arbre au niveau 60")
 assert(WC:TalentPlanLevel(10).current.english=="Cruelty")
 assert(WC:TalentPlanLevel(14).current.rank==5)
 assert(WC:TalentPlanLevel(15).current.english=="Unbridled Wrath")
