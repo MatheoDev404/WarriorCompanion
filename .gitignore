@@ -1,0 +1,5 @@
+*.zip
+*.log
+*.bak
+__pycache__/
+WTF/
