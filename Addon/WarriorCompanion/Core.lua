@@ -1,6 +1,6 @@
 local addonName, WC = ...
 _G.WarriorCompanion = WC
-WC.version = "0.2.1"
+WC.version = "0.2.2"
 WC.metrics = { xpGained = 0, deaths = 0, started = nil, lastXP = nil, lastXPMax = nil, lastLevel = nil, moneyStart = nil, moneyNow = nil, questCount = nil }
 WC.alerts = {}
 WC.inCombat = false
@@ -59,7 +59,10 @@ frame:SetScript("OnEvent", function(_, event, ...)
     WC.inCombat = false
     WC:Refresh()
   else
+    local priorXP = WC.metrics.xpGained
+    local priorQuests = WC.metrics.questCount
     WC:OnObservedEvent(event, ...)
+    WC:OnActivityEvent(event, priorXP, priorQuests, ...)
     if not WC.inCombat then WC:Refresh() end
   end
 end)
@@ -76,12 +79,13 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
     WC:ClearLogs()
     WC:Print("Journal desactive et efface.")
   elseif msg == "logs" then WC:ShowLogs()
+  elseif msg == "history" then WC:ShowActivity()
   elseif msg == "clear" then WC:ClearLogs(); WC:Print("Traces effacees.")
   elseif msg == "status" then WC:Status()
   elseif msg == "reset" then WC:ResetSession()
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end

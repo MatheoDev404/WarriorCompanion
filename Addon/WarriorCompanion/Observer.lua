@@ -108,6 +108,7 @@ function WC:ResetSession()
   local m = self.metrics
   m.xpGained, m.deaths = 0, 0
   self:InitObserver()
+  self:ClearActivity()
   self:Trace("observer", "session reinitialisee")
   self:Print("Session reinitialisee.")
   self:Refresh()

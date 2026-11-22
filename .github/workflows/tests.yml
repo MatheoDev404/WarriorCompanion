@@ -20,4 +20,6 @@ jobs:
             luac${{ matrix.lua }} -p "$file"
           done
       - name: Run Lua simulations
-        run: lua${{ matrix.lua }} tests/test_addon.lua
+        run: |
+          lua${{ matrix.lua }} tests/test_addon.lua
+          lua${{ matrix.lua }} tests/test_activity.lua

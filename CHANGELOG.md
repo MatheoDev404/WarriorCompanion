@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.2 — historique de session
+
+- Historique borné des événements effectivement observés, disponible via `/wc history`.
+- La chronologie inclut les gains d’XP mesurés au changement de zone et conserve les changements rapprochés sur deux emplacements d’équipement distincts.
+- Limite de 60 entrées, anti-répétition sur les modifications fréquentes, effacement avec `/wc reset`.
+- Tests de chronologie et de confidentialité : aucun détail d'objet ou de quête non disponible n'est inventé.
+- Logs de debug toujours indépendants et désactivés par défaut.
+
 ## 0.2.1 — audit de compatibilité Forever
 
 - Le tableau compte les quêtes hors en-têtes. Les alertes lisent les points de classe et de spécialisation via les API documentées dans le build 71037.
