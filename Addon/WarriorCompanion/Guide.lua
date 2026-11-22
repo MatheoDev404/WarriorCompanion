@@ -205,6 +205,10 @@ function WC:GetGuideView()
   return {
     title = area,
     status = "Etape "..i.."/"..#guide.steps.."  - Guide Horde 1-60",
+    actionText = readableStep(self, step),
+    locationText = location or "Lieu non precise dans cette etape.",
+    nextText = nextStep and readableStep(self, nextStep) or
+      "Fin de la section : passe a la suivante.",
     steps = table.concat(lines, "\n"),
   }
 end
