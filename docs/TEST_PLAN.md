@@ -102,3 +102,12 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 3. Ouvrir `/wc` → Conseils : suggestion de vérifier les barres d'action pendant dix minutes, sans notification chat automatique.
 4. Si le grimoire est temporairement indisponible, ne pas afficher de conseil fondé sur une lecture incomplète.
 5. `/wc reset` réinitialise la référence du grimoire et n'annonce pas les sorts déjà connus comme nouvellement appris.
+
+## Test de la minimap et de l'ouverture automatique (0.5.3-rc1)
+
+1. Activer l'addon, se connecter au personnage : le tableau de bord doit s'ouvrir automatiquement **une fois**.
+2. En haut à droite de la minimap, repérer le petit écusson guerrier. Cliquer : la fenêtre doit s'ouvrir/fermer. Le survol doit afficher Warrior Companion.
+3. Fermer la fenêtre, changer de zone : elle ne doit pas s'ouvrir à nouveau automatiquement.
+4. `/wc autostart off` puis déconnexion/reconnexion : la fenêtre doit rester fermée mais le bouton de minimap reste visible.
+5. `/wc autostart on` puis déconnexion/reconnexion : la fenêtre doit à nouveau s'ouvrir au lancement.
+6. `/wc` doit continuer à ouvrir/fermer la fenêtre indépendamment de l'option de démarrage.

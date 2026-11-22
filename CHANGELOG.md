@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.3-rc1 — minimap et lancement automatique
+
+- Bouton guerrier sur le bord de la minimap : clic gauche pour ouvrir et fermer le tableau.
+- Tableau de bord automatiquement ouvert une fois à la connexion, sans réouverture à chaque changement de zone.
+- Option persistante `/wc autostart on|off` ; repli si la minimap devient disponible après le chargement.
+- Tests Lua 5.1/5.4 de l'icône, de l'ouverture/fermeture, du tooltip et des options.
+
 ## 0.5.2-rc1 — observation des sorts et rangs
 
 - Lecture prudente des onglets du grimoire via `C_SpellBook` sur Forever.
