@@ -75,26 +75,6 @@ local function fmt(value, fallback)
   return fallback or "--"
 end
 
-function WC:MoneyParts(value)
-  if type(value) ~= "number" or value ~= value
-      or value == math.huge or value == -math.huge then return nil end
-  local n = math.floor(math.abs(value))
-  return value < 0 and "-" or (value > 0 and "+" or ""),
-    math.floor(n / 10000), math.floor(n % 10000 / 100), n % 100
-end
-
--- Grande carte de statistiques centree, comme dans la maquette.
-local function stat(parent, x, heading, imagePath)
-  metalPlate(parent, x, -1, 120, 57)
-  rectangle(parent, x + 8, -10, 104, 1, COLORS.ridge, "ARTWORK")
-  if imagePath then picture(parent, imagePath, x + 12, -13, 28, 28) end
-  local value = text(parent, "GameFontHighlightLarge",
-    x + 43, -12, 74, 29)
-  text(parent, "GameFontNormalSmall", x + 9, -43, 108, 17,
-    tint(heading, "E7C19A"))
-  return value
-end
-
 local function tab(parent, key, y, iconPath, name)
   local frame = CreateFrame("Button", nil, parent)
   frame:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, y)
@@ -107,18 +87,6 @@ local function tab(parent, key, y, iconPath, name)
     tint(name, "E8C99A"))
   frame:SetScript("OnClick", function() WC:ShowDashboardPage(key) end)
   return frame
-end
-
-local function noteBox(parent, x, y, w, h, name, iconPath)
-  metalPlate(parent, x, y, w, h)
-  if iconPath then picture(parent, iconPath, x + 10, y - 9, 20, 20) end
-  text(parent, "GameFontNormal", x + (iconPath and 34 or 11), y - 11,
-    w - 45, 18, tint(name, "EBC487"))
-end
-
-local function createSubPage(parent, heading, iconPath)
-  noteBox(parent, 0, -4, 512, 237, heading, iconPath)
-  return text(parent, "GameFontHighlight", 15, -43, 482, 184)
 end
 
 function WC:CreateDashboard()
@@ -335,21 +303,6 @@ function WC:ShowDashboardPage(page)
     end
   end
   self:RefreshDashboard()
-end
-
-local function activityLines(list, limit)
-  if type(list) ~= "table" or #list == 0 then
-    return "Aucune activite enregistree."
-  end
-  local lines = {}
-  for i = #list, math.max(1, #list - limit + 1), -1 do
-    local e = list[i]
-    if e and type(e.description) == "string" then
-      lines[#lines + 1] = tint("> ", "D9634D") .. e.description
-    end
-  end
-  return #lines > 0 and table.concat(lines, "\n") or
-    "Aucune activite enregistree."
 end
 
 function WC:RefreshTalentGuidePanel()
