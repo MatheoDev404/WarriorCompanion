@@ -33,4 +33,4 @@ WeaponTargets.lua
 FuryAdvisor.lua
 Advisor.lua
 Dashboard.lua
-Minimap.lua
+CompactDashboard.lua
