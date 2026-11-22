@@ -277,4 +277,24 @@ now = now + 300
 start = #messages
 event("PLAYER_TALENT_UPDATE")
 assert(#messages == start, "un conseil informatif est resté dans le tableau")
+-- Le compteur et la chronologie doivent refléter la même mesure après un zonage.
+baseline()
+command("history")
+assert(messages[#messages]:find("Historique de session vide.", 1, true))
+start = #messages
+xp = xp + 35
+event("PLAYER_ENTERING_WORLD")
+event("PLAYER_XP_UPDATE", "player")
+assert(WC.metrics.xpGained == 35)
+assert(#messages == start, "l'historique doit rester silencieux")
+command("history")
+assert(#messages == start + 2 and messages[#messages]:match("%+35 XP$"),
+  "le gain mesuré au changement de zone doit apparaître exactement une fois")
+command("debug on")
+command("debug off")
+command("history")
+assert(messages[#messages]:match("%+35 XP$"), "désactiver le debug a effacé l'historique")
+command("reset")
+command("history")
+assert(messages[#messages]:find("Historique de session vide.", 1, true))
 print("OK: API Forever simulées, combat, XP, niveaux, alertes, journal, options et tableau")

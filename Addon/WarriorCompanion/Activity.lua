@@ -3,35 +3,32 @@ local _, WC = ...
 local MAX_ACTIVITY = 60
 local RECENT_DISPLAY = 12
 local DEBOUNCE_SECONDS = 8
-local recentByKind = {}
 
 function WC:ClearActivity()
   self.activity = {}
-  recentByKind = {}
 end
 
 function WC:AddActivity(kind, description, debounce)
   if type(kind) ~= "string" or type(description) ~= "string" then return end
   local now = self:Now()
-  if debounce then
-    local previous = recentByKind[kind]
-    if previous and now >= previous and now - previous < DEBOUNCE_SECONDS then
-      return
-    end
-    recentByKind[kind] = now
-  end
   self.activity = self.activity or {}
+  if debounce then
+    for i = #self.activity, 1, -1 do
+      local row = self.activity[i]
+      local age = now - row.t
+      if age >= DEBOUNCE_SECONDS then break end
+      if age >= 0 and row.kind == kind and row.description == description then return end
+    end
+  end
   self.activity[#self.activity + 1] = { t = now, kind = kind, description = description }
   if #self.activity > MAX_ACTIVITY then table.remove(self.activity, 1) end
 end
 
 function WC:OnActivityEvent(event, previousXP, previousQuests, ...)
   if not self.ready then return end
-  if event == "PLAYER_XP_UPDATE" or event == "PLAYER_LEVEL_UP" then
-    local currentXP = self.metrics.xpGained
-    if type(previousXP) == "number" and type(currentXP) == "number" and currentXP > previousXP then
-      self:AddActivity("xp", "+" .. tostring(currentXP - previousXP) .. " XP")
-    end
+  local currentXP = self.metrics.xpGained
+  if type(previousXP) == "number" and type(currentXP) == "number" and currentXP > previousXP then
+    self:AddActivity("xp", "+" .. tostring(currentXP - previousXP) .. " XP")
   end
   if event == "PLAYER_LEVEL_UP" then
     local level = ...

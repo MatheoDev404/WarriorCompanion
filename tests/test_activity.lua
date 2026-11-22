@@ -24,7 +24,14 @@ WC:OnActivityEvent("PLAYER_EQUIPMENT_CHANGED", 150, 4, 16)
 local n = #WC.activity
 WC:OnActivityEvent("PLAYER_EQUIPMENT_CHANGED", 150, 4, 16)
 assert(#WC.activity == n, "Anti-spam")
-now = now + 9
+WC:OnActivityEvent("PLAYER_EQUIPMENT_CHANGED", 150, 4, 17)
+assert(#WC.activity == n + 1 and WC.activity[#WC.activity].description:find("(emplacement 17)", 1, true),
+  "Deux emplacements distincts doivent apparaître même dans la même seconde")
+n = #WC.activity
+now = now + 7
+WC:OnActivityEvent("PLAYER_EQUIPMENT_CHANGED", 150, 4, 16)
+assert(#WC.activity == n, "Doublon intercalé dans les huit secondes")
+now = now + 1
 WC:OnActivityEvent("PLAYER_EQUIPMENT_CHANGED", 150, 4, 16)
 assert(#WC.activity == n + 1)
 WC:OnActivityEvent("QUEST_LOG_UPDATE", 150, 4)
@@ -32,9 +39,10 @@ assert(#WC.activity == n + 1, "Quete sans variation")
 WC.metrics.questCount = 5
 WC:OnActivityEvent("QUEST_LOG_UPDATE", 150, 4)
 assert(WC.activity[#WC.activity].description == "Nombre de quetes : 5")
+n = #WC.activity
 WC.metrics.questCount = nil
 WC:OnActivityEvent("QUEST_LOG_UPDATE", 150, 5)
-assert(WC.activity[#WC.activity].kind == "quetes", "API indisponible ne cree pas d'activite")
+assert(#WC.activity == n, "API indisponible ne cree pas d'activite")
 now = now + 9
 WC:OnActivityEvent("PLAYER_EQUIPMENT_CHANGED", 150, 5, 999999)
 assert(WC.activity[#WC.activity].description == "Equipement modifie", "Valeur restreinte sans slot")
@@ -47,8 +55,15 @@ assert(WC.activity[1].description == "Evenement 41")
 local before = #printed
 WC:ShowActivity()
 assert(#printed == before + 13, "En-tete + 12 dernieres activites")
+assert(printed[before + 2]:match("Evenement 89$") and printed[#printed]:match("Evenement 100$"))
+WC:OnActivityEvent("SKILL_LINES_CHANGED", 150, nil)
+WC:OnActivityEvent("SKILL_LINES_CHANGED", 150, nil)
+assert(WC.activity[59].kind == "test" and WC.activity[60].kind == "competences")
 WC:ClearActivity()
 assert(#WC.activity == 0)
+WC:OnActivityEvent("SKILL_LINES_CHANGED", 150, nil)
+assert(#WC.activity == 1, "Reset du délai anti-répétition avec l'historique")
+WC:ClearActivity()
 WC.ready = false
 WC:OnActivityEvent("PLAYER_DEAD", 0, 0)
 assert(#WC.activity == 0, "Aucun enregistrement avant initialisation")

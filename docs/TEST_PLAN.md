@@ -25,4 +25,9 @@ Consigner le build, la version de l’addon, l’action, le résultat attendu, l
 
 ## Test additionnel — historique 0.2.2
 
-Activer `/wc history` juste après connexion : l'historique est vide. Gagner de l'XP, changer une pièce d'équipement puis ouvrir `/wc history` : chaque changement détecté doit apparaître, sans nom d'objet inventé. Après `/wc reset`, `/wc history` doit de nouveau être vide. Le journal `/wc logs` reste séparé et désactivé par défaut.
+1. Exécuter `/wc reset`, puis `/wc history` avant toute nouvelle activité. Vérifier que l’historique est vide.
+2. Gagner de l’XP près d’un changement de zone. Comparer la variation du compteur dans `/wc status` aux gains affichés par `/wc history`. Vérifier que chaque gain mesuré apparaît une fois.
+3. Changer rapidement deux pièces sur des emplacements différents. Si les deux numéros sont lisibles, vérifier que l’historique contient les deux emplacements.
+4. Exécuter `/wc debug off`, puis consulter `/wc logs` et `/wc history`. Le diagnostic doit être vide et les activités doivent encore être présentes. Vérifier ensuite leur effacement avec `/wc reset`.
+
+Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.2 de l’addon sur le client Forever reste à consigner.
