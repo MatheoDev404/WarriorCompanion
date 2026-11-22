@@ -14,6 +14,45 @@ local function validPack(pack)
   return true
 end
 
+WC.guideCatalog = WC.guideCatalog or {}
+WC.guideOrder = WC.guideOrder or {}
+
+function WC:RegisterGuidePack(pack)
+  if not validPack(pack) or self.guideCatalog[pack.id] then return false end
+  self.guideCatalog[pack.id] = pack
+  self.guideOrder[#self.guideOrder+1] = pack.id
+  return true
+end
+
+function WC:GuideStart()
+  if not self.guideOrder or #self.guideOrder == 0 then return false end
+  local options = self:Profile()
+  if options and type(options.guideProgress) == "table" then
+    local saved = self.guideCatalog[options.guideProgress.id]
+    if saved then return self:GuideLoad(saved) end
+  end
+  local level = nil
+  if type(UnitLevel) == "function" then
+    local ok, value = pcall(UnitLevel, "player")
+    if ok and type(value) == "number" and value == math.floor(value)
+      and value >= 1 and value <= 60 then level = value end
+  end
+  if not level then return false end
+  -- Favorise la progression principale plutôt que la branche Silverpine 12-14.
+  local candidate
+  for _, id in ipairs(self.guideOrder) do
+    local pack = self.guideCatalog[id]
+    if pack.primary and type(pack.minLevel) == "number"
+        and type(pack.maxLevel) == "number"
+        and level >= pack.minLevel and level < pack.maxLevel then
+      candidate = pack
+      break
+    end
+  end
+  if candidate then return self:GuideLoad(candidate) end
+  return false
+end
+
 function WC:GuideLoad(pack)
   if not validPack(pack) then return false end
   self.activeGuide = pack
@@ -26,11 +65,18 @@ function WC:GuideLoad(pack)
   else
     self.guideIndex = 1
   end
+  if options then
+    options.guideProgress = {id = pack.id, index = self.guideIndex}
+  end
   return true
 end
 
 function WC:GuideMove(delta)
   if not self.activeGuide or (delta ~= -1 and delta ~= 1) then return false end
+  if delta == 1 and self.guideIndex == #self.activeGuide.steps then
+    local nextPack = self.guideCatalog and self.guideCatalog[self.activeGuide.nextID]
+    if nextPack then return self:GuideLoad(nextPack) end
+  end
   local index = math.max(1, math.min(#self.activeGuide.steps, (self.guideIndex or 1) + delta))
   self.guideIndex = index
   local options = self.Profile and self:Profile()
@@ -70,8 +116,9 @@ function WC:GuideAdvanceFromJournal()
     local ok, done = pcall(api.IsQuestFlaggedCompleted, step.questID)
     confirmed = ok and done == true
   end
-  if not confirmed or self.guideIndex >= #self.activeGuide.steps then
-    return false
+  if not confirmed then return false end
+  if self.guideIndex >= #self.activeGuide.steps then
+    return self.activeGuide.nextID ~= nil and self:GuideMove(1)
   end
   return self:GuideMove(1)
 end
