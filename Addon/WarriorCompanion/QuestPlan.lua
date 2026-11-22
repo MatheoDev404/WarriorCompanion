@@ -33,6 +33,10 @@ local function validLine(value)
 end
 
 function WC:BuildQuestPlan(mode)
+  if mode=="talents" then
+    local view=self.TalentPlanText and self:TalentPlanText()
+    return "Talents - Furie",view and view.current or "Plan de talents indisponible."
+  end
   if mode=="guide" then
     local view=self.GetGuideView and self:GetGuideView()
     if not view then
@@ -96,6 +100,7 @@ function WC:SelectQuestPlan(mode)
   if self.dashboardQuestTitle then
     self.dashboardQuestTitle:SetText(self.questPlanTitle)
   end
+  if self.RefreshTalentGuidePanel then self:RefreshTalentGuidePanel() end
   -- Affichage etape par etape pour GUIDE, texte libre pour les autres vues.
   if self.dashboardGuideLocation and self.dashboardGuideNextText then
     if self.dashboardQuestDetail and self.dashboardQuestDetail.SetHeight then
