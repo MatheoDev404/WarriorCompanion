@@ -1,6 +1,6 @@
 # Warrior Companion
 
-Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau ni itinéraire de quêtes. Le **mini-bilan de 304 × 88 pixels** s'ouvre automatiquement à la connexion. Son bouton `>>` ouvre le tableau complet, et la fermeture du tableau revient au mini-bilan. **Aucun bouton de minimap n'est créé.**
+Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau, avec un parcours de leveling Horde 1–60 intégré depuis un guide existant. Le **mini-bilan de 304 × 88 pixels** s'ouvre automatiquement à la connexion. Son bouton `>>` ouvre le tableau complet, et la fermeture du tableau revient au mini-bilan. **Aucun bouton de minimap n'est créé.**
 
 ## Ce que mesure la version 0.5.6-rc1
 
@@ -30,7 +30,7 @@ Les textures n'utilisent pas de code propriétaire de tiers. Le rendu exact, les
 
 ## Deux affichages : mini-bilan et interface complète
 
-Le mini-bilan mesure **304 × 88 pixels** et présente uniquement l'XP gagnée, le temps écoulé de session au format HH:MM:SS, les morts, la balance nette de la session (gains moins dépenses), en or, argent et cuivre avec les icônes WoW et un code couleur : vert pour gain, rouge pour perte, gris clair pour zéro et une ligne de conseil. Il est déplaçable, avec position mémorisée. Le bouton `>>` agrandit vers la fenêtre complète **720 × 460** ; le bouton X de celle-ci revient au mini-bilan. La fenêtre complète ne comporte plus que **Combat, Conseils et Guide** ; Bilan et Journal ne figurent plus parmi les onglets. Le Guide inspiré de RestedXP est sélectionné par défaut et présente une action, la position connue, la prochaine étape et les boutons précédent/suivant.
+Le mini-bilan mesure **304 × 88 pixels** et présente uniquement l'XP gagnée, le temps écoulé de session au format HH:MM:SS, les morts, la balance nette de la session (gains moins dépenses), en or, argent et cuivre avec les icônes WoW et un code couleur : vert pour gain, rouge pour perte, gris clair pour zéro, ainsi qu'une ligne de conseil. Il est déplaçable, avec position mémorisée. Le bouton `>>` agrandit vers la fenêtre complète **720 × 460** ; le bouton X de celle-ci revient au mini-bilan. La fenêtre complète ne comporte plus que **Combat, Conseils et Guide** ; Bilan et Journal ne figurent plus parmi les onglets. Le Guide inspiré de RestedXP est sélectionné par défaut et présente une action, la position connue, la prochaine étape et les boutons précédent/suivant.
 
 Le mode compact est affiché au premier démarrage. Le choix compact/complet et la position du mini-bilan sont enregistrés dans WC_DB. La commande `/wc` alterne les deux vues, `/wc mini` force la vue réduite et `/wc full` force la vue complète. Aucun bouton de minimap n'est installé.
 
