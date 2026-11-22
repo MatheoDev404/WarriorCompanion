@@ -6,21 +6,21 @@ local _, WC = ...
 -- tant que l'API Forever pour les talents individuels n'est pas verifiee.
 local GROUPS={
   {10,14,"fury","Cruaute","Cruelty",5},
-  {15,19,"fury","Rage debridee","Unbridled Wrath",5},
+  {15,19,"fury","Colere dechainee","Unbridled Wrath",5},
   {20,22,"fury","Precision furieuse","Furious Precision",3},
   {23,24,"fury","Enrager","Enrage",5},
   {25,29,"fury","Specialisation Ambidextrie","Dual Wield Specialization",5},
   {30,30,"fury","Souhait mortel","Death Wish",1},
   {31,33,"fury","Enrager","Enrage",5},
-  {34,34,"fury","Coups imprudents","Reckless Swings",1},
+  {34,34,"fury","Coups dechaines","Reckless Swings",1},
   {35,37,"fury","Rafale","Flurry",3},
   {38,39,"fury","Tourbillon ameliore","Improved Whirlwind",2},
   {40,40,"fury","Sanguinaire","Bloodthirst",1},
   {41,43,"fury","Folie sanguinaire","Blood Craze",3},
-  {44,45,"fury","Buveur de sang","Gore Drinker",2},
+  {44,45,"fury","Tripes desalterantes","Gore Drinker",2},
   {46,47,"fury","Rage berserker amelioree","Improved Berserker Rage",2},
   {48,49,"fury","Execution amelioree","Improved Execute",2},
-  {50,54,"fury","Rage persistante","Lingering Rage",5},
+  {50,54,"fury","Rage remanente","Lingering Rage",5},
   {55,55,"fury","Hurlement percant","Piercing Howl",1},
   {56,57,"fury","Interception amelioree","Improved Intercept",2},
   {58,60,"fury","Voix tonitruante","Booming Voice",5},
@@ -47,18 +47,18 @@ end
 local FURY_GRID={
   {"Booming Voice","Voix tonitruante",1,1},
   {"Cruelty","Cruaute",1,3},
-  {"Lingering Rage","Rage persistante",2,1},
-  {"Unbridled Wrath","Rage debridee",2,3},
+  {"Lingering Rage","Rage remanente",2,1},
+  {"Unbridled Wrath","Colere dechainee",2,3},
   {"Furious Precision","Precision furieuse",3,1},
   {"Piercing Howl","Hurlement percant",3,2},
   {"Blood Craze","Folie sanguinaire",3,3},
   {"Enrage","Enrager",3,4},
   {"Dual Wield Specialization","Ambidextrie",4,1},
-  {"Reckless Swings","Coups imprudents",4,2},
+  {"Reckless Swings","Coups dechaines",4,2},
   {"Improved Execute","Execution amelioree",4,4},
   {"Improved Berserker Rage","Rage berserker",5,1},
   {"Death Wish","Souhait mortel",5,2},
-  {"Gore Drinker","Buveur de sang",5,3},
+  {"Gore Drinker","Tripes desalterantes",5,3},
   {"Improved Intercept","Interception",5,4},
   {"Improved Whirlwind","Tourbillon ameliore",6,1},
   {"Flurry","Rafale",6,3},
@@ -77,9 +77,17 @@ function WC:TalentTreeGrid(level)
     local meta=TALENTS[item[1]]
     -- Tous les talents de la grille figurent dans le parcours propose.
     local rank=ranks[item[1]] or 0
+    local live=self.LiveFuryTalent and self:LiveFuryTalent(item[1])
+    local actual=live and live.rank or nil
+    local currentLevel=self:CurrentTalentPlanLevel()
+    -- Ne comparer qu'au niveau reel et uniquement les talents reconnus.
+    local compare=(level==currentLevel and actual~=nil)
     nodes[#nodes+1]={
-      key=item[1],label=item[2],row=item[3],column=item[4],
-      rank=rank,maximum=meta.max,
+      key=item[1],label=(live and live.name or item[2]),
+      row=item[3],column=item[4],
+      rank=rank,actualRank=actual,maximum=meta.max,
+      verified=compare,
+      mismatch=compare and rank~=actual or false,
       status=plan.current.english==item[1] and "current"
         or (rank>0 and "planned" or "future"),
     }
