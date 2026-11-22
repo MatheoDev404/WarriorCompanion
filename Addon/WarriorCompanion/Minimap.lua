@@ -15,12 +15,12 @@ local DIAGONAL_RADIUS = 103.13708498985
 local SHAPES = {
   ROUND = {true, true, true, true},
   SQUARE = {false, false, false, false},
-  ["CORNER-TOPLEFT"] = {true, false, false, false},
+  ["CORNER-TOPLEFT"] = {false, false, false, true},
   ["CORNER-TOPRIGHT"] = {false, false, true, false},
   ["CORNER-BOTTOMLEFT"] = {false, true, false, false},
-  ["CORNER-BOTTOMRIGHT"] = {false, false, false, true},
-  ["SIDE-LEFT"] = {true, true, false, false},
-  ["SIDE-RIGHT"] = {false, false, true, true},
+  ["CORNER-BOTTOMRIGHT"] = {true, false, false, false},
+  ["SIDE-LEFT"] = {false, true, false, true},
+  ["SIDE-RIGHT"] = {true, false, true, false},
   ["SIDE-TOP"] = {false, false, true, true},
   ["SIDE-BOTTOM"] = {true, true, false, false},
 }
