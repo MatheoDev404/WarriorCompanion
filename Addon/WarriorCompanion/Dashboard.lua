@@ -200,8 +200,14 @@ function WC:CreateDashboard()
     WC:RefreshSettingsPanel()
   end)
   settingButton("reset","REINITIALISER SESSION",24,-252,250,function()
-    WC:ResetSession()
-    WC.settingsResetMessage="Session reinitialisee."
+    if not WC.settingsResetPending then
+      WC.settingsResetPending=true
+      WC.settingsResetMessage="Confirmer en cliquant de nouveau pour effacer la session."
+    else
+      WC.settingsResetPending=false
+      WC:ResetSession()
+      WC.settingsResetMessage="Session reinitialisee."
+    end
     WC:RefreshSettingsPanel()
   end)
   text(settingsPage,"GameFontHighlightSmall",24,-291,557,36,
