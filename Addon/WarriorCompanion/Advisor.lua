@@ -16,7 +16,8 @@ end
 
 function WC:UpdateAdvice()
   local alerts = {}
-  local points = unspentPoints()
+  local observed = self.talentState and self.talentState.points
+  local points = observed and observed.total or unspentPoints()
   if points and points > 0 then
     alerts[#alerts + 1] = {
       id = "talents",
