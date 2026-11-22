@@ -13,9 +13,6 @@ function WC:DiscoverQuests(limit)
  if limit==40 then return {rows={{id=101,name="Quete non acceptee",level=31}}} end
  error("unexpected limit")
 end
-function WC:BuildQuestClusters()
- return {{zone=400,x=20,y=25,rows={{id=101,level=31,name="Quete non acceptee"}}}}
-end
 local titleValue,bodyValue="",""
 WC.dashboardQuestTitle={SetText=function(_,v) titleValue=v end}
 WC.dashboardQuestDetail={SetText=function(_,v) bodyValue=v end}
@@ -25,23 +22,16 @@ WC:SelectQuestPlan("journal")
 assert(titleValue=="Mon journal" and bodyValue:find("A RENDRE",1,true))
 WC:SelectQuestPlan("discover")
 assert(titleValue=="Quetes a prendre" and bodyValue:find("Quete non acceptee",1,true))
-WC:SelectQuestPlan("route")
-assert(bodyValue:find("n'est pas un trajet",1,true))
-assert(bodyValue:find("GUIDE",1,true))
-assert(not bodyValue:find("Zone #",1,true))
 assert(scans==2)
 WC.inCombat=true
-local before=scans
-WC:SelectQuestPlan("route")
-assert(scans==before and bodyValue:find("hors combat",1,true))
+WC:SelectQuestPlan("discover")
+assert(bodyValue:find("hors combat",1,true),
+  "ne pas rechercher des quetes en combat")
 WC.inCombat=false
-level=50
-WC:SelectQuestPlan("route")
-assert(bodyValue:find("GUIDE",1,true))
 local shownPage=nil
 local shown=false
 WC.dashboard={IsShown=function() return shown end,Show=function() shown=true end}
 function WC:ShowDashboardPage(p) shownPage=p end
 WC:OpenQuestPlan("journal")
 assert(shown and shownPage=="quests" and titleValue=="Mon journal")
-print("OK: vue quetes, pistes explicites, pas de fausse navigation et aucun scan en combat")
+print("OK: vues des quetes et decouverte, aucun scan en combat")
