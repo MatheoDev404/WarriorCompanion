@@ -44,6 +44,18 @@ function WC:AddFuryAdvice(items)
         tostring(combat.average) .. " s. Verifie tes armes et essaie des ennemis moins difficiles."
     }
   end
+  local learned = self.spellbook and self.spellbook.learned or {}
+  local t = self:Now()
+  if #learned > 0 and type(t) == "number" and t >= learned[#learned].time
+      and t - learned[#learned].time <= 600 then
+    local newest = learned[#learned]
+    items[#items + 1] = {
+      id = "fury-new-spell",
+      priority = "info",
+      message = "Guerrier Furie : nouveau sort ou rang observe (" ..
+        newest.name .. "). Verifie tes barres d'action et son utilisation."
+    }
+  end
   -- Ne pas deduire la specialisation reelle, le DPS des armes ou la maitrise de
   -- Premiers secours d'une API non validee.
 end

@@ -1,6 +1,6 @@
 local addonName, WC = ...
 _G.WarriorCompanion = WC
-WC.version = "0.5.1-rc1"
+WC.version = "0.5.2-rc1"
 WC.metrics = { xpGained = 0, deaths = 0, started = nil, lastXP = nil, lastXPMax = nil, lastLevel = nil, moneyStart = nil, moneyNow = nil, questCount = nil }
 WC.alerts = {}
 WC.inCombat = false
@@ -38,7 +38,8 @@ local events = {
   "PLAYER_DEAD", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
   "PLAYER_EQUIPMENT_CHANGED", "PLAYER_TALENT_UPDATE", "CHARACTER_POINTS_CHANGED",
   "PLAYER_MONEY", "QUEST_LOG_UPDATE", "SKILL_LINES_CHANGED",
-  "UNIT_HEALTH", "UNIT_MAXHEALTH", "PLAYER_ALIVE", "PLAYER_UNGHOST"
+  "UNIT_HEALTH", "UNIT_MAXHEALTH", "PLAYER_ALIVE", "PLAYER_UNGHOST",
+  "SPELLS_CHANGED", "LEARNED_SPELL_IN_SKILL_LINE"
 }
 for _, event in ipairs(events) do frame:RegisterEvent(event) end
 
@@ -51,6 +52,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
     WC:ResetCombatMetrics()
     WC:ResetPerformance()
     WC:InitHealthObserver()
+    WC:InitSpellbookObserver()
     WC:CreateDashboard()
     WC.ready = true
     WC:Trace("core", "initialise")
@@ -72,6 +74,9 @@ frame:SetScript("OnEvent", function(_, event, ...)
     WC:RecordPerformanceGain(WC.metrics.xpGained - priorXP)
     WC:OnActivityEvent(event, priorXP, priorQuests, ...)
     WC:OnCombatObservedEvent(event)
+    if event == "SPELLS_CHANGED" or event == "LEARNED_SPELL_IN_SKILL_LINE" then
+      WC:ObserveSpellbook()
+    end
     if event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" then
       local unit = ...
       if WC:IsReadableUnit(unit) then WC:ReadHealth() else return end
@@ -99,6 +104,7 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "combat" then WC:ShowCombatStatus()
   elseif msg == "health" then WC:ShowHealthStatus()
   elseif msg == "fury" then WC:ShowFuryStatus()
+  elseif msg == "spells" then WC:ShowSpellbookStatus()
   elseif msg == "performance" then WC:ShowPerformance()
   elseif msg == "clear" then WC:ClearLogs(); WC:Print("Traces effacees.")
   elseif msg == "status" then WC:Status()
@@ -106,6 +112,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end
