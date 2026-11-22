@@ -146,7 +146,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "quests" then WC:OpenQuestPlan("journal")
   elseif msg == "questie" then WC:BindQuestie(); WC:ShowQuestieStatus()
   elseif msg == "discover" then WC:OpenQuestPlan("discover")
-  elseif msg == "route" then WC:OpenQuestPlan("route")
   elseif msg == "guide" then WC:OpenQuestPlan("guide")
   elseif msg == "mini" then WC:ShowCompact()
   elseif msg == "full" then WC:OpenFullDashboard()
@@ -161,6 +160,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | route | guide | mini | full | autostart on/off | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | guide | mini | full | autostart on/off | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end
