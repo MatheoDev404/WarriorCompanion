@@ -1,4 +1,4 @@
--- Simulation d'une petite surface de l'API WoW. Execute par lua 5.4.
+-- Simulation d'une petite surface de l'API WoW. Exécutée par Lua 5.1 et 5.4.
 local now, level, xp, xpMax, money, talents = 100, 13, 200, 1000, 1000, 0
 local messages = {}
 DEFAULT_CHAT_FRAME = { AddMessage = function(_, msg) messages[#messages + 1] = msg end }

@@ -5,13 +5,19 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lua: ["5.1", "5.4"]
     steps:
       - uses: actions/checkout@v4
       - name: Install Lua
-        run: sudo apt-get update && sudo apt-get install -y lua5.4
+        run: sudo apt-get update && sudo apt-get install -y lua${{ matrix.lua }}
       - name: Run structural check
         run: python3 tests/check_structure.py
-      - name: Run Lua simulations
-        run: lua5.4 tests/test_addon.lua
       - name: Verify syntax
-        run: luac5.4 -p Addon/WarriorCompanion/*.lua tests/test_addon.lua
+        run: |
+          for file in Addon/WarriorCompanion/*.lua tests/*.lua; do
+            luac${{ matrix.lua }} -p "$file"
+          done
+      - name: Run Lua simulations
+        run: lua${{ matrix.lua }} tests/test_addon.lua
