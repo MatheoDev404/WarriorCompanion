@@ -18,7 +18,8 @@ local function frame()
     local t={}
     function t:SetTexture(path) self.path=path end
     function t:SetTexCoord(...) self.texCoord={...} end
-    function t:SetPoint() end
+    function t:SetPoint(...) self.point={...} end
+    function t:ClearAllPoints() self.point=nil end
     function t:SetSize() end
     function t:SetWidth(w) self.width=w end
     function t:SetAllPoints() end
@@ -191,20 +192,36 @@ assert(WC.combatMode=="performance" and
   WC.dashboardCombatDetail.text:find("XP/h session",1,true))
 WC.dashboardCombatButtons.combat.handlers.OnClick()
 WC.dashboardTabs.settings.handlers.OnClick()
-assert(WC.dashboardSettingsInfo.text:find("ACTIF",1,true))
+assert(WC.dashboardSettingsCards.autostart
+  and WC.dashboardSettingsCards.alerts and WC.dashboardSettingsCards.reset,
+  "trois cartes de reglages")
+assert(WC.dashboardSettingsCards.autostart.title.text:find("Demarrage",1,true))
+assert(WC.dashboardSettingsButtons.autostart.label.text=="ON")
+assert(WC.dashboardSettingsButtons.autostart.indicator.point[4]==41,
+  "interrupteur ON a droite")
 WC.dashboardSettingsButtons.autostart.handlers.OnClick()
-assert(settings.autoOpen==false and
-  WC.dashboardSettingsInfo.text:find("INACTIF",1,true))
-assert(WC.dashboardSettingsButtons.autostart.accent.color[1]<0.5,
-  "option inactive grisee")
+assert(settings.autoOpen==false
+  and WC.dashboardSettingsButtons.autostart.label.text=="OFF")
+assert(WC.dashboardSettingsButtons.autostart.indicator.point[4]==3,
+  "interrupteur OFF a gauche")
+WC.dashboardSettingsButtons.autostart.handlers.OnClick()
+assert(settings.autoOpen and WC.dashboardSettingsButtons.autostart.label.text=="ON",
+  "retour ON fonctionne")
 WC.dashboardSettingsButtons.alerts.handlers.OnClick()
-assert(settings.showAlerts==false and
-  WC.dashboardSettingsInfo.text:find("DESACTIVEES",1,true))
+assert(settings.showAlerts==false
+  and WC.dashboardSettingsButtons.alerts.label.text=="OFF")
 WC.dashboardSettingsButtons.reset.handlers.OnClick()
-assert(WC.sessionReset==nil and WC.settingsResetPending,
-  "premier clic demande confirmation")
+assert(WC.sessionReset==nil and WC.settingsResetPending
+  and WC.dashboardSettingsButtons.reset.label.text=="Confirmer",
+  "premier clic demande confirmation dans la carte")
+WC.dashboardTabs.combat.handlers.OnClick()
+assert(not WC.settingsResetPending,"quitter Reglages annule la confirmation")
+WC.dashboardTabs.settings.handlers.OnClick()
 WC.dashboardSettingsButtons.reset.handlers.OnClick()
-assert(WC.sessionReset==1 and not WC.settingsResetPending,
+assert(WC.sessionReset==nil and WC.settingsResetPending)
+WC.dashboardSettingsButtons.reset.handlers.OnClick()
+assert(WC.sessionReset==1 and not WC.settingsResetPending
+  and WC.dashboardSettingsNotice.text:find("reinitialisee",1,true),
   "second clic reinitialise la session")
 WC.dashboardTabs.quests.handlers.OnClick()
 assert(WC.dashboardPage=="quests" and WC.dashboardPages.quests:IsShown())
