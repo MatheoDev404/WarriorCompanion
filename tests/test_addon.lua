@@ -19,7 +19,8 @@ C_ClassTalents = { HasUnspentTalentPoints = function() return talents > 0, talen
 
 local function frame()
   local f = { visible = false, scripts = {} }
-  for _, n in ipairs({"SetSize","SetPoint","SetFrameStrata","EnableMouse","SetMovable","RegisterForDrag","SetAllPoints","SetTexture","SetVertexColor","SetWidth","SetHeight","SetJustifyH","SetJustifyV","SetText"}) do f[n] = function() end end
+  for _, n in ipairs({"SetSize","SetPoint","SetFrameStrata","EnableMouse","SetMovable","RegisterForDrag","SetAllPoints","SetTexture","SetVertexColor","SetWidth","SetHeight","SetJustifyH","SetJustifyV"}) do f[n] = function() end end
+  function f:SetText(value) self.text = value end
   function f:RegisterEvent(name) self.registered = self.registered or {}; self.registered[name] = true end
   function f:SetScript(name, fn) self.scripts[name] = fn end
   function f:CreateTexture() return frame() end
@@ -127,4 +128,78 @@ assert(not WC.dashboard:IsShown())
 SlashCmdList.WARRIORCOMPANION("reset")
 assert(WC.metrics.xpGained == 0 and WC.metrics.deaths == 0)
 assert(WC:XPPerHour() == nil)
+-- XP et niveau peuvent être rafraîchis dans des ordres différents.
+local function baseline()
+  level, xp, xpMax = 20, 900, 1000
+  SlashCmdList.WARRIORCOMPANION("reset")
+end
+baseline()
+xp, xpMax = 50, 1200
+event("PLAYER_XP_UPDATE", "player")
+event("PLAYER_LEVEL_UP", 21)
+level = 21
+event("PLAYER_XP_UPDATE", "player")
+event("PLAYER_ENTERING_WORLD")
+assert(WC.metrics.xpGained == 150, "XP remise à zéro avant UnitLevel")
+
+baseline()
+event("PLAYER_LEVEL_UP", 21)
+xp = 950
+event("PLAYER_XP_UPDATE", "player")
+assert(WC.metrics.xpGained == 0, "annonce du niveau avant les lectures")
+level, xp, xpMax = 21, 25, 1200
+event("PLAYER_XP_UPDATE", "player")
+assert(WC.metrics.xpGained == 125)
+
+baseline()
+level = 21
+event("PLAYER_LEVEL_UP", 21)
+assert(WC.metrics.xpGained == 0, "niveau visible avec l'ancienne barre XP")
+xp = 100
+event("PLAYER_XP_UPDATE", "player")
+assert(WC.metrics.xpGained == 0, "seuil encore ancien")
+xpMax = 1200
+event("PLAYER_XP_UPDATE", "player")
+assert(WC.metrics.xpGained == 200)
+level, xp, xpMax = 24, 50, 1500
+event("PLAYER_LEVEL_UP", 24)
+assert(WC.metrics.xpGained == 200, "saut de plusieurs niveaux")
+xp = 55
+event("PLAYER_XP_UPDATE", "player")
+assert(WC.metrics.xpGained == 205)
+
+baseline()
+level, xpMax = 21, 1200
+event("PLAYER_LEVEL_UP", 21)
+assert(WC.metrics.xpGained == 0, "seuil actualisé avant l'XP")
+xp = 50
+event("PLAYER_XP_UPDATE", "player")
+assert(WC.metrics.xpGained == 150)
+
+baseline()
+event("PLAYER_LEVEL_UP", 21)
+baseline()
+xp = 920
+event("PLAYER_XP_UPDATE", "player")
+assert(WC.metrics.xpGained == 20, "reset d'une transition en attente")
+now = now + 200000
+event("PLAYER_ENTERING_WORLD")
+assert(WC:XPPerHour() == 0)
+for _, alert in ipairs(WC.alerts) do assert(alert.id ~= "xp-idle", "taux arrondi") end
+
+for _, unavailable in ipairs({0, restricted, -1}) do
+  xp, xpMax = 0, unavailable
+  SlashCmdList.WARRIORCOMPANION("reset")
+  now = now + 601
+  event("PLAYER_XP_UPDATE", "player")
+  assert(WC:XPPerHour() == nil, "XP inaccessible ou barre inactive")
+  for _, alert in ipairs(WC.alerts) do assert(alert.id ~= "xp-idle") end
+end
+baseline()
+now = now + 601
+local beforeOpen = #messages
+SlashCmdList.WARRIORCOMPANION("")
+assert(WC.dashboardAdvice.text:find("Aucune XP", 1, true), "conseil actualisé à l'ouverture")
+assert(#messages == beforeOpen, "ouvrir le tableau a envoyé une notification")
+SlashCmdList.WARRIORCOMPANION("")
 print("OK: chargement, XP, niveau, morts, argent, talents, combat, cooldown, logs, UI, reset")

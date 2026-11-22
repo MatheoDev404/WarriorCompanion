@@ -32,8 +32,8 @@ function WC:UpdateAdvice()
       message = tostring(deaths) .. " morts cette session : envisage des ennemis moins difficiles."
     }
   end
-  local xph = self:XPPerHour()
-  if xph == 0 and self.metrics.started and self:Now() - self.metrics.started >= 600 then
+  if self.metrics.xpAvailable and self.metrics.xpGained == 0
+      and self:Now() - self.metrics.started >= 600 then
     alerts[#alerts + 1] = {
       id = "xp-idle",
       priority = "info",
@@ -42,7 +42,6 @@ function WC:UpdateAdvice()
   end
   -- Une condition non verifiable ne devient jamais une alerte certaine.
   self.alerts = alerts
-  self:NotifyImportant()
 end
 
 function WC:NotifyImportant()

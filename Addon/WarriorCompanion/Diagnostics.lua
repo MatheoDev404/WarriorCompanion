@@ -33,7 +33,7 @@ end
 function WC:Status()
   local xp = self:XPPerHour()
   self:Print("v" .. self.version .. " | XP: " .. self.metrics.xpGained ..
-    " | XP/h: " .. (xp and tostring(xp) or "attente") ..
+    " | XP/h: " .. (xp and tostring(xp) or (self.metrics.xpAvailable and "attente" or "indisponible")) ..
     " | morts: " .. self.metrics.deaths)
   local checks = {
     {"XP", UnitXP}, {"XP maximum", UnitXPMax}, {"Niveau", UnitLevel},

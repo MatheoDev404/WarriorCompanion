@@ -27,6 +27,7 @@ end
 function WC:Refresh()
   if not self.ready then return end
   self:UpdateAdvice()
+  self:NotifyImportant()
   self:RefreshDashboard()
 end
 
