@@ -40,6 +40,7 @@ local options={autoOpen=true}
 local WC={metrics={xpGained=120,deaths=2,questCount=19,xpAvailable=true}}
 function WC:Profile() return options end
 function WC:XPPerHour() return 3456 end
+function WC:MoneyDelta() return -12345 end
 function WC:AdviceLines() return "Attention : deux points de talent inutilises." end
 function WC:RefreshDashboard() self.fullRefresh=(self.fullRefresh or 0)+1 end
 WC.dashboard=frame();WC.dashboard:Hide()
@@ -50,7 +51,16 @@ assert(not WC.compactDashboard:IsShown(),"pas de double apparition")
 WC:AutoOpenDashboard()
 assert(WC.compactDashboard:IsShown() and not WC.dashboard:IsShown())
 assert(WC.compactStats[1].text=="120" and WC.compactStats[2].text=="3456")
-assert(WC.compactStats[3].text=="2" and WC.compactStats[4].text=="19")
+assert(WC.compactStats[3].text=="2" and WC.compactStats[4].text=="-1.23")
+WC.MoneyDelta=function() return 25678 end
+WC:RefreshCompactDashboard()
+assert(WC.compactStats[4].text=="+2.57","solde positif")
+WC.MoneyDelta=function() return 0 end
+WC:RefreshCompactDashboard()
+assert(WC.compactStats[4].text=="+0.00","solde nul")
+WC.MoneyDelta=function() return nil end
+WC:RefreshCompactDashboard()
+assert(WC.compactStats[4].text=="--","montant indisponible")
 assert(WC.compactAdvice.text:find("talent",1,true))
 WC.compactExpand.scripts.OnClick()
 assert(WC.dashboard:IsShown() and not WC.compactDashboard:IsShown())
