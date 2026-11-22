@@ -127,3 +127,12 @@ Ces scénarios ont été simulés sous Lua. Leur exécution avec la version 0.2.
 3. Cliquer pour ouvrir/fermer Warrior Companion ; la fenêtre ne doit pas s'ouvrir à la fin d'un glisser-déposer.
 4. Reconnecter le personnage : la position de l'icône doit rester stable ; l'option d'ouverture auto doit être respectée.
 5. Si un addon remplace la minimap par un carré et fournit GetMinimapShape, vérifier le positionnement dans les coins.
+
+## Armes Furie V0.5.6 — test en jeu
+
+1. `/wc weapons` : identifier les emplacements main droite et main gauche (numéro d'objet et type). Noter si la lecture du type est indisponible.
+2. Avec une arme à une main et main gauche vide, sur guerrier de niveau 20+, ouvrir Conseils : suggestion conditionnelle de double maniement.
+3. Avec une arme à deux mains, vérifier qu'aucun conseil de main gauche vide n'est émis.
+4. Avec un bouclier en main gauche, vérifier le conseil informatif ; avec deux armes équipées, il disparaît.
+5. Sur une autre classe ou en cas de lecture API impossible, aucun conseil d'arme Furie ne doit apparaître.
+6. Vérifier que `/wc reset` reprend une photographie valide des armes.

@@ -32,3 +32,4 @@ jobs:
           lua${{ matrix.lua }} tests/test_fury.lua
           lua${{ matrix.lua }} tests/test_spellbook.lua
           lua${{ matrix.lua }} tests/test_minimap.lua
+          lua${{ matrix.lua }} tests/test_weapons.lua
