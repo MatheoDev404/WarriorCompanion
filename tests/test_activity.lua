@@ -35,6 +35,7 @@ assert(WC.activity[#WC.activity].description == "Nombre de quetes : 5")
 WC.metrics.questCount = nil
 WC:OnActivityEvent("QUEST_LOG_UPDATE", 150, 5)
 assert(WC.activity[#WC.activity].kind == "quetes", "API indisponible ne cree pas d'activite")
+now = now + 9
 WC:OnActivityEvent("PLAYER_EQUIPMENT_CHANGED", 150, 5, 999999)
 assert(WC.activity[#WC.activity].description == "Equipement modifie", "Valeur restreinte sans slot")
 for i = 1, 100 do
