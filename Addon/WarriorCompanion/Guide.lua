@@ -159,6 +159,9 @@ local function readableStep(self, step)
   end
   -- Le texte de source reste visible si aucune traduction fiable n'existe.
   local value = step.text or ""
+  -- Le titre du chapitre identifie deja la zone : evite de repeter
+  -- les entetes techniques du guide source (ex. "Desolace >>Get to ...").
+  value=value:match("^.-%s*>>%s*(.+)$") or value
   value = value:gsub("^Talk to ", "Parler a ")
     :gsub("^Kill ", "Eliminer ")
     :gsub("^Loot ", "Ramasser ")
@@ -168,6 +171,10 @@ local function readableStep(self, step)
     :gsub("^Accept ", "Accepter ")
     :gsub("^Turn in ", "Rendre ")
     :gsub("^Get the ", "Recuperer ")
+    :gsub(": Fly to ", " : Prendre un vol vers ")
+    :gsub(", then ride to ", ", puis rejoindre ")
+    :gsub("^Fly to ", "Prendre un vol vers ")
+    :gsub("^Ride to ", "Rejoindre ")
   return value
 end
 
