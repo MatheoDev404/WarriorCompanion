@@ -112,7 +112,7 @@ WC.dashboardGuideNext.handlers.OnClick()
 assert(WC.talentPlanSelection==34)
 assert(WC.dashboardTalentCurrent.text:find("Niv. 34",1,true))
 local swings=WC.dashboardTalentGrid[14]
-assert(swings.name.text:find("Coups imprudents",1,true) and
+assert(swings.name.text:find("Coups dechaines",1,true) and
        swings.rank.text:find("1/1",1,true),
        "mise a jour du talent visible en changeant de niveau")
 WC.dashboardGuidePrev.handlers.OnClick()
