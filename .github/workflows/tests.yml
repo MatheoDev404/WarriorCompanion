@@ -9,7 +9,7 @@ jobs:
       matrix:
         lua: ["5.1", "5.4"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Lua
         run: sudo apt-get update && sudo apt-get install -y lua${{ matrix.lua }}
       - name: Run structural check
