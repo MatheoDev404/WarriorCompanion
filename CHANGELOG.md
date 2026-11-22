@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.2-rc1 — regroupement des PNJ de départ
+
+- Nouvelle commande `/wc route` : regroupe des pistes `/wc discover` par zone et proximité de PNJ de départ vérifiés via QuestieDB.
+- Exclut les PNJ qui ne sont pas identifiés comme accueillant la Horde, ainsi que les coordonnées invalides et données manquantes.
+- Classement par nombre de pistes regroupées et proximité du niveau de quête avec le niveau du guerrier moins deux.
+- Aucune route d'objectifs, XP/h, difficulté solo ou temps de trajet inventée.
+- Tests Lua 5.1/5.4 et pas de changement d'interface.
+
+
+
 ## 0.6.1-rc1 — découverte prudente de quêtes avec QuestieDB
 
 - Commande `/wc discover` pour rechercher les quêtes non acceptées à partir des fiches publiques de QuestieDB (contrat v4), sans dupliquer sa base.

@@ -1,6 +1,6 @@
 local addonName, WC = ...
 _G.WarriorCompanion = WC
-WC.version = "0.6.1-rc1"
+WC.version = "0.6.2-rc1"
 WC.metrics = { xpGained = 0, deaths = 0, started = nil, lastXP = nil, lastXPMax = nil, lastLevel = nil, moneyStart = nil, moneyNow = nil, questCount = nil }
 WC.alerts = {}
 WC.inCombat = false
@@ -134,6 +134,7 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "quests" then WC:UpdateQuestAdvice(); WC:ShowQuestAdvice()
   elseif msg == "questie" then WC:BindQuestie(); WC:ShowQuestieStatus()
   elseif msg == "discover" then WC:ShowQuestDiscovery()
+  elseif msg == "route" then WC:ShowQuestClusters()
   elseif msg == "minimap reset" then WC:ResetMinimapPosition()
   elseif msg == "autostart on" then
     WC:Profile().autoOpen = true; WC:Print("Ouverture automatique activee a la connexion.")
@@ -146,6 +147,6 @@ SlashCmdList.WARRIORCOMPANION = function(msg)
   elseif msg == "alerts on" then WC:Profile().showAlerts = true; WC:Print("Alertes actives."); WC:Refresh()
   elseif msg == "alerts off" then WC:Profile().showAlerts = false; WC:Print("Alertes desactivees.")
   elseif msg == "help" then
-    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | minimap reset | autostart on/off | performance | clear | alerts on/off")
+    WC:Print("/wc : tableau | status | reset | debug on/off | logs | history | combat | health | fury | spells | weapons | gear | talents | quests | questie | discover | route | minimap reset | autostart on/off | performance | clear | alerts on/off")
   else WC:ToggleDashboard() end
 end
