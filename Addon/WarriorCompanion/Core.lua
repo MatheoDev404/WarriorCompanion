@@ -74,6 +74,9 @@ frame:SetScript("OnEvent", function(_, event, ...)
     local priorXP = WC.metrics.xpGained
     local priorQuests = WC.metrics.questCount
     WC:OnObservedEvent(event, ...)
+    if event == "PLAYER_ENTERING_WORLD" and not WC.minimapButton then
+      WC:CreateMinimapButton()
+    end
     WC:RecordPerformanceGain(WC.metrics.xpGained - priorXP)
     WC:OnActivityEvent(event, priorXP, priorQuests, ...)
     WC:OnCombatObservedEvent(event)
