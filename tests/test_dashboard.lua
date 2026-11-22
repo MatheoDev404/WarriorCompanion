@@ -17,6 +17,7 @@ local function frame()
   function f:CreateTexture()
     local t={}
     function t:SetTexture(path) self.path=path end
+    function t:SetTexCoord(...) self.texCoord={...} end
     function t:SetPoint() end
     function t:SetSize() end
     function t:SetWidth(w) self.width=w end
