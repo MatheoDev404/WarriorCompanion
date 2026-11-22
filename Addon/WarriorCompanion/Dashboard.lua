@@ -215,6 +215,7 @@ function WC:CreateDashboard()
     {"journal", "JOURNAL", 11, 111},
     {"discover", "A PRENDRE", 130, 117},
     {"route", "PARCOURS", 255, 117},
+    {"guide", "GUIDE", 378, 117},
   }
   self.dashboardQuestButtons = {}
   for _, data in ipairs(options) do
@@ -229,6 +230,22 @@ function WC:CreateDashboard()
     button:SetScript("OnClick", function() WC:SelectQuestPlan(mode) end)
     self.dashboardQuestButtons[mode] = button
   end
+  local function stepButton(label, x, direction)
+    local b = CreateFrame("Button", nil, questPage)
+    b:SetPoint("TOPLEFT", questPage, "TOPLEFT", x, -241)
+    b:SetSize(106, 25)
+    rectangle(b, 0, 0, 106, 25, COLORS.ridge)
+    rectangle(b, 2, -2, 102, 21, COLORS.darkPlate)
+    text(b, "GameFontNormalSmall", 7, -5, 96, 18, tint(label, "F0C58A"))
+    b:SetScript("OnClick", function()
+      if WC.GuideMove and WC:GuideMove(direction) then
+        WC:SelectQuestPlan("guide")
+      end
+    end)
+    return b
+  end
+  self.dashboardGuidePrev = stepButton("< Precedente", 13, -1)
+  self.dashboardGuideNext = stepButton("Suivante >", 132, 1)
   self.dashboardQuestTitle = text(questPage, "GameFontNormalSmall", 13, -77,
     484, 17, tint("Choisis une vue de quetes", "E9C58D"))
   self.dashboardQuestDetail = text(questPage, "GameFontHighlightSmall", 13,
@@ -322,6 +339,14 @@ function WC:RefreshDashboard()
   self.dashboardAdviceDetail:SetText(advice)
   self.dashboardActivity:SetText(activityLines(self.activity, 2))
   self.dashboardActivityDetail:SetText(activityLines(self.activity, 8))
+  -- Seul le guide charge est relu sans lancer de recherche QuestieDB.
+  if self.questPlanMode == "guide" and self.GetGuideView then
+    local view = self:GetGuideView()
+    self.dashboardQuestTitle:SetText(view and view.title or "Guide : aucun parcours charge")
+    self.dashboardQuestDetail:SetText(view and
+      ((view.status or "") .. "\\n\\n" .. (view.steps or "")) or
+      "Les guides existants doivent etre importes puis verifies pour Forever.")
+  end
   -- Donnees des quetes mises a jour uniquement au clic explicite.
 end
 
