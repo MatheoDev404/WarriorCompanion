@@ -4,14 +4,14 @@ local _, WC = ...
 -- Compatible avec Lua 5.1 : pas de backdrops ni d'API Retail obligatoires.
 local ROOT = "Interface\\AddOns\\WarriorCompanion\\Textures\\"
 local COLORS = {
-  black = {0.055, 0.061, 0.067, 0.98},
-  steel = {0.093, 0.101, 0.110, 0.97},
-  darkPlate = {0.132, 0.144, 0.155, 0.98},
-  ridge = {0.245, 0.260, 0.275, 1},
-  copper = {0.56, 0.40, 0.25, 1},
-  gold = {0.79, 0.59, 0.37, 1},
-  blood = {0.26, 0.21, 0.17, 1},
-  litBlood = {0.67, 0.49, 0.30, 1},
+  black = {0.067, 0.075, 0.094, 0.97},
+  steel = {0.098, 0.106, 0.133, 1},
+  darkPlate = {0.122, 0.133, 0.165, 0.97},
+  ridge = {0.27, 0.29, 0.33, 0.72},
+  copper = {0.58, 0.61, 0.68, 1},
+  gold = {1.0, 0.784, 0.341, 1},
+  blood = {0.18, 0.19, 0.22, 1},
+  litBlood = {1.0, 0.784, 0.341, 1},
 }
 local function tint(text, hex)
   return "|cff" .. hex .. tostring(text) .. "|r"
@@ -95,19 +95,16 @@ function WC:CreateDashboard()
   f:SetScript("OnDragStart", function(frame) frame:StartMoving() end)
   f:SetScript("OnDragStop", function(frame) frame:StopMovingOrSizing() end)
 
-  rectangle(f, 0, 0, 720, 460, COLORS.ridge)
-  rectangle(f, 1, -1, 718, 458, COLORS.black)
-  rectangle(f, 1, -1, 718, 51, COLORS.steel)
-  rectangle(f, 1, -51, 718, 1, COLORS.copper)
-  rectangle(f, 1, -53, 77, 405, COLORS.steel)
-  rectangle(f, 77, -53, 1, 405, COLORS.ridge)
-  rectangle(f, 1, -457, 718, 2, COLORS.copper)
+  rectangle(f,0,0,720,460,COLORS.black)
+  rectangle(f,0,0,720,45,COLORS.steel)
+  rectangle(f,12,-44,696,1,COLORS.ridge)
+  rectangle(f,1,-55,77,392,COLORS.steel)
 
   picture(f, ROOT .. "Warcrest", 13, -8, 32, 32)
-  text(f, "GameFontNormalLarge", 56, -8, 336, 24,
-    tint("WARRIOR COMPANION", "E9DFD2"))
-  text(f, "GameFontHighlightSmall", 57, -31, 352, 16,
-    tint("GUIDE DE PROGRESSION / HORDE", "C9A47B"))
+  text(f, "GameFontNormalLarge", 56, -7, 336, 24,
+    tint("Warrior Companion", "EDEFF5"))
+  text(f, "GameFontHighlightSmall", 57, -28, 352, 16,
+    tint("Guerrier Furie  |  Horde", "949CAE"))
   local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, -2)
   close:SetScript("OnClick", function() WC:ShowCompact() end)
@@ -284,14 +281,11 @@ function WC:CreateDashboard()
   end
   self.dashboardGuidePrev = stepButton("< Precedente", 20, -1)
   self.dashboardGuideNext = stepButton("Suivante >", 138, 1)
-  rectangle(questPage, 18, -78, 582, 2, COLORS.ridge, "ARTWORK")
+  rectangle(questPage, 18, -78, 582, 1, COLORS.ridge, "ARTWORK")
   self.dashboardQuestTitle = text(questPage, "GameFontNormalLarge", 24, -91,
     557, 26, tint("Etape en cours", "E9C58D"))
-  rectangle(questPage, 18, -123, 582, 91, COLORS.darkPlate)
-  rectangle(questPage, 18, -123, 2, 91, COLORS.gold, "ARTWORK")
   self.dashboardQuestDetail = text(questPage, "GameFontHighlight", 33,
     -135, 540, 77, "Ouvre le guide pour voir la prochaine action.")
-  rectangle(questPage, 18, -220, 582, 2, COLORS.ridge, "ARTWORK")
   self.dashboardGuideLocation = text(questPage, "GameFontHighlight", 24,
     -225, 554, 36)
   self.dashboardGuideNextText = text(questPage, "GameFontHighlightSmall", 24,
@@ -345,6 +339,7 @@ function WC:CreateDashboard()
     self.dashboardQuestTitle,self.dashboardQuestDetail,
     self.dashboardGuideLocation,self.dashboardGuideNextText,
   }
+  if self.CreateGuideTracker then self:CreateGuideTracker(questPage) end
 
   text(f, "GameFontHighlightSmall", 90, -438, 597, 17,
     tint("GUIDE  /  CONSEILS  /  COMBAT  /  REGLAGES", "B4A391"))
@@ -400,11 +395,18 @@ function WC:RefreshTalentGuidePanel()
   refreshGuideButtons(self)
   if not self.dashboardTalentWidgets then return end
   local active=self.questPlanMode=="talents"
+  local guide=self.questPlanMode=="guide"
   for _,t in ipairs(self.dashboardTalentWidgets) do
     if active then t:Show() else t:Hide() end
   end
   for _,t in ipairs(self.dashboardQuestWidgets) do
-    if active then t:Hide() else t:Show() end
+    if active or guide then t:Hide() else t:Show() end
+  end
+  if self.guideTracker then
+    if guide then
+      self.guideTracker:Show()
+      if self.RefreshGuideTracker then self:RefreshGuideTracker() end
+    else self.guideTracker:Hide() end
   end
   if self.dashboardGuidePrev and self.dashboardGuidePrev.labelText then
     self.dashboardGuidePrev.labelText:SetText(
