@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.1-rc1 — découverte prudente de quêtes avec QuestieDB
+
+- Commande `/wc discover` pour rechercher les quêtes non acceptées à partir des fiches publiques de QuestieDB (contrat v4), sans dupliquer sa base.
+- Filtres de faction Horde, race, classe guerrier, niveau, PNJ de départ, acceptées et terminées ; exclusions conservatrices des conditions non vérifiables.
+- Classement limité à sept pistes proches du niveau -2 et consultation explicite hors combat, sans prétendre vérifier le niveau réel des ennemis.
+- Aucun marqueur de carte ajouté ; Questie conserve ses fonctions de suivi.
+- Tests Lua 5.1/5.4 de validation des sources, prérequis, niveaux et absence de fausses recommandations.
+
+
+
 ## 0.6.0-rc1 — conseiller de quêtes Horde et intégration Questie
 
 - Classement conservateur des quêtes déjà acceptées selon niveau, statut de remise, présence explicite d'indications groupe/donjon/élite et niveau du guerrier Horde.
