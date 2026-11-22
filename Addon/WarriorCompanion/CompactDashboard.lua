@@ -65,7 +65,7 @@ function WC:CreateCompactDashboard()
   expand:SetScript("OnClick",function() WC:OpenFullDashboard() end)
   self.compactExpand=expand
   -- Trois statistiques sur une ligne ; toute la largeur pour la monnaie.
-  local names={{"XP",6,22},{"XP/H",103,39},{"MORTS",210,43}}
+  local names={{"XP",6,22},{"TEMPS",103,39},{"MORTS",210,43}}
   self.compactStats={}
   for i,item in ipairs(names) do
     font(f,item[2],-30,item[3],17,"GameFontNormalSmall",
@@ -118,13 +118,24 @@ local moneyColors={
   zero="|cffD4D4D4",unknown="|cff888888"
 }
 
+-- Duree ecoulee depuis le debut de la session ; remise a zero avec /wc reset.
+local function sessionTime(self)
+  local started=self.metrics and self.metrics.started
+  if type(started)~="number" or
+      not self.Now or type(self:Now())~="number" then return "--:--:--" end
+  local seconds=self:Now()-started
+  if seconds<0 or seconds~=seconds then return "--:--:--" end
+  seconds=math.floor(seconds)
+  local hours=math.floor(seconds/3600)
+  local minutes=math.floor(seconds%3600/60)
+  return string.format("%02d:%02d:%02d",hours,minutes,seconds%60)
+end
 function WC:RefreshCompactDashboard()
   if not self.compactDashboard or not self.compactDashboard:IsShown() then return end
   local m=self.metrics or {}
-  local xp=self.XPPerHour and self:XPPerHour()
   local balance=self.MoneyDelta and self:MoneyDelta()
   local values={
-    tostring(m.xpGained or 0),xp and tostring(math.floor(xp+.5)) or "--",
+    tostring(m.xpGained or 0),sessionTime(self),
     tostring(m.deaths or 0),
   }
   for i=1,3 do self.compactStats[i]:SetText(values[i]) end
