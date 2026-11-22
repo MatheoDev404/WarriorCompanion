@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1-rc1 — HUD moderne (design D)
+
+- Remplacement des grands panneaux carrés par un HUD compact à navigation latérale (Bilan, Combat, Conseils, Journal).
+- Cartes statistiques plus compactes, rappels de combat et dernières activités ; rafraîchissement limité sans notifications involontaires.
+- Variation monétaire affichée avec icônes WoW en or, argent et cuivre, signe correct pour les pertes.
+- Tests Lua 5.1 et 5.4 : navigation, données indisponibles, mise à jour et conversions monétaires.
+
 ## 0.4.0-rc1 — refonte visuelle Horde guerrier
 
 - Nouveau panneau plus grand, contrasté, rouge sombre / acier noirci / bronze.

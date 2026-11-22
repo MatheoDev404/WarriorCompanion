@@ -2,13 +2,13 @@
 
 Warrior Companion observe la session de ton guerrier dans WoW Forever. Il fonctionne de façon autonome, sans trafic réseau ni itinéraire de quêtes. Le tableau de bord reste fermé jusqu’à la commande `/wc`.
 
-## Ce que mesure la version 0.4.0-rc1
+## Ce que mesure la version 0.4.1-rc1
 
 | Activité | Comportement |
 | --- | --- |
 | XP | Gain mesuré depuis le chargement ou `/wc reset`. L’XP/h est une moyenne de session affichée après une minute si la barre d’XP est lisible et active. Les transitions ambiguës peuvent retarder le total. Les niveaux intermédiaires manqués ne sont pas estimés. |
 | Morts et combats | Compteur de morts et conseil dans le tableau après trois morts. L’état de combat suspend les notifications. La durée et le nombre d'intervalles d'état de combat sont maintenant suivis. Un intervalle n'est pas un ennemi tué ; les dégâts et la récupération restent non mesurés. |
-| Quêtes et argent | Nombre de quêtes du journal, en excluant les en-têtes, et variation en cuivre depuis la première lecture disponible de la session. |
+| Quêtes et argent | Nombre de quêtes du journal, en excluant les en-têtes, et variation convertie en pièces d'or, d'argent et de cuivre avec leurs icônes, depuis la première lecture disponible de la session. |
 | Talents | Les points libres de classe et de spécialisation déclenchent une alerte hors combat, au plus une fois toutes les cinq minutes par session. Les autres conseils se lisent dans le tableau. |
 | Compétences, métiers et équipement | Le journal de diagnostic peut signaler un changement de compétences ou d’équipement. L’analyse des rangs de métier et la comparaison des pièces restent à développer. |
 
@@ -16,9 +16,13 @@ L'analyse XP/h récente utilise une fenêtre glissante de 10 minutes, après au 
 
 L'historique d'activité conserve en mémoire vive les 60 derniers événements utiles : XP mesurée, niveaux, morts, modifications d'équipement, mises à jour des compétences et changements du nombre de quêtes. Il ne déduit ni l'objet obtenu ni la quête terminée. Utiliser `/wc history` pour afficher les 12 derniers événements. Un gain mesuré au changement de zone apparaît une seule fois. Pour l’équipement, deux emplacements lisibles distincts peuvent apparaître dans la même seconde. Les répétitions de la même description d’équipement ou de compétences sont filtrées pendant huit secondes parmi les entrées conservées. Le journal des activités est distinct du journal de debug et est effacé à `/wc reset`.
 
-## Tableau de bord — Horde guerrier
+## Tableau de bord — HUD Horde moderne
 
-La fenêtre `/wc` utilise désormais un thème rouge sang, acier noirci et bronze, avec l'icône guerrier fournie par le client. Les quatre sections PROGRESSION, COMBAT, CONSEILS DU GUERRIER et DERNIERES ACTIVITES évitent l'accumulation de valeurs dans un seul paragraphe. Les éléments restent en jeu, sans textures externes. Le panneau est déplaçable, fermé par défaut, et l'affichage des valeurs se rafraîchit toutes les trois secondes lorsqu'il est ouvert. Cette présentation nécessite une validation visuelle sur le client réel (lisibilité, taille, échelle UI, cadres et contrôle de la souris).
+La fenêtre `/wc` suit la direction visuelle **D : HUD compact WoW moderne**. Elle utilise un bandeau Horde, une barre latérale à quatre vues (**Bilan**, **Combat**, **Conseils**, **Journal**), quatre compteurs XP/morts, des sections discrètes et un fond métal sombre aux touches rouge sang et bronze. Le panneau est déplaçable, fermé par défaut et se rafraîchit visuellement toutes les trois secondes seulement lorsqu'il est ouvert.
+
+**Argent :** la variation de monnaie est maintenant décomposée avec les icônes intégrées du jeu en **or / argent / cuivre** ; le signe `+` ou `-` s'applique au montant entier. Exemple : `-10005` cuivre devient `- 1 or 0 argent 5 cuivre`. Une lecture indisponible affiche des tirets. Le compteur indique la **variation de session**, pas le solde actuel.
+
+Le rendu du HUD (textures, tailles, lisibilité et changement de vue) reste à valider sur le vrai client WoW Forever, malgré les tests Lua simulés.
 
 ## Installation et commandes
 
@@ -39,7 +43,7 @@ Copier le dossier `Addon/WarriorCompanion` dans `Interface/AddOns/` du client Fo
 
 ## Compatibilité et tests
 
-Les signatures ont été vérifiées dans les sources d’interface de Forever 1.60.1, build 71037. Les essais automatisés chargent les modules dans l’ordre du TOC et simulent les appels du client. La validation en jeu de la version 0.4.0-rc1 reste à faire. [Sources consultées et protocole en jeu](docs/TEST_PLAN.md)
+Les signatures ont été vérifiées dans les sources d’interface de Forever 1.60.1, build 71037. Les essais automatisés chargent les modules dans l’ordre du TOC et simulent les appels du client. La validation en jeu de la version 0.4.1-rc1 reste à faire. [Sources consultées et protocole en jeu](docs/TEST_PLAN.md)
 
 Pour reproduire les contrôles de GitHub Actions depuis la racine du dépôt, installer Python 3, Lua 5.1 et Lua 5.4, puis exécuter le bloc dans un shell POSIX.
 
