@@ -1,33 +1,7 @@
 local _, WC = ...
--- Vue lisible pour les quetes et pistes de route.
+-- Vues de guide, talents et quetes ; aucun calcul de route concurrent.
 -- Les recommandations sont calculees uniquement sur une action du joueur ;
 -- aucune recherche globale QuestieDB dans OnUpdate ou au login.
--- Reperes de zones cites par ForeverTavern, verifications des objectifs
--- et des chaines requises avant toute recommandation de trajet precise.
--- https://forevertavern.net/guides/leveling/horde
-local guideStages = {
-  {min=30,max=32,label="Contreforts de Hautebrande (30-32)"},
-  {min=32,max=33,label="Hautes-terres d'Arathi (32-33)"},
-  {min=33,max=34,label="Mille pointes (33-34)"},
-  {min=34,max=36,label="Desolace (34-36)"},
-  {min=36,max=37,label="Vallee de Strangleronce (36-37)"},
-}
-local function guideNote()
-  if type(UnitLevel)~="function" then return nil end
-  local ok,level=pcall(UnitLevel,"player")
-  if not ok or type(level)~="number" then return nil end
-  if type(issecretvalue)=="function" then
-    local clean,hidden=pcall(issecretvalue,level)
-    if not clean or hidden then return nil end
-  end
-  for _,entry in ipairs(guideStages) do
-    if level>=entry.min and level<entry.max then
-      return "Reference guide Horde : "..entry.label..
-        " (ForeverTavern, a verifier avec Questie)."
-    end
-  end
-  return nil
-end
 local function validLine(value)
   return type(value)=="string" and value~=""
 end
@@ -79,12 +53,6 @@ function WC:BuildQuestPlan(mode)
     end
     lines[#lines+1]="Accessibilite, objectifs, danger et trajet non garantis."
     return "Quetes a prendre",table.concat(lines,"\n")
-  end
-  if mode=="route" then
-    return "Pistes de quetes",
-      "Cette vue n'est pas un trajet : elle regroupe uniquement des PNJ possibles.\\n"..
-      "Pour savoir ou aller et quoi faire, ouvre l'onglet GUIDE.\\n"..
-      "Les points de depart de quetes peuvent etre retrouves sur la carte Questie."
   end
   return "Plan de leveling","Choisis GUIDE pour suivre une route, Journal pour tes quetes ou A prendre."
 end
