@@ -19,6 +19,7 @@ local function frame()
     function t:SetTexture(path) self.path=path end
     function t:SetPoint() end
     function t:SetSize() end
+    function t:SetWidth(w) self.width=w end
     function t:SetAllPoints() end
     function t:SetVertexColor(...) self.color={...} end
     textures[#textures+1]=t
@@ -74,6 +75,21 @@ function WC:SelectQuestPlan(mode)
   if self.RefreshTalentGuidePanel then self:RefreshTalentGuidePanel() end
 end
 assert(loadfile("Addon/WarriorCompanion/Dashboard.lua"))("WarriorCompanion",WC)
+assert(loadfile("Addon/WarriorCompanion/GuideTracker.lua"))("WarriorCompanion",WC)
+WC.activeGuide={title="33-34 Desolace",steps={
+  {text="Go to Shadowprey Village"},
+  {text="Talk to the innkeeper"},
+  {text="Accept a quest"},
+  {text="Kill 10 enemies"},
+  {text="Return to the camp"},
+  {text="Rest and repair"},
+}}
+WC.guideIndex=2
+function WC:GuideStepText(step) return step.text end
+function WC:GetGuideView() return {
+  title="33-34 Desolace",actionText="Talk to the innkeeper",
+  locationText="Desolace",nextText="Accept a quest"
+} end
 
 WC:CreateDashboard()
 assert(WC.dashboard.w==720 and WC.dashboard.h==460,"grande fenetre lisible")
@@ -129,7 +145,18 @@ assert(WC.talentPlanSelection==33)
 WC.dashboardQuestButtons.guide.handlers.OnClick()
 assert(not WC.dashboardTalentHeader:IsShown() and
   not WC.dashboardTalentGrid[12]:IsShown()
-  and WC.dashboardQuestDetail:IsShown(),"retour aux etapes sans arbre superpose")
+  and not WC.dashboardQuestDetail:IsShown()
+  and WC.guideTracker:IsShown(),"retour aux cartes d'etapes sans superposition")
+assert(WC.guideTracker.rows[1].title.text=="Talk to the innkeeper")
+assert(WC.guideTracker.rows[2].title.text=="Accept a quest")
+assert(WC.guideTracker.count.text=="2 / 6")
+assert(WC.guideTracker.progressFill.width==182,
+  "avancement du guide affiche")
+WC.guideIndex=3
+WC:RefreshGuideTracker()
+assert(WC.guideTracker.rows[1].title.text=="Accept a quest")
+assert(WC.guideTracker.rows[1].accent.color[1]==1,
+  "carte courante distingable en or")
 WC.dashboardTabs.combat.handlers.OnClick()
 assert(WC.dashboardPage=="combat" and WC.dashboardPages.combat:IsShown())
 assert(WC.dashboardCombatDetail.text:find("Combats",1,true))
