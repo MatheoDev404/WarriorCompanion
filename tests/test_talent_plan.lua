@@ -81,6 +81,31 @@ for _,node in ipairs(at33) do
   end
 end
 assert(current==1 and planned>0 and future>0)
+-- Les rangs observes viennent de C_Traits, pas de la progression theorique.
+WC.LiveFuryTalent=function(_,key)
+  if key=="Enrage" then return {name="Enrager",rank=4} end
+  if key=="Cruelty" then return {name="Cruauté",rank=5} end
+  return nil
+end
+local live33=WC:TalentTreeGrid(33)
+local currentObserved=false
+for _,node in ipairs(live33) do
+  if node.key=="Enrage" then
+    assert(node.label=="Enrager" and node.rank==5
+      and node.actualRank==4 and node.mismatch and node.verified)
+    currentObserved=true
+  elseif node.key=="Cruelty" then
+    assert(node.label=="Cruauté" and node.actualRank==5
+      and not node.mismatch and node.verified)
+  end
+end
+assert(currentObserved,"difference reelle identifiee")
+local historical=WC:TalentTreeGrid(32)
+for _,node in ipairs(historical) do
+  assert(not node.mismatch and not node.verified,
+    "pas de comparaison avec l'historique depuis le build reel")
+end
+WC.LiveFuryTalent=nil
 local endTree=WC:TalentTreeGrid(60)
 local spent=0
 for _,node in ipairs(endTree) do spent=spent+node.rank end
