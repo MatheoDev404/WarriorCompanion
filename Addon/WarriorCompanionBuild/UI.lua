@@ -234,6 +234,8 @@ function B:CreateGearPage(page)
   label(page,16,-34,660,19,"GameFontHighlightSmall",
     "Recompenses de quetes ou objets fabriques uniquement.",MUTED)
   page.items={}
+  page.gearOffset=0
+  page.displayed={}
   for i,item in ipairs(self.gear) do
     local y=-61-(i-1)*62
     local row=button(page,16,y,411,56,"",function()
@@ -268,7 +270,12 @@ function B:CreateGearPage(page)
   if page.previewDescription.SetWordWrap then
     page.previewDescription:SetWordWrap(true)
   end
-  page.gearStatus=label(page,18,-318,469,27,"GameFontHighlightSmall","",GOLD)
+  page.gearStatus=label(page,18,-318,288,27,"GameFontHighlightSmall","",GOLD)
+  page.moreButton=button(page,313,-312,179,31,"Autres paliers",function()
+    local count=#B.gear
+    page.gearOffset=(page.gearOffset+4)%math.max(1,count)
+    B:RefreshGear()
+  end)
   page.gotoButton=button(page,502,-312,181,31,"Voir dans Parcours",function()
     if B.selectedItem and B:GoToGear(B.selectedItem) then
       B:ShowPage("parcours")
@@ -473,42 +480,72 @@ function B:RefreshGear()
   if not page then return end
   local level=self.viewLevel
   self.selectedItem=self.selectedItem or self.gear[1].id
+  local ordered=self:GearListAt(level)
+  local start=(page.gearOffset or 0)+1
+  if start>#ordered then
+    start=1
+    page.gearOffset=0
+  end
+  local shown={}
+  page.displayed={}
+  for pos=1,4 do
+    local item=ordered[start+pos-1]
+    if item then
+      shown[item.id]=pos
+      page.displayed[pos]=item
+    end
+  end
   local current=nil
   for _,item in ipairs(self.gear) do
     local row=page.items[item.id]
-    local eligible,reason=self:ItemEligible(item,level)
-    row.icon:SetTexture(itemIcon(item.id))
-    row.name:SetText(itemName(item))
-    row.detail:SetText(item.slot.."  |  Niv. "..item.minLevel..
-      "  |  "..(item.source=="quest" and "Quete" or "Forge")..
-      (item.group and " (GROUPE)" or ""))
-    local selected=self.selectedItem==item.id
-    if selected then current=item end
-    local c=selected and {0.28,0.30,0.32,1} or
-      (eligible and CARD or {0.14,0.16,0.18,1})
-    row.bg:SetVertexColor(c[1],c[2],c[3],c[4])
-    if row.name.SetTextColor then
-      row.name:SetTextColor(selected and GOLD[1] or WHITE[1],
-        selected and GOLD[2] or WHITE[2],
-        selected and GOLD[3] or WHITE[3])
+    local pos=shown[item.id]
+    if pos then
+      row:ClearAllPoints()
+      row:SetPoint("TOPLEFT",page,"TOPLEFT",16,-61-(pos-1)*62)
+      row:Show()
+      row.icon:SetTexture(itemIcon(item.id))
+      row.name:SetText(itemName(item))
+      local levelLabel=item.requiredLevel and
+        ("Niv. requis "..item.requiredLevel) or
+        ("Quete min. "..item.minLevel)
+      row.detail:SetText(item.slot.."  |  "..levelLabel.."  |  "..
+        (item.source=="quest" and "Quete" or "Forge")..
+        (item.group and " (GROUPE)" or ""))
+      local selected=self.selectedItem==item.id
+      local eligible=self:ItemEligible(item,level)
+      local color=selected and {0.28,0.30,0.32,1} or
+        (eligible and CARD or {0.14,0.16,0.18,1})
+      row.bg:SetVertexColor(color[1],color[2],color[3],color[4])
+      if row.name.SetTextColor then
+        row.name:SetTextColor(selected and GOLD[1] or WHITE[1],
+          selected and GOLD[2] or WHITE[2],
+          selected and GOLD[3] or WHITE[3])
+      end
+    else
+      row:Hide()
     end
+    if self.selectedItem==item.id then current=item end
   end
   if current then
     local eligible,reason=self:ItemEligible(current,level)
     page.previewIcon:SetTexture(itemIcon(current.id))
     page.previewName:SetText(itemName(current))
-    page.previewLevel:SetText("Niveau requis : "..current.minLevel)
+    page.previewLevel:SetText(current.requiredLevel and
+      ("Niveau requis : "..current.requiredLevel) or
+      ("Acces quete des le niv. "..current.minLevel))
     local source=current.source=="quest" and
-      ("Quete #"..current.questId..(current.group and "  |  Groupe" or ""))
-      or ("Forge "..current.skill.."  |  Recette #"..current.recipe)
+      ("Quete #"..current.questId..(current.group and " | Groupe" or ""))
+      or ("Forge "..current.skill.." | Recette #"..current.recipe)
     page.previewSource:SetText(source)
     page.previewDescription:SetText((self.gearDescriptions[current.id] or
-      current.note or "Description du client indisponible.")..
-      "\n\n"..reason)
+      current.note or "Fiche indisponible.")..
+      "\n\n"..self:GearRelevance(current,level).."\n"..reason)
     page.gearStatus:SetText(eligible and
-      "Objet consultable : verifier les conditions avant de l'obtenir."
-      or ("Non disponible : "..reason))
+      "Cible potentielle : comparer les statistiques en jeu."
+      or ("Non accessible : "..reason))
   end
+  page.moreButton.txt:SetText((start+3>=#ordered) and
+    "Retour aux cibles" or ("Paliers suivants ("..start.."/"..#ordered..")"))
 end
 local function routeText(text,maxLen)
   if type(text)~="string" then return "" end
