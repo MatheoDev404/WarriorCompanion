@@ -109,61 +109,75 @@ end
 function B:CreateTalentPage(page)
   panel(page,0,0,349,347)
   panel(page,359,0,341,347)
-  label(page,16,-11,305,24,"GameFontNormalLarge","Arbre Furie",WHITE)
-  label(page,375,-11,308,24,"GameFontNormalLarge","Plan de progression",WHITE)
-  -- Fleches de pre-requis verifiees (Zephras 1.60.1.70938).
-  page.connections={}
-  for _,connection in ipairs({
-    {3,3,5,3}, -- Blood Craze vers Gore Drinker
-    {5,2,7,2}, -- Death Wish vers Bloodthirst
-  }) do
-    local col=connection[2]
-    local x=16+(col-1)*78+16
-    local y=-44-(connection[1]-1)*41-32
-    local endY=-44-(connection[3]-1)*41
-    local h=math.max(2,y-endY)
-    local line=page:CreateTexture(nil,"ARTWORK")
-    line:SetTexture("Interface\\Buttons\\WHITE8X8")
-    line:SetPoint("TOPLEFT",page,"TOPLEFT",x,y)
-    line:SetSize(2,h)
-    line:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],0.8)
-    page.connections[#page.connections+1]=line
+  label(page,16,-8,305,25,"GameFontNormalLarge","Arbres du Guerrier",WHITE)
+  label(page,375,-10,308,24,"GameFontNormalLarge","Plan de progression",WHITE)
+  page.treeTabs={}
+  page.trees={}
+  for tabIndex,treeName in ipairs(self.talentTreeOrder) do
+    page.treeTabs[treeName]=button(page,16+(tabIndex-1)*108,-38,103,27,
+      treeName,function()
+        B:SelectTree(treeName)
+        B:Refresh()
+      end)
+    local holder=CreateFrame("Frame",nil,page)
+    holder:SetPoint("TOPLEFT",page,"TOPLEFT",0,0)
+    holder:SetSize(349,347)
+    local tree={frame=holder,nodes={},connections={}}
+    page.trees[treeName]=tree
+    local positions={}
+    for _,node in ipairs(self.talentTrees[treeName]) do
+      positions[node[1]]=node
+    end
+    for _,link in ipairs(self.talentArrows[treeName] or {}) do
+      local from,to=positions[link[1]],positions[link[2]]
+      if from and to and from[3]==to[3] then
+        local col=from[3]
+        local x=16+(col-1)*78+17
+        local y=-67-(from[2]-1)*36-32
+        local endY=-67-(to[2]-1)*36
+        local line=holder:CreateTexture(nil,"ARTWORK")
+        line:SetTexture("Interface\\Buttons\\WHITE8X8")
+        line:SetPoint("TOPLEFT",holder,"TOPLEFT",x,y)
+        line:SetSize(2,math.max(2,y-endY))
+        line:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],0.7)
+        tree.connections[#tree.connections+1]=line
+      end
+    end
+    for _,node in ipairs(self.talentTrees[treeName]) do
+      local x=16+(node[3]-1)*78
+      local y=-67-(node[2]-1)*36
+      local b=CreateFrame("Button",nil,holder)
+      b:SetPoint("TOPLEFT",holder,"TOPLEFT",x,y)
+      b:SetSize(35,33)
+      b.bg=rect(b,0,0,35,33,CARD)
+      b.edges={
+        rect(b,0,0,35,2,GOLD),
+        rect(b,0,-31,35,2,GOLD),
+        rect(b,0,0,2,33,GOLD),
+        rect(b,33,0,2,33,GOLD),
+      }
+      local icon=b:CreateTexture(nil,"ARTWORK")
+      icon:SetPoint("TOPLEFT",b,"TOPLEFT",3,-3)
+      icon:SetSize(29,27)
+      local ok=pcall(icon.SetTexture,icon,node[6])
+      if not ok then icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark") end
+      b.icon=icon
+      b.rank=label(b,35,-2,40,27,"GameFontHighlightSmall","",MUTED)
+      b:SetScript("OnEnter",function() B:TooltipTalent(b,node) end)
+      b:SetScript("OnLeave",dismissTip)
+      b:SetScript("OnClick",function()
+        B.selectedTalent=node[1]
+        B:Refresh()
+      end)
+      tree.nodes[node[1]]=b
+    end
+    holder:Hide()
   end
-  page.nodes={}
-  for _,node in ipairs(self.talents) do
-    local x=16+(node[3]-1)*78
-    local y=-44-(node[2]-1)*41
-    local b=CreateFrame("Button",nil,page)
-    b:SetPoint("TOPLEFT",page,"TOPLEFT",x,y)
-    b:SetSize(35,34)
-    b.bg=rect(b,0,0,35,34,CARD)
-    b.edges={
-      rect(b,0,0,35,2,GOLD),
-      rect(b,0,-32,35,2,GOLD),
-      rect(b,0,0,2,34,GOLD),
-      rect(b,33,0,2,34,GOLD),
-    }
-    local icon=b:CreateTexture(nil,"ARTWORK")
-    icon:SetPoint("TOPLEFT",b,"TOPLEFT",3,-3)
-    icon:SetSize(29,28)
-    local ok=pcall(icon.SetTexture,icon,node[6])
-    if not ok then icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark") end
-    b.icon=icon
-    b.rank=label(b,34,-2,40,28,"GameFontHighlightSmall","",MUTED)
-    b:SetScript("OnEnter",function() B:TooltipTalent(b,node) end)
-    b:SetScript("OnLeave",dismissTip)
-    b:SetScript("OnClick",function()
-      B.selectedTalent=node[1]
-      B:Refresh()
-    end)
-    page.nodes[node[1]]=b
-  end
-  page.nextLabel=label(page,376,-52,320,43,"GameFontHighlight","",GOLD)
-  page.desc=label(page,376,-105,315,122,"GameFontHighlight","",WHITE)
+  page.nodes=page.trees.Furie.nodes
+  page.connections=page.trees.Furie.connections
   page.levelPoint=label(page,376,-44,310,60,"GameFontNormal","",GOLD)
-  page.nextLabel:SetPoint("TOPLEFT",page,"TOPLEFT",376,-101)
-  page.desc:SetPoint("TOPLEFT",page,"TOPLEFT",376,-170)
-  page.desc:SetSize(310,161)
+  page.nextLabel=label(page,376,-101,320,55,"GameFontHighlight","",GOLD)
+  page.desc=label(page,376,-168,310,171,"GameFontHighlight","",WHITE)
 end
 -- Informations de fiche obtenues du client, avec repli pour les objets
 -- non encore charges en cache. Ne jamais inventer leurs statistiques.
@@ -395,44 +409,64 @@ function B:RefreshTalents()
   if not page then return end
   local plan=self:PlanAt(self.viewLevel)
   if not plan then return end
-  local atLevel=self:TalentPointAt(self.viewLevel)
-  for _,node in ipairs(self.talents) do
-    local b=page.nodes[node[1]]
-    local rank=plan.ranks[node[1]] or 0
-    b.rank:SetText(rank.."/"..node[4])
-    -- Les points deja investis restent visibles, mais SEUL celui gagne
-    -- au niveau choisi a un contour or clairement identifiable.
-    local c=(rank>0) and {0.21,0.26,0.30,1} or CARD
-    b.bg:SetVertexColor(c[1],c[2],c[3],c[4])
-    local active=atLevel and node[1]==atLevel.key
-    for _,edge in ipairs(b.edges) do
-      edge:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],active and 1 or 0)
+  local selectedTree=self.selectedTree or "Furie"
+  local point=self:TalentPointAt(self.viewLevel)
+  for _,treeName in ipairs(self.talentTreeOrder) do
+    local tree=page.trees[treeName]
+    local tab=page.treeTabs[treeName]
+    local visible=treeName==selectedTree
+    if visible then tree.frame:Show() else tree.frame:Hide() end
+    local color=visible and GOLD or CARD
+    tab.bg:SetVertexColor(color[1],color[2],color[3],color[4])
+    if tab.txt.SetTextColor then
+      tab.txt:SetTextColor(visible and 0.12 or 0.93,
+        visible and 0.15 or 0.94,visible and 0.21 or 0.97)
     end
-    if b.rank.SetTextColor then
-      b.rank:SetTextColor(active and 1 or 0.69,
-        active and 0.77 or 0.74,active and 0.36 or 0.81)
+    for _,node in ipairs(self.talentTrees[treeName]) do
+      local b=tree.nodes[node[1]]
+      local rank=plan.ranks[node[1]] or 0
+      b.rank:SetText(rank.."/"..node[4])
+      local c=rank>0 and {0.21,0.26,0.30,1} or CARD
+      b.bg:SetVertexColor(c[1],c[2],c[3],c[4])
+      local active=point and point.tree==treeName and point.key==node[1]
+      for _,edge in ipairs(b.edges) do
+        edge:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],active and 1 or 0)
+      end
+      if b.rank.SetTextColor then
+        b.rank:SetTextColor(active and 1 or 0.69,
+          active and 0.77 or 0.74,active and 0.36 or 0.81)
+      end
     end
   end
-  page.levelPoint:SetText(atLevel and
-    ("NIVEAU "..atLevel.level.."\n"..textWithFallback(atLevel.metadata)..
-    "  (rang "..atLevel.rank.."/"..atLevel.metadata[4]..")")
-    or "AUCUN POINT DE TALENT\nAvant le niveau 10.")
+  page.nodes=page.trees[selectedTree].nodes
+  page.connections=page.trees[selectedTree].connections
+  local distribution=string.format("Armes %d / Furie %d / Protection %d",
+    plan.pointsByTree.Armes or 0,plan.pointsByTree.Furie or 0,
+    plan.pointsByTree.Protection or 0)
+  page.levelPoint:SetText(point and
+    ("Niveau "..point.level.." - "..point.tree.."\n"..
+      textWithFallback(point.metadata).."  ("..point.rank.."/"..
+      point.metadata[4]..")")
+    or "Aucun point avant le niveau 10")
   local nextKey=plan.nextKey
-  local node=nextKey and plan.metadata[nextKey]
-  page.nextLabel:SetText(nextKey and
-    ("Niveau suivant : "..textWithFallback(node)) or "Plan termine au niveau 60")
-  -- La fiche montre par defaut le talent du niveau selectionne.
-  local selected=plan.metadata[self.selectedTalent or (atLevel and atLevel.key) or nextKey]
+  local nextNode=nextKey and plan.metadata[nextKey]
+  page.nextLabel:SetText((nextNode and
+    ("Prochain point : "..textWithFallback(nextNode)..
+      " ("..(plan.nextTree or "Furie")..")")
+      or "Plan termine au niveau 60").."\n"..distribution)
+  local selected=plan.metadata[self.selectedTalent or
+    (point and point.tree==selectedTree and point.key) or
+    (plan.nextTree==selectedTree and nextKey) or
+    self.talentTrees[selectedTree][1][1]]
   if selected then
     local rank=plan.ranks[selected[1]] or 0
     local dep=self.talentDependencies[selected[1]]
-    page.desc:SetText(textWithFallback(selected).."\n\nRang : "..rank.."/"..selected[4]..
-      "\nPalier "..selected[2].." | Colonne "..selected[3]..
+    page.desc:SetText(textWithFallback(selected).."\n\nRang : "..rank.."/"..
+      selected[4].."\nPalier "..selected[2].." | Colonne "..selected[3]..
       (dep and ("\nRequis : "..dep[1].." "..dep[2].." rang(s)") or "")..
       "\n\n"..(self:TalentHint(selected[1],math.max(1,rank)) or
-        "Survole l'icone pour obtenir plus de details."))
+        "Survole l'icone pour plus de details."))
   end
-
 end
 function B:RefreshGear()
   local page=self.pages and self.pages.equipement
