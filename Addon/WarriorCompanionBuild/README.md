@@ -1,4 +1,4 @@
-# Warrior Companion | Build Planner — 0.1.0-test
+# Warrior Companion | Build Planner — 0.2.0-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
 
@@ -12,14 +12,18 @@
 
 ### Contrôles
 
-- **Talents / Équipement / Parcours** : les 3 onglets.
+- **Talents / Équipement / Parcours / Rotation** : les 4 onglets.
 - `<` et `>` en haut : visualiser le plan à un autre niveau **sans changer le niveau réel**.
 - **Niv réel** : revenir au niveau actuel et à son suivi automatique.
 - **− / +** : réduire / agrandir l'interface. Par défaut 82 %, plage 65–115 %. La position et l'échelle sont sauvegardées. En-tête déplaçable au clic gauche.
-- `/wcb compact` : échelle 70 % ; `/wcb grand` : échelle 100 %.
-- **Survol des icônes** : infobulle de sort côté client lorsque l'API le permet, avec rangs prévus et prérequis.
-- **Équipement** : choisir une pièce puis **Voir dans Parcours** pour rejoindre la quête ou la fabrication correspondante.
-- **Parcours** : Avant/Après, sélection d'étape, validation manuelle uniquement sur des étapes éligibles et non-groupes. Les quêtes de groupe sont toujours marquées optionnelles.
+- Les boutons **− / +** suffisent pour ajuster l’échelle : aucun préréglage compact ou grand.
+- **Survol des icônes** : infobulle de sort côté client lorsque l'API le permet, avec rangs prévus et prérequis. Le talent attribué au **niveau consulté** possède un contour doré distinct des points déjà acquis.
+- **Équipement** : icône, nom, niveau et description de l'objet ; infobulle du client au survol. Choisir une pièce puis **Voir dans Parcours** pour rejoindre la quête ou la fabrication correspondante.
+- **Parcours** : grande carte d'étape actuelle et liste des étapes suivantes à la manière de PexGuide ; navigation Avant/Après, validation manuelle uniquement sur des étapes éligibles et non-groupes. Les quêtes de groupe sont toujours marquées optionnelles.
+
+- **Rotation** : quatrième onglet distinct avec priorités indicatives monocible et multicible, sorts affichés selon le niveau et infobulles au survol. Aucun sort lancé automatiquement.
+
+**Police :** sans empattement `Fonts\\ARIALN.TTF`, déjà présente dans le client WoW, proche visuellement de Roboto ; aucun fichier de police distribué.
 
 ### Couverture réelle
 
@@ -27,7 +31,7 @@
 
 **Pilote documenté : niveaux 30–40**. L'ordre des hubs a été recoupé entre ForeverTavern et plusieurs guides Horde; les **PNJ et quêtes individuelles non confirmées** restent explicitement « à vérifier ». En-dessous de 30 ou au-dessus de 40 : **simple vue d'ensemble des zones 1–60**, non une route de quêtes exhaustivement validée. Les options donjon (Monastère écarlate / Maraudon à 45+) ne sont pas obligatoires en solo.
 
-**Non encore validé en jeu :** la lecture des icônes par FileDataID sur la version du client, l'apparence des infobulles, l'échelle selon résolution, les noms français, les récompenses locales et les raccourcis `/wcb`. Le build Furie pur est un point de départ, **pas une démonstration du DPS maximum**. Les descriptions de rang exactes proviennent du tooltip jeu lorsqu'il est accessible.
+**Non encore validé en jeu :** la lecture des icônes par FileDataID, la récupération des icônes d'objets via le cache client sur la version du client, l'apparence des infobulles, l'échelle selon résolution, les noms français, les récompenses locales et les raccourcis `/wcb`. Le build Furie pur est un point de départ, **pas une démonstration du DPS maximum**. Les descriptions de rang exactes proviennent du tooltip jeu lorsqu'il est accessible.
 
 Aucun achat, déplacement, allocation de talent ou lancement de sort automatique.
 
