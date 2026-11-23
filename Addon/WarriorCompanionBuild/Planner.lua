@@ -223,6 +223,7 @@ function B:GearScore(item,level)
   if item.slot=="Arme 1 main" then score=score+25 end
   if item.group then score=score-15 end
   if difference<0 then score=score-25 end
+  if item.questMinLevel and difference<0 then score=score-20 end
   if difference>8 then score=score-65 end
   if difference< -4 then score=score-90 end
   if self.db and self.db.done and self.db.done[item.routeId] then
@@ -285,6 +286,9 @@ function B:QuestCompletion(questId)
 end
 -- nil: donnees manquantes; false: preuve de prerequis non rempli.
 function B:PrerequisitesMet(step)
+  -- La chaine a ete identifiee mais les prerequis serveur ne sont pas
+  -- verifies un par un. Toujours afficher un statut incertain.
+  if step.chainUnverified then return nil end
   if type(step.requiresAll)~="table" or #step.requiresAll==0 then
     return true
   end
@@ -315,7 +319,9 @@ function B:StepState(step)
   end
   local prerequisites=self:PrerequisitesMet(step)
   if prerequisites==false then return "PREREQUIS MANQUANT" end
-  if prerequisites==nil then return "CHAINE A VERIFIER" end
+  if prerequisites==nil then
+    return step.group and "CHAINE / GROUPE" or "CHAINE A VERIFIER"
+  end
   if step.group then return "OPTION GROUPE" end
   if step.optional then return "OPTION" end
   if step.questId then return "QUETE A VERIFIER" end
