@@ -138,7 +138,7 @@ function B:CreateGearPage(page)
     page.items[item.id]=b
   end
   page.gearStatus=label(page,18,-324,470,22,"GameFontHighlightSmall","",GOLD)
-  page.goto=button(page,504,-318,176,26,"Voir dans Parcours",function()
+  page.gotoButton=button(page,504,-318,176,26,"Voir dans Parcours",function()
     if B.selectedItem and B:GoToGear(B.selectedItem) then
       B:ShowPage("parcours")
     end
