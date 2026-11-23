@@ -16,11 +16,12 @@ B.combatGuide={
       {"Sanguinaire",23881,40,"Tourbillon et Sanguinaire sur leurs CD selon la rage.","Bloodthirst"},
       {"Tourbillon",1680,36,"A lancer si posture Berserker et rage suffisante."},
       {"Pourfendre",772,4,"En debut de combat sur ennemis qui vivent assez longtemps.",nil,35},
+      {"Fracasser armure",7386,10,"Sur cible robuste : 2-3 charges au debut si le combat dure. Economiser la rage sur les petites cibles."},
       {"Frappe heroique",78,1,"Uniquement en surplus de rage, pas en boucle permanente."},
     },
     reactive={
       {"Fulgurance",7384,12,"Apres esquive, passer en posture de combat si possible. GCD 1,5 s."},
-      {"Ivresse de la victoire",34428,20,"Apres un ennemi tue : profiter de la fenetre avant expiration."},
+      {"Ivresse de la victoire",402927,20,"Apres un ennemi tue : profiter de la fenetre avant expiration."},
       {"Execution",5308,24,"En dessous de 20% PV de la cible; coute toute la rage."},
     },
     offense={
@@ -47,7 +48,7 @@ B.combatGuide={
       {"Coup de tonnerre",6343,6,"En posture compatible, utile pour ralentir les attaques.",nil,35},
     },
     reactive={
-      {"Ivresse de la victoire",34428,20,"Une cible vient de mourir : profiter de l'ouverture."},
+      {"Ivresse de la victoire",402927,20,"Une cible vient de mourir : profiter de l'ouverture."},
       {"Execution",5308,24,"Finir vite une cible dangereuse si ses PV sont faibles."},
     },
     offense={
@@ -73,11 +74,11 @@ function B:RotationCycleSummaryAt(level,mode)
   end
   local plan=self:PlanAt(level)
   if level>=40 and plan and (plan.ranks["Bloodthirst"] or 0)>0 then
-    return "Boucle : Sanguinaire > Tourbillon > autos ; selon rage et CD."
+    return "Boucle : Sanguinaire > Tourbillon > autos ; Fracasser si cible robuste."
   elseif level>=36 then
-    return "Boucle : Tourbillon > autos ; economiser la rage pour son CD."
+    return "Boucle : Tourbillon > autos ; Fracasser si cible robuste."
   elseif level>=4 then
-    return "Boucle : Pourfendre si combat long > autos ; Frappe heroique si surplus."
+    return "Boucle : Pourfendre (long) > Fracasser (robuste) > autos."
   end
   return "Boucle : autos ; Frappe heroique si surplus de rage."
 end
