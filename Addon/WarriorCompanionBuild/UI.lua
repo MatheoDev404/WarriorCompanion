@@ -227,7 +227,10 @@ function B:TooltipItem(btn,item)
   end
   if type(tooltip.AddLine)=="function" then
     if not ok then tooltip:AddLine(itemName(item),1,0.8,0.4) end
-    tooltip:AddLine("Niveau requis : "..item.minLevel,0.9,0.9,0.95)
+    tooltip:AddLine("Niveau requis : "..(item.requiredLevel or item.minLevel),0.9,0.9,0.95)
+    if item.requiredLevel and item.minLevel~=item.requiredLevel then
+      tooltip:AddLine("Palier conseille pour la quete : "..item.minLevel,0.9,0.7,0.4)
+    end
     tooltip:AddLine(item.source=="quest" and "Source : recompense de quete" or
       "Source : fabrication "..(item.profession or ""),0.7,0.85,0.98)
     if item.group then tooltip:AddLine("OPTION GROUPE / DONJON",1,0.63,0.35) end
@@ -244,6 +247,7 @@ function B:CreateGearPage(page)
     "Recompenses de quetes ou objets fabriques uniquement.",MUTED)
   page.items={}
   page.gearOffset=0
+  page.gearFuture=false
   page.displayed={}
   for i,item in ipairs(self.gear) do
     local y=-61-(i-1)*62
@@ -280,9 +284,19 @@ function B:CreateGearPage(page)
     page.previewDescription:SetWordWrap(true)
   end
   page.gearStatus=label(page,18,-318,288,27,"GameFontHighlightSmall","",GOLD)
-  page.moreButton=button(page,313,-312,179,31,"Autres paliers",function()
-    local count=#B.gear
-    page.gearOffset=(page.gearOffset+4)%math.max(1,count)
+  page.moreButton=button(page,313,-312,179,31,"Paliers suivants",function()
+    local mode=page.gearFuture and "future" or "current"
+    local visible=B:GearListAt(B.viewLevel,mode)
+    if page.gearOffset+4<#visible then
+      page.gearOffset=page.gearOffset+4
+    elseif not page.gearFuture and #B:GearListAt(B.viewLevel,"future")>0 then
+      page.gearFuture=true
+      page.gearOffset=0
+    else
+      page.gearFuture=false
+      page.gearOffset=0
+    end
+    B.selectedItem=nil
     B:RefreshGear()
   end)
   page.gotoButton=button(page,502,-312,181,31,"Voir dans Parcours",function()
@@ -489,8 +503,7 @@ function B:RefreshGear()
   local page=self.pages and self.pages.equipement
   if not page then return end
   local level=self.viewLevel
-  self.selectedItem=self.selectedItem or self.gear[1].id
-  local ordered=self:GearListAt(level)
+  local ordered=self:GearListAt(level,page.gearFuture and "future" or "current")
   local start=(page.gearOffset or 0)+1
   if start>#ordered then
     start=1
@@ -504,6 +517,9 @@ function B:RefreshGear()
       shown[item.id]=pos
       page.displayed[pos]=item
     end
+  end
+  if not self.selectedItem or not shown[self.selectedItem] then
+    self.selectedItem=page.displayed[1] and page.displayed[1].id or nil
   end
   local current=nil
   for _,item in ipairs(self.gear) do
@@ -557,8 +573,29 @@ function B:RefreshGear()
       "Cible potentielle : comparer les statistiques en jeu."
       or ("Non accessible : "..reason))
   end
-  page.moreButton.txt:SetText((start+3>=#ordered) and
-    "Retour aux cibles" or ("Paliers suivants ("..start.."/"..#ordered..")"))
+  if not current then
+    page.previewIcon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+    page.previewName:SetText("Aucune cible documentee")
+    page.previewLevel:SetText("Niveau "..level)
+    page.previewSource:SetText("")
+    page.previewDescription:SetText(
+      "Aucune recompense de quete ou de forge validee dans ce palier."..
+      " Les futurs objets sont consultables a part.")
+    page.gearStatus:SetText("Pas de recommandation fiable a ce niveau.")
+  end
+  local futureCount=#self:GearListAt(level,"future")
+  if start+3<#ordered then
+    page.moreButton:Show()
+    page.moreButton.txt:SetText("Autres cibles ("..(start+3).."/"..#ordered..")")
+  elseif not page.gearFuture and futureCount>0 then
+    page.moreButton:Show()
+    page.moreButton.txt:SetText("Paliers suivants ("..futureCount..")")
+  elseif page.gearFuture then
+    page.moreButton:Show()
+    page.moreButton.txt:SetText("Retour aux cibles")
+  else
+    page.moreButton:Hide()
+  end
 end
 local function routeText(text,maxLen)
   if type(text)~="string" then return "" end
