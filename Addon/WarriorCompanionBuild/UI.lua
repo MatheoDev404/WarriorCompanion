@@ -296,6 +296,30 @@ function B:CreateGearPage(page)
     "GameFontHighlightSmall","Molette : faire defiler",MUTED)
   page.scrollTrack=rect(page,430,-62,5,244,{0.26,0.29,0.32,1})
   page.scrollThumb=rect(page,430,-62,5,70,GOLD)
+  -- Le curseur peut aussi etre glisse si le client propose l'API Slider.
+  local slider=CreateFrame("Slider",nil,page)
+  if type(slider.SetOrientation)=="function" and
+      type(slider.SetMinMaxValues)=="function" and
+      type(slider.SetThumbTexture)=="function" then
+    slider:SetPoint("TOPLEFT",page,"TOPLEFT",425,-62)
+    slider:SetSize(14,244)
+    slider:SetOrientation("VERTICAL")
+    slider:SetMinMaxValues(0,0)
+    if type(slider.SetValueStep)=="function" then slider:SetValueStep(1) end
+    slider:SetThumbTexture("Interface\\Buttons\\WHITE8X8")
+    local thumb=type(slider.GetThumbTexture)=="function" and
+      slider:GetThumbTexture() or nil
+    if thumb and type(thumb.SetVertexColor)=="function" then
+      thumb:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],1)
+    end
+    page.scrollBar=slider
+    if type(page.scrollThumb.Hide)=="function" then page.scrollThumb:Hide() end
+    slider:SetScript("OnValueChanged",function(_,value)
+      if page.updatingScroll or type(value)~="number" then return end
+      page.gearOffset=math.max(0,math.floor(value+0.5))
+      B:RefreshGear()
+    end)
+  end
   page.gotoButton=button(page,502,-312,181,31,"Voir dans Parcours",function()
     if B.selectedItem and B:GoToGear(B.selectedItem) then
       B:ShowPage("parcours")
@@ -574,6 +598,12 @@ function B:RefreshGear()
       "Aucune recompense de quete ou de forge validee dans ce palier."..
       " Les futurs objets sont consultables a part.")
     page.gearStatus:SetText("Pas de recommandation fiable a ce niveau.")
+  end
+  if page.scrollBar then
+    page.updatingScroll=true
+    page.scrollBar:SetMinMaxValues(0,math.max(0,count-4))
+    page.scrollBar:SetValue(page.gearOffset)
+    page.updatingScroll=false
   end
   page.scrollHint:SetText("Molette  |  "..(count==0 and "0/0" or
     (start.."-"..math.min(count,start+3).."/"..count))..
