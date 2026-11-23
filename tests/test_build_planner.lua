@@ -103,6 +103,18 @@ for _,step in ipairs(B.route) do
   if step.questId==1366 then chain=step end
 end
 assert(chain and #chain.requiresAll==1 and chain.requiresAll[1]==1365)
+local routeById={}
+for _,step in ipairs(B.route) do routeById[step.id]=step end
+assert(routeById["warrior-islander"].questId==1718 and
+  routeById["warrior-affray"].questId==1719 and
+  routeById["warrior-affray"].requiresAll[1]==1718,
+  "la posture Berserker passe par les quetes de classe 30")
+assert(routeById["desolace-kodo"].questId==5561 and
+  routeById["desolace-catch-day"].questId==5386,
+  "les quetes supplementaires de Desolace sont identifiees")
+assert(routeById["desolace-cookbook"].optional and
+  routeById["desolace-cookbook"].note:find("Wulan",1,true),
+  "le vendeur de Cuisine expert reste une etape optionnelle")
 
 assert(B:GoToGear(6802))
 local ordered=B:OrderedRoute()
