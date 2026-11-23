@@ -520,6 +520,7 @@ function B:RefreshGear()
         ("Quete min. "..item.minLevel)
       row.detail:SetText(item.slot.."  |  "..levelLabel.."  |  "..
         (item.source=="quest" and "Quete" or "Forge")..
+        (item.dps and ("  |  "..string.format("%.1f",item.dps).." DPS") or "")..
         (item.group and " (GROUPE)" or ""))
       local selected=self.selectedItem==item.id
       local eligible=self:ItemEligible(item,level)
@@ -549,6 +550,8 @@ function B:RefreshGear()
     page.previewSource:SetText(source)
     page.previewDescription:SetText((self.gearDescriptions[current.id] or
       current.note or "Fiche indisponible.")..
+      (current.dps and ("\nDPS de base : "..string.format("%.1f",current.dps)..
+        " (sans stats/talents)") or "")..
       "\n\n"..self:GearRelevance(current,level).."\n"..reason)
     page.gearStatus:SetText(eligible and
       "Cible potentielle : comparer les statistiques en jeu."
