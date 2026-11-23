@@ -75,24 +75,24 @@ B.talentBlocks={
 -- sans pretendre qu'il est appris si le client ne le confirme pas.
 -- {nom, spellID, niveau indicatif, justification / condition}
 B.rotation={
+  -- Ordre prioritaire, avec gestes conditionnels precises dans les notes.
   mono={
-    {"Cri de guerre",6673,1,"Maintenir le bonus de puissance d'attaque."},
-    {"Charge",100,4,"Pour engager hors combat, si disponible."},
-    {"Fulgurance",7384,12,"Sur une esquive, si la posture le permet."},
-    {"Enrager (talent passif)",12317,25,"Effet passif ; ne se lance pas."},
-    {"Tourbillon",1680,36,"Priorite lorsque la rage et la posture le permettent."},
-    {"Sanguinaire",23881,40,"Competence principale lorsque le talent est investi."},
-    {"Execution",5308,24,"Terminer une cible a faible sante."},
-    {"Frappe heroique",78,1,"Seulement sur surplus de rage : consomme la prochaine attaque."},
+    {"Sanguinaire",23881,40,"Prioritaire si le talent est investi, la rage et le CD suffisants."},
+    {"Tourbillon",1680,36,"Lorsque disponible, si posture compatible et assez de rage."},
+    {"Execution",5308,24,"Seulement si la cible est en phase d'execution."},
+    {"Fulgurance",7384,12,"Apres esquive adverse, en posture compatible."},
+    {"Cri de guerre",6673,1,"Maintenir le buff de puissance d'attaque (avant combat)."},
+    {"Charge",100,4,"Avant combat pour engager une cible isolee."},
+    {"Frappe heroique",78,1,"Uniquement pour vider une rage excedentaire."},
   },
   multi={
-    {"Cri de guerre",6673,1,"Maintenir avant l'engagement."},
-    {"Charge",100,4,"Engager une cible sans attirer un groupe trop fort."},
-    {"Cri demoralisant",1160,14,"Reduire les degats entrants sur plusieurs ennemis."},
-    {"Coup de tonnerre",6343,6,"Si la posture et les conditions le permettent."},
-    {"Tourbillon",1680,36,"Frappe de zone prioritaire si appris et en posture compatible."},
-    {"Enchainement",845,20,"Pour surplus de rage contre plusieurs cibles."},
-    {"Execution",5308,24,"Finir une cible dangereuse, selon le contexte."},
+    {"Tourbillon",1680,36,"Attaque principale multicible si apprise et sure."},
+    {"Enchainement",845,20,"Surplus de rage contre plusieurs ennemis."},
+    {"Cri demoralisant",1160,14,"Reduire les degats entrants sur un groupe."},
+    {"Coup de tonnerre",6343,6,"Seulement selon les postures disponibles."},
+    {"Cri de guerre",6673,1,"Maintenir avant de combattre."},
+    {"Charge",100,4,"N'engager qu'un groupe de taille raisonnable."},
+    {"Execution",5308,24,"Finir une cible fragile si necessaire."},
   },
 }
 B.rotationWarnings={
