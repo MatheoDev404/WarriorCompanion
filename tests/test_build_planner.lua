@@ -68,6 +68,14 @@ for _,g in ipairs(B.gear) do if g.id==17705 then t=g end end
 assert(not B:ItemEligible(t,34),"Thrash Blade ne doit pas etre conseillee au 34")
 assert(B:ItemEligible(t,45))
 local relevant=B:GearListAt(39)
+for _,item in ipairs(relevant) do
+  assert(item.minLevel<=39 and (not item.requiredLevel or item.requiredLevel<=39),
+    "le premier panneau ne doit pas recommander de futures recompenses")
+end
+assert(#B:GearListAt(20)==0,"aucun objet invente au niveau 20")
+local future=B:GearListAt(39,"future")
+assert(#future==2 and future[1].id==271802 and future[2].id==17705,
+  "les objets du niveau 43/45 restent consultables dans un panneau separe")
 assert(relevant[1].id==250607,"Dague de Forge 180 visee au niveau 39")
 local delayed
 for _,item in ipairs(B.gear) do
@@ -121,5 +129,11 @@ assert(B:ValidateContent())
 assert(B:CombatSectionAt(19,"mono","cycle")[1].name=="Pourfendre")
 assert(B:CombatSectionAt(40,"mono","cycle")[1].name=="Sanguinaire")
 assert(B:CombatSectionAt(40,"multi","cycle")[1].name=="Tourbillon")
+assert(#B:CombatSectionAt(40,"mono","reactive")==3,
+  "Fulgurance, Ivresse et Execution ne doivent pas etre masquees")
+assert(B:CombatSectionAt(40,"mono","reactive")[1].name=="Fulgurance")
+assert(B:RotationCycleSummaryAt(20,"mono"):find("Pourfendre",1,true))
+assert(B:RotationCycleSummaryAt(40,"mono"):find("Sanguinaire",1,true))
+assert(B:RotationCycleSummaryAt(40,"multi"):find("Enchainement",1,true))
 assert(B:ChangeScale(1)==1.15 and B:ChangeScale(-9)==0.65)
 print("OK: 3 talent trees, mixed 51 points, gear at level, quest prereqs, rotation steps, route linking")
