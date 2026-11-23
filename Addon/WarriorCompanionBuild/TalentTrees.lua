@@ -108,6 +108,28 @@ B.talentDependencies["Impale"]={"Deep Wounds",3}
 B.talentDependencies["Mortal Strike"]={"Sweeping Strikes",1}
 B.talentDependencies["Master of Defense"]={"Shield Specialization",5}
 B.talentDependencies["Shield Slam"]={"Concussion Blow",1}
+-- Variante de comparaison, PAS un build valide comme meilleur DPS.
+-- 38 points Furie jusqu'au niveau 47, puis 13 points Armes.
+-- Le controle de paliers et de prerequis est fait par Planner.lua.
+B.talentPlans={["fury"]=B.talentBlocks,["hybrid"]={}}
+for _,block in ipairs(B.talentBlocks) do
+  if block[2]<=47 then
+    B.talentPlans.hybrid[#B.talentPlans.hybrid+1]=
+      {block[1],block[2],block[3],"Furie"}
+  end
+end
+for _,block in ipairs({
+  {48,52,"Deflection","Armes"},
+  {53,55,"Improved Rend","Armes"},
+  {56,57,"Improved Tactical Mastery","Armes"},
+  {58,60,"Deep Wounds","Armes"},
+}) do
+  B.talentPlans.hybrid[#B.talentPlans.hybrid+1]=block
+end
+B.talentPlanLabels={
+  fury="Furie pure (0/51/0)",
+  hybrid="Armes/Furie (13/38/0) - experimental",
+}
 function B:TreeForTalent(key)
   for _,tree in ipairs(self.talentTreeOrder) do
     for _,n in ipairs(self.talentTrees[tree]) do
