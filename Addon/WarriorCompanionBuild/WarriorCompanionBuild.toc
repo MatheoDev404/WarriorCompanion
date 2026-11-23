@@ -8,6 +8,7 @@ Data.lua
 TalentTrees.lua
 Spellbook.lua
 Planner.lua
+CombatData.lua
 UI.lua
 Rotation.lua
 Core.lua
