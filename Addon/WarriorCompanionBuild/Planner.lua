@@ -39,6 +39,11 @@ function B:SetPreview(level)
   self.mode="preview"
   self.routeForced=false
   self.routeIndex=nil
+  self.selectedItem=nil
+  if self.pages and self.pages.equipement then
+    self.pages.equipement.gearOffset=0
+    self.pages.equipement.gearFuture=false
+  end
   if self.db then self.db.preview=level end
   return true
 end
@@ -47,6 +52,11 @@ function B:ReturnToReal()
   self.routeForced=false
   self.routeIndex=nil
   self.viewLevel=self.realLevel or 1
+  self.selectedItem=nil
+  if self.pages and self.pages.equipement then
+    self.pages.equipement.gearOffset=0
+    self.pages.equipement.gearFuture=false
+  end
   if self.db then self.db.preview=nil end
 end
 function B:ChangeScale(delta)
@@ -238,12 +248,27 @@ function B:GearScore(item,level)
   end
   return score
 end
-function B:GearListAt(level)
+-- Le premier ecran propose uniquement des objets du palier consulte.
+-- Les recompenses futures restent visibles mais dans une liste distincte,
+-- sans pretendre qu'elles sont deja obtenables.
+function B:GearListAt(level,mode)
+  if not numberLevel(level) then return {} end
+  local future=mode=="future"
   local result={}
   for _,item in ipairs(self.gear) do
-    result[#result+1]=item
+    local accessible=item.minLevel<=level and
+      (not item.requiredLevel or item.requiredLevel<=level)
+    if (future and not accessible) or (not future and accessible) then
+      result[#result+1]=item
+    end
   end
   table.sort(result,function(a,b)
+    if future then
+      if a.minLevel==b.minLevel then
+        return self:GearScore(a,level)>self:GearScore(b,level)
+      end
+      return a.minLevel<b.minLevel
+    end
     local x,y=self:GearScore(a,level),self:GearScore(b,level)
     if x==y then return a.minLevel>b.minLevel end
     return x>y
