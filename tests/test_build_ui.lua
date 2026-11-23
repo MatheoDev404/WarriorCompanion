@@ -2,6 +2,7 @@
 local function frame()
   local f={shown=true,handlers={}}
   function f:SetPoint(...) self.point={...} end
+  function f:ClearAllPoints() self.point=nil end
   function f:SetSize(w,h) self.width=w self.height=h end
   function f:SetScale(v) self.scale=v end
   function f:SetFrameStrata(v) self.strata=v end
@@ -42,6 +43,31 @@ UIParent=frame()
 function CreateFrame() return frame() end
 function UnitLevel() return 34 end
 local lastTooltipSpell, lastTooltipItem
+Enum={SpellBookSpellBank={Player=0}}
+C_Spell={GetSpellInfo=function(id)
+  local names={[6673]="Cri de guerre",[100]="Charge",
+    [23881]="Sanguinaire",[1680]="Tourbillon"}
+  return {name=names[id],spellID=id}
+end}
+-- Dans le vrai grimoire, le rang 2 de Cri de guerre est connu,
+-- meme si le rang 1 (6673) n'est pas signale par IsPlayerSpell.
+function IsPlayerSpell() return false end
+C_SpellBook={
+  GetNumSpellBookSkillLines=function()return 1 end,
+  GetSpellBookSkillLineInfo=function()return {
+    itemIndexOffset=0,numSpellBookItems=2
+  }end,
+  GetSpellBookItemInfo=function(slot)
+    return {spellID=slot==1 and 5242 or 100,itemType="SPELL"}
+  end,
+  GetSpellBookItemName=function(slot)
+    return slot==1 and "Cri de guerre" or "Charge"
+  end,
+}
+C_UnitAuras={GetAuraDataByIndex=function(_,index)
+  if index==1 then return {name="Cri de guerre",spellId=5242} end
+  return nil
+end}
 C_Item={GetItemIconByID=function(id) return 100000+id end}
 GameTooltip={
   SetOwner=function() end,
@@ -51,14 +77,32 @@ GameTooltip={
 }
 local B={}
 assert(loadfile("Addon/WarriorCompanionBuild/Data.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/TalentTrees.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Spellbook.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Planner.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/CombatData.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/UI.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Rotation.lua"))("WarriorCompanionBuild",B)
 B:InitState()
 assert(B:ValidateContent())
+assert(B:BuildSpellbookCache())
+assert(B:IsKnownSpell({name="Cri de guerre",spellId=6673})==true,
+  "le rang 2 appris est reconnu malgre le rang 1 inconnu")
+assert(B:PlayerBuffStatus("Cri de guerre",6673)==true)
 B:CreateUI()
 assert(B.frame.width==760 and B.frame.scale==0.82)
 assert(B.page=="talents" and B.pages.talents:IsShown())
+assert(B.pages.talents.trees.Armes and B.pages.talents.trees.Furie
+  and B.pages.talents.trees.Protection,
+  "les trois arbres doivent etre accessibles")
+B.pages.talents.treeTabs.Armes.handlers.OnClick()
+assert(B.selectedTree=="Armes"
+  and B.pages.talents.nodes["Deep Wounds"],"arbre Armes visible")
+B.pages.talents.treeTabs.Protection.handlers.OnClick()
+assert(B.selectedTree=="Protection"
+  and B.pages.talents.nodes["Shield Slam"],"arbre Protection visible")
+B.pages.talents.treeTabs.Furie.handlers.OnClick()
+assert(B.selectedTree=="Furie")
 assert(B.tabs.rotation and B.pages.rotation,"4eme onglet Rotation")
 assert(B.pages.talents.levelPoint.text:find("Coups",1,true),
   "point de talent gagne au niveau 34 indique")
@@ -99,11 +143,31 @@ assert(B.pages.talents.nodes["Bloodthirst"].edges[1].color[4]==1,
   "le talent de niveau 40 est en surbrillance")
 assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]==0)
 B:ShowPage("rotation")
-assert(B.pages.rotation:IsShown() and B.pages.rotation.rows.mono[1].name.text=="Sanguinaire")
-assert(B.pages.rotation.rows.multi[1].name.text=="Tourbillon")
-B.pages.rotation.rows.mono[1].handlers.OnEnter()
+assert(B.pages.rotation:IsShown()
+  and B.pages.rotation.rows.cycle[1].name.text=="Sanguinaire")
+assert(B.pages.rotation.rows.maintain[1].note.text=="Buff actif",
+  "Cri de guerre deja actif est detecte avec le rang du grimoire")
+assert(not B.pages.rotation.rows.maintain[1].note.text:find("Non appris",1,true))
+B.pages.rotation.rows.cycle[1].handlers.OnEnter()
 assert(lastTooltipSpell==23881,"infobulle du sort de la rotation")
-B.pages.rotation.rows.mono[1].handlers.OnLeave()
+B.pages.rotation.rows.cycle[1].handlers.OnLeave()
+B.pages.rotation.modeButtons.multi.handlers.OnClick()
+assert(B.rotationMode=="multi" and
+ B.pages.rotation.rows.cycle[1].name.text=="Tourbillon")
+B.pages.rotation.modeButtons.mono.handlers.OnClick()
+assert(B.rotationMode=="mono")
+B:ShowPage("talents")
+B.pages.talents.variantButton.handlers.OnClick()
+assert(B.planVariant=="hybrid" and B:PlanAt(60).pointsByTree.Armes==13,
+  "variante hybride accessible et plan partage entre 3 arbres")
+B:SetPreview(60)
+B:SelectTree("Armes")
+B:Refresh()
+assert(B.pages.talents.nodes["Deep Wounds"].edges[1].color[4]==1,
+  "point actuel hybride surligne dans l'arbre Armes")
+B:SelectPlanVariant("fury")
+B:SelectTree("Furie")
+B:Refresh()
 B:SetPreview(60)
 B:Refresh()
 assert(B.pages.talents.nextLabel.text:find("termine",1,true))
@@ -116,4 +180,4 @@ assert(B.frame.scale==0.74)
 B:ReturnToReal()
 B:Refresh()
 assert(B.levelText.text:find("34",1,true))
-print("OK: four tabs, current-level talent highlight, mono/aoe rotation, gear tooltips, Pex route, scale")
+print("OK: 3 tree panels, hybrid points, learned rank-2 spells, buff state, gear and real mono/aoe loops")
