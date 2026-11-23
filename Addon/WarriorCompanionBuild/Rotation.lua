@@ -37,12 +37,12 @@ function B:SpellTooltip(btn,entry)
   if type(t.Show)=="function" then t:Show() end
 end
 local layout={
-  maintain={x=14,y=-78,w=326,count=1},
-  opener={x=14,y=-139,w=326,count=2,dy=36},
-  cycle={x=14,y=-238,w=326,count=2,dy=36},
-  reactive={x=358,y=-78,w=326,count=2,dy=36},
-  offense={x=358,y=-181,w=326,count=1},
-  defense={x=358,y=-247,w=326,count=1},
+  maintain={x=14,y=-75,w=326,count=2,dy=31},
+  opener={x=14,y=-163,w=326,count=2,dy=31},
+  cycle={x=14,y=-244,w=326,count=3,dy=30},
+  reactive={x=358,y=-75,w=326,count=2,dy=31},
+  offense={x=358,y=-163,w=326,count=2,dy=31},
+  defense={x=358,y=-244,w=326,count=2,dy=31},
 }
 local function makeRow(page,section,i)
   local cfg=layout[section]
@@ -83,11 +83,11 @@ function B:CreateRotationPage(page)
   W.label(page,14,-35,660,19,"GameFontHighlightSmall",
     "Maintenir / engager / attaquer / reagir. Aucun lancement automatique.",MUTED)
   W.label(page,14,-56,317,19,"GameFontNormal","A MAINTENIR",GOLD)
-  W.label(page,14,-117,317,18,"GameFontNormal","OUVERTURE",GOLD)
-  W.label(page,14,-216,317,18,"GameFontNormal","BOUCLE PRINCIPALE",GOLD)
+  W.label(page,14,-143,317,18,"GameFontNormal","OUVERTURE",GOLD)
+  W.label(page,14,-225,317,18,"GameFontNormal","BOUCLE PRINCIPALE",GOLD)
   W.label(page,358,-56,328,18,"GameFontNormal","REACTIONS ET PROCS",GOLD)
-  W.label(page,358,-158,328,18,"GameFontNormal","GROS CD OFFENSIFS",GOLD)
-  W.label(page,358,-224,328,18,"GameFontNormal","CD DEFENSIFS",GOLD)
+  W.label(page,358,-143,328,18,"GameFontNormal","GROS CD OFFENSIFS",GOLD)
+  W.label(page,358,-225,328,18,"GameFontNormal","CD DEFENSIFS",GOLD)
   page.rows={}
   for _,section in ipairs({"maintain","opener","cycle","reactive","offense","defense"}) do
     local cfg=layout[section]
@@ -96,8 +96,8 @@ function B:CreateRotationPage(page)
       page.rows[section][i]=makeRow(page,section,i)
     end
   end
-  page.warning=W.label(page,358,-296,328,42,"GameFontHighlightSmall",
-    "Fulgurance declenche le GCD : reaction, pas hors GCD.",MUTED)
+  page.warning=W.label(page,359,-328,325,16,"GameFontHighlightSmall",
+    "Fulgurance : reaction qui declenche le GCD.",MUTED)
 end
 function B:RefreshRotation()
   if not self.pages or not self.pages.rotation then return end
@@ -128,11 +128,13 @@ function B:RefreshRotation()
           elseif aura==false then status="A renouveler"
           else status="A maintenir" end
         end
-        row.note:SetText(status)
+        local hint=item.note and item.note:sub(1,26) or ""
+        if #hint>23 then hint=hint.."..." end
+        row.note:SetText(status.." - "..hint)
       end
     end
   end
   page.warning:SetText(mode=="mono" and
-    "Fulgurance : reaction apres esquive, GCD 1,5 s.\nCDs selon PV, rage et posture."
-    or "Eviter les gros packs en solo.\nDefensifs si les PV baissent.")
+    "Fulgurance : reaction apres esquive, GCD 1,5 s."
+    or "Eviter les gros packs en solo : garder une defense.")
 end
