@@ -161,24 +161,97 @@ function B:CreateTalentPage(page)
   page.desc:SetPoint("TOPLEFT",page,"TOPLEFT",376,-170)
   page.desc:SetSize(310,161)
 end
+-- Informations de fiche obtenues du client, avec repli pour les objets
+-- non encore charges en cache. Ne jamais inventer leurs statistiques.
+local function itemIcon(itemID)
+  if type(C_Item)=="table" and type(C_Item.GetItemIconByID)=="function" then
+    local ok,icon=pcall(C_Item.GetItemIconByID,itemID)
+    if ok and icon then return icon end
+  end
+  if type(GetItemIcon)=="function" then
+    local ok,icon=pcall(GetItemIcon,itemID)
+    if ok and icon then return icon end
+  end
+  if type(GetItemInfoInstant)=="function" then
+    local ok,_,_,_,_,icon=pcall(GetItemInfoInstant,itemID)
+    if ok and icon then return icon end
+  end
+  if type(C_Item)=="table" and type(C_Item.RequestLoadItemDataByID)=="function" then
+    pcall(C_Item.RequestLoadItemDataByID,itemID)
+  end
+  return "Interface\\Icons\\INV_Misc_QuestionMark"
+end
+local function itemName(item)
+  if type(GetItemInfo)=="function" then
+    local ok,name=pcall(GetItemInfo,item.id)
+    if ok and type(name)=="string" and name~="" then return name end
+  end
+  return item.name
+end
+function B:TooltipItem(btn,item)
+  if type(GameTooltip)~="table" or type(GameTooltip.SetOwner)~="function" then return end
+  local tooltip=GameTooltip
+  tooltip:SetOwner(btn,"ANCHOR_RIGHT")
+  local ok=false
+  if type(tooltip.SetItemByID)=="function" then
+    ok=pcall(tooltip.SetItemByID,tooltip,item.id)
+  elseif type(tooltip.SetHyperlink)=="function" then
+    ok=pcall(tooltip.SetHyperlink,tooltip,"item:"..item.id)
+  end
+  if type(tooltip.AddLine)=="function" then
+    if not ok then tooltip:AddLine(itemName(item),1,0.8,0.4) end
+    tooltip:AddLine("Niveau requis : "..item.minLevel,0.9,0.9,0.95)
+    tooltip:AddLine(item.source=="quest" and "Source : recompense de quete" or
+      "Source : fabrication "..(item.profession or ""),0.7,0.85,0.98)
+    if item.group then tooltip:AddLine("OPTION GROUPE / DONJON",1,0.63,0.35) end
+    tooltip:AddLine(self.gearDescriptions[item.id] or item.note or
+      "Description indisponible",0.74,0.78,0.85,true)
+  end
+  if type(tooltip.Show)=="function" then tooltip:Show() end
+end
 function B:CreateGearPage(page)
   panel(page,0,0,700,347)
-  label(page,16,-10,640,23,"GameFontNormalLarge",
-    "Objets de quete et fabrication",WHITE)
-  label(page,16,-33,666,20,"GameFontHighlightSmall",
-    "Armes prioritaires; pas de butin aleatoire ni de vendeur comme source.",MUTED)
+  label(page,16,-10,650,23,"GameFontNormalLarge",
+    "Equipement par paliers",WHITE)
+  label(page,16,-34,660,19,"GameFontHighlightSmall",
+    "Recompenses de quetes ou objets fabriques uniquement.",MUTED)
   page.items={}
   for i,item in ipairs(self.gear) do
-    local b=button(page,16,-62-(i-1)*64,664,57,"",function()
+    local y=-61-(i-1)*62
+    local row=button(page,16,y,411,56,"",function()
       B.selectedItem=item.id
       B:Refresh()
     end)
-    b.name=label(b,11,-6,480,21,"GameFontNormal",item.name,WHITE)
-    b.detail=label(b,11,-29,610,20,"GameFontHighlightSmall","",MUTED)
-    page.items[item.id]=b
+    row.icon=row:CreateTexture(nil,"ARTWORK")
+    row.icon:SetPoint("TOPLEFT",row,"TOPLEFT",10,-8)
+    row.icon:SetSize(40,40)
+    row.icon:SetTexture(itemIcon(item.id))
+    row.name=label(row,60,-5,342,23,"GameFontNormal","",WHITE)
+    row.detail=label(row,60,-29,342,20,"GameFontHighlightSmall","",MUTED)
+    row:SetScript("OnEnter",function()
+      row.bg:SetVertexColor(0.24,0.29,0.34,1)
+      B:TooltipItem(row,item)
+    end)
+    row:SetScript("OnLeave",function()
+      dismissTip()
+      B:RefreshGear()
+    end)
+    page.items[item.id]=row
   end
-  page.gearStatus=label(page,18,-324,470,22,"GameFontHighlightSmall","",GOLD)
-  page.gotoButton=button(page,504,-318,176,26,"Voir dans Parcours",function()
+  panel(page,439,-61,244,238)
+  page.previewIcon=page:CreateTexture(nil,"ARTWORK")
+  page.previewIcon:SetPoint("TOPLEFT",page,"TOPLEFT",455,-78)
+  page.previewIcon:SetSize(42,42)
+  page.previewName=label(page,505,-76,165,44,"GameFontNormal","",WHITE)
+  page.previewLevel=label(page,455,-130,211,21,"GameFontHighlightSmall","",GOLD)
+  page.previewSource=label(page,455,-153,213,30,"GameFontHighlightSmall","",MUTED)
+  page.previewDescription=label(page,455,-187,209,110,
+    "GameFontHighlightSmall","",WHITE)
+  if page.previewDescription.SetWordWrap then
+    page.previewDescription:SetWordWrap(true)
+  end
+  page.gearStatus=label(page,18,-318,469,27,"GameFontHighlightSmall","",GOLD)
+  page.gotoButton=button(page,502,-312,181,31,"Voir dans Parcours",function()
     if B.selectedItem and B:GoToGear(B.selectedItem) then
       B:ShowPage("parcours")
     end
@@ -352,19 +425,43 @@ function B:RefreshGear()
   local page=self.pages and self.pages.equipement
   if not page then return end
   local level=self.viewLevel
+  self.selectedItem=self.selectedItem or self.gear[1].id
+  local current=nil
   for _,item in ipairs(self.gear) do
     local row=page.items[item.id]
     local eligible,reason=self:ItemEligible(item,level)
-    local prefix=item.source=="quest" and "Quete" or "Fabrication"
-    row.name:SetText(item.name.."  |  "..item.slot.."  |  Niveau "..item.minLevel)
-    row.detail:SetText(prefix.." : "..reason)
-    local c=eligible and (item.group and {0.55,0.39,0.24,1} or CARD)
-      or {0.17,0.19,0.21,1}
+    row.icon:SetTexture(itemIcon(item.id))
+    row.name:SetText(itemName(item))
+    row.detail:SetText(item.slot.."  |  Niv. "..item.minLevel..
+      "  |  "..(item.source=="quest" and "Quete" or "Forge")..
+      (item.group and " (GROUPE)" or ""))
+    local selected=self.selectedItem==item.id
+    if selected then current=item end
+    local c=selected and {0.28,0.30,0.32,1} or
+      (eligible and CARD or {0.14,0.16,0.18,1})
     row.bg:SetVertexColor(c[1],c[2],c[3],c[4])
+    if row.name.SetTextColor then
+      row.name:SetTextColor(selected and GOLD[1] or WHITE[1],
+        selected and GOLD[2] or WHITE[2],
+        selected and GOLD[3] or WHITE[3])
+    end
   end
-  self.selectedItem=self.selectedItem or self.gear[1].id
-  page.gearStatus:SetText("Selection : item #"..tostring(self.selectedItem)..
-    "   |   Sources : quete ou fabrication uniquement")
+  if current then
+    local eligible,reason=self:ItemEligible(current,level)
+    page.previewIcon:SetTexture(itemIcon(current.id))
+    page.previewName:SetText(itemName(current))
+    page.previewLevel:SetText("Niveau requis : "..current.minLevel)
+    local source=current.source=="quest" and
+      ("Quete #"..current.questId..(current.group and "  |  Groupe" or ""))
+      or ("Forge "..current.skill.."  |  Recette #"..current.recipe)
+    page.previewSource:SetText(source)
+    page.previewDescription:SetText((self.gearDescriptions[current.id] or
+      current.note or "Description du client indisponible.")..
+      "\n\n"..reason)
+    page.gearStatus:SetText(eligible and
+      "Objet consultable : verifier les conditions avant de l'obtenir."
+      or ("Non disponible : "..reason))
+  end
 end
 function B:RefreshChapters()
   local page=self.pages.parcours
