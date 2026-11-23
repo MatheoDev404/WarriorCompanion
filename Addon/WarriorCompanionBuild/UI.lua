@@ -102,6 +102,24 @@ function B:CreateTalentPage(page)
   panel(page,359,0,341,347)
   label(page,16,-11,305,24,"GameFontNormalLarge","Arbre Furie",WHITE)
   label(page,375,-11,308,24,"GameFontNormalLarge","Plan de progression",WHITE)
+  -- Fleches de pre-requis verifiees (Zephras 1.60.1.70938).
+  page.connections={}
+  for _,connection in ipairs({
+    {3,3,5,3}, -- Blood Craze vers Gore Drinker
+    {5,2,7,2}, -- Death Wish vers Bloodthirst
+  }) do
+    local col=connection[2]
+    local x=16+(col-1)*78+16
+    local y=-44-(connection[1]-1)*41-32
+    local endY=-44-(connection[3]-1)*41
+    local h=math.max(2,y-endY)
+    local line=page:CreateTexture(nil,"ARTWORK")
+    line:SetTexture("Interface\\Buttons\\WHITE8X8")
+    line:SetPoint("TOPLEFT",page,"TOPLEFT",x,y)
+    line:SetSize(2,h)
+    line:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],0.8)
+    page.connections[#page.connections+1]=line
+  end
   page.nodes={}
   for _,node in ipairs(self.talents) do
     local x=16+(node[3]-1)*78
