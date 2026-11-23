@@ -109,6 +109,11 @@ assert(routeById["warrior-islander"].questId==1718 and
   routeById["warrior-affray"].questId==1719 and
   routeById["warrior-affray"].requiresAll[1]==1718,
   "la posture Berserker passe par les quetes de classe 30")
+assert(routeById["salt-hardened-shells"].questId==1105 and
+  routeById["salt-road"].questId==1175 and
+  not routeById["salt-road"].group and
+  routeById["salt-road"].kind=="quest",
+  "les Salines incluent deux quetes XP sans donjon impose")
 assert(routeById["desolace-kodo"].questId==5561 and
   routeById["desolace-catch-day"].questId==5386,
   "les quetes supplementaires de Desolace sont identifiees")
@@ -140,6 +145,13 @@ B.gear[1].routeId=old
 assert(B:ValidateContent())
 assert(B:CombatSectionAt(19,"mono","cycle")[1].name=="Pourfendre")
 assert(B:CombatSectionAt(40,"mono","cycle")[1].name=="Sanguinaire")
+local foundSunder=false
+for _,spell in ipairs(B:CombatSectionAt(34,"mono","cycle")) do
+  if spell.name=="Fracasser armure" and spell.spellId==7386 then
+    foundSunder=true
+  end
+end
+assert(foundSunder,"Fracasser armure est utile en monocible sur cible robuste")
 assert(B:CombatSectionAt(40,"multi","cycle")[1].name=="Tourbillon")
 assert(#B:CombatSectionAt(40,"mono","reactive")==3,
   "Fulgurance, Ivresse et Execution ne doivent pas etre masquees")
