@@ -220,7 +220,14 @@ end
 function B:GearScore(item,level)
   local difference=level-item.minLevel
   local score=40-math.abs(difference)*4
-  if item.slot=="Arme 1 main" then score=score+25 end
+  if item.slot=="Arme 1 main" then
+    score=score+25
+    -- Base objective provenant des fiches d'armes, mais sans simuler
+    -- la rage / cadence / statistiques du personnage.
+    if type(item.dps)=="number" then
+      score=score+math.min(30,item.dps)
+    end
+  end
   if item.group then score=score-15 end
   if difference<0 then score=score-25 end
   if item.questMinLevel and difference<0 then score=score-20 end
