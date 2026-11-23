@@ -31,6 +31,21 @@ local function named(id)
   end
   return nil
 end
+-- Rangs documentes pour Forever 1.60.1 : annoncer une amelioration
+-- seulement si le rang reel peut etre identifie dans le grimoire.
+local families={
+  [7386]={{7386,10},{7405,22},{8380,34},{11596,46},{11597,58}},
+  [6673]={{6673,1},{5242,12},{6192,22},{11549,32},
+          {11550,42},{11551,52},{25289,60}},
+  [78]={{78,1},{284,8},{285,16},{1608,24},{11564,32},
+        {11565,40},{11566,48},{11567,56},{25286,60}},
+}
+local function parsedRank(label)
+  if type(label)~="string" then return nil end
+  local n=tonumber(label:match("%d+"))
+  if n and n>=1 and n<=20 then return n end
+  return nil
+end
 function B:BuildSpellbookCache()
   local book=C_SpellBook
   local bank=type(Enum)=="table" and type(Enum.SpellBookSpellBank)=="table"
@@ -47,7 +62,7 @@ function B:BuildSpellbookCache()
   if type(count)~="number" or count<1 or count>100 then
     self.knownSpells=nil return nil
   end
-  local known={byName={},byId={}}
+  local known={byName={},byId={},rankByName={},complete=true}
   local found=0
   for i=1,count do
     local line=safe(book.GetSpellBookSkillLineInfo,i)
@@ -60,7 +75,7 @@ function B:BuildSpellbookCache()
           local info=safe(book.GetSpellBookItemInfo,slot,bank)
           if not (type(info)=="table" and info.itemType=="FLYOUT") then
             local spellId=type(info)=="table" and info.spellID or nil
-            local name=safe(book.GetSpellBookItemName,slot,bank)
+            local name,rank=safe(book.GetSpellBookItemName,slot,bank)
             if type(name)~="string" then
               name=type(info)=="table" and info.name or nil
             end
@@ -68,12 +83,26 @@ function B:BuildSpellbookCache()
               name=named(spellId)
             end
             local normalized=normalize(name)
-            if normalized then known.byName[normalized]=true end
+            if normalized then
+              known.byName[normalized]=true
+              local value=parsedRank(rank)
+              if value and value>(known.rankByName[normalized] or 0) then
+                known.rankByName[normalized]=value
+              end
+            end
             if type(spellId)=="number" then known.byId[spellId]=true end
-            if normalized or type(spellId)=="number" then found=found+1 end
+            if normalized or type(spellId)=="number" then
+              found=found+1
+            else
+              known.complete=false
+            end
           end
         end
+      else
+        known.complete=false
       end
+    else
+      known.complete=false
     end
   end
   -- 0 sorts donne un grimoire non initialise et non une preuve d'absence.
@@ -100,7 +129,8 @@ function B:IsKnownSpell(entry)
     if localName and book.byName[normalize(localName)] then return true end
     if book.byName[normalize(entry.name)] then return true end
   end
-  return nil -- Jamais "non appris" sur le seul ID du rang 1.
+  if book and book.complete then return false end
+  return nil
 end
 function B:SpellStatus(entry)
   if self.viewLevel and self.realLevel and
@@ -108,7 +138,29 @@ function B:SpellStatus(entry)
     return "Prevu au niveau "..entry.level
   end
   local known=self:IsKnownSpell(entry)
-  if known==true then return "Dans le grimoire" end
+  if known==true then
+    local series=families[entry.spellId]
+    local book=self.knownSpells
+    if series and book then
+      local learned=0
+      local name=normalize(named(entry.spellId) or entry.name)
+      if name then learned=book.rankByName[name] or 0 end
+      for i,rank in ipairs(series) do
+        if book.byId[rank[1]] and i>learned then learned=i end
+      end
+      if learned>0 and learned<#series then
+        local nextRank=series[learned+1]
+        if nextRank[2]<=(self.realLevel or 1) then
+          return "Maitre : rang "..(learned+1)..
+            " disponible (niv "..nextRank[2]..")"
+        end
+      end
+    end
+    return "" -- Sort connu : ne rien afficher d'inutile.
+  end
+  if known==false and entry.level<=(self.realLevel or 1) then
+    return "Non appris : verifier chez le maitre"
+  end
   return "Apprentissage a verifier"
 end
 function B:PlayerBuffStatus(name,spellId)
