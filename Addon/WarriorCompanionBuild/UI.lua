@@ -154,8 +154,12 @@ function B:CreateRoutePage(page)
   for i=1,4 do
     local row=button(page,14,-120-(i-1)*44,672,39,"",function()
       local index=(B.routeWindowStart or 1)+i-1
-      local route=B:OrderedRoute()
-      if route[index] then B.routeIndex=index B:Refresh() end
+      if B.chapterMode then
+        if B.chapters[index] then B.selectedChapter=index B:Refresh() end
+      else
+        local route=B:OrderedRoute()
+        if route[index] then B.routeIndex=index B:Refresh() end
+      end
     end)
     row.num=label(row,8,-6,35,25,"GameFontHighlightSmall","",GOLD)
     row.name=label(row,45,-5,500,25,"GameFontHighlight","",WHITE)
@@ -163,11 +167,15 @@ function B:CreateRoutePage(page)
     page.rows[i]=row
   end
   page.previous=button(page,16,-310,86,27,"Avant",function()
-    B.routeIndex=math.max(1,(B:FocusRoute() or 1)-1)
+    if B.chapterMode then
+      B.selectedChapter=math.max(1,(B.selectedChapter or 1)-1)
+    else B.routeIndex=math.max(1,(B:FocusRoute() or 1)-1) end
     B:Refresh()
   end)
   page.next=button(page,115,-310,86,27,"Apres",function()
-    B.routeIndex=math.min(#B:OrderedRoute(),(B:FocusRoute() or 1)+1)
+    if B.chapterMode then
+      B.selectedChapter=math.min(#B.chapters,(B.selectedChapter or 1)+1)
+    else B.routeIndex=math.min(#B:OrderedRoute(),(B:FocusRoute() or 1)+1) end
     B:Refresh()
   end)
   page.done=button(page,480,-310,200,27,"Valider manuellement",function()
@@ -242,6 +250,7 @@ end
 function B:ShowPage(key)
   if not self.pages or not self.pages[key] then return end
   self.page=key
+  if key~="parcours" then self.routeForced=false end
   for id,page in pairs(self.pages) do
     if id==key then page:Show() else page:Hide() end
     local btn=self.tabs[id]
@@ -309,7 +318,44 @@ function B:RefreshGear()
   page.gearStatus:SetText("Selection : item #"..tostring(self.selectedItem)..
     "   |   Sources : quete ou fabrication uniquement")
 end
+function B:RefreshChapters()
+  local page=self.pages.parcours
+  local level=self.viewLevel or 1
+  local index=self.selectedChapter
+  if not index then
+    for i,c in ipairs(self.chapters) do
+      if level>=c[1] and level<=c[2] then index=i break end
+    end
+    index=index or #self.chapters
+  end
+  index=math.max(1,math.min(#self.chapters,index))
+  self.selectedChapter=index
+  local chapter=self.chapters[index]
+  page.count:SetText("Vue d'ensemble 1-60 | quetes a verifier")
+  page.zone:SetText("Niveaux "..chapter[1].."-"..chapter[2].." : "..chapter[3])
+  page.note:SetText(chapter[4]..
+    "\nApercu de zones : aucune quete individuelle confirmee dans ce chapitre.")
+  local start=math.max(1,math.min(#self.chapters-3,index-1))
+  self.routeWindowStart=start
+  for j,row in ipairs(page.rows) do
+    local c=self.chapters[start+j-1]
+    if c then
+      row:Show()
+      row.num:SetText(tostring(start+j-1))
+      row.name:SetText(c[1].."-"..c[2].."  "..c[3])
+      row.state:SetText("PLAN")
+      local color=start+j-1==index and GOLD or CARD
+      row.bg:SetVertexColor(color[1],color[2],color[3],color[4])
+    else row:Hide() end
+  end
+  page.done.txt:SetText("Non valide")
+end
 function B:RefreshRoute()
+  self.chapterMode=(self.viewLevel<30 or self.viewLevel>40)
+    and not self.routeForced
+  if self.chapterMode then self:RefreshChapters() return end
+  self.selectedChapter=nil
+  self.pages.parcours.done.txt:SetText("Valider manuellement")
   local page=self.pages and self.pages.parcours
   if not page then return end
   local ordered=self:OrderedRoute()
