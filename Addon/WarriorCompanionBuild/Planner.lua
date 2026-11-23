@@ -222,6 +222,7 @@ function B:GearScore(item,level)
   local score=40-math.abs(difference)*4
   if item.slot=="Arme 1 main" then score=score+25 end
   if item.group then score=score-15 end
+  if difference<0 then score=score-25 end
   if difference>8 then score=score-65 end
   if difference< -4 then score=score-90 end
   if self.db and self.db.done and self.db.done[item.routeId] then
@@ -247,12 +248,20 @@ function B:GearRelevance(item,level)
   elseif level-item.minLevel>8 then
     return "Ancien palier - comparer avant de fabriquer"
   elseif item.group then
-    return "Option groupe / donjon"
+    return item.questMinLevel and "Longue chaine de quetes / reputation / groupe" or
+      "Option groupe / donjon"
   end
   return "A evaluer pour le niveau "..level
 end
 function B:ItemEligible(item,level)
-  if item.minLevel>level then return false,"Niveau "..item.minLevel.." requis" end
+  if item.minLevel>level then
+    if item.questMinLevel then
+      return false,"Objet portable "..item.requiredLevel..
+        "+ mais chaine prevue vers "..item.minLevel..
+        " (quete minimum "..item.questMinLevel..")"
+    end
+    return false,"Palier cible "..item.minLevel.." pas encore atteint"
+  end
   if item.source=="quest" then
     if item.group then return true,"GROUPE : quete non obligatoire" end
     return true,"Quete : verifier les prerequis"
