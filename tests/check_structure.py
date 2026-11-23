@@ -5,7 +5,7 @@ assert root.is_dir(), "Le dossier du nouvel addon est absent"
 toc=(root/"WarriorCompanionBuild.toc").read_text(encoding="utf-8")
 lines=[line.strip() for line in toc.splitlines() if line.strip()]
 modules=[line for line in lines if not line.startswith("#")]
-assert modules==["Data.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","UI.lua","Rotation.lua","Core.lua"], modules
+assert modules==["Data.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","CombatData.lua","UI.lua","Rotation.lua","Core.lua"], modules
 assert "## Interface: 16001" in toc
 assert "## SavedVariables: WCBuildDB" in toc
 assert "## Version: 0.3.0-test" in toc
