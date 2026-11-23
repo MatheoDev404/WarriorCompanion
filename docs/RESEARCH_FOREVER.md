@@ -15,6 +15,20 @@
 | [OpenXP](https://github.com/OpenXP) | Exemple libre d'enchaînement d'étapes ; ancien paquet présent dans le dépôt | Contenu généré après lvl 22 selon une étude externe ; licence du paquet présent à respecter |
 | [RestedXP](https://www.restedxp.com/) / Journey | Comparaison **méthodologique** (retours / hubs / détours / donjons) | Ne pas reproduire leurs parcours propriétaires ni transcrire des données payantes |
 
+### Analyse du PexGuide fourni (archive locale de l'utilisateur)
+
+Inspection des fichiers `PexGuide/Engine.lua`, `Chapters.lua`, `DB.lua`, `Data/Corrections.lua`, `Data/Paths.lua` et `Routes/Chap_H_*.lua` :
+
+- Le **moteur d'étapes** distingue `done`, `todo`, `skip` et `wait(level)`. Il relit le journal, les quêtes terminées et le niveau pour se recaler, y compris après un détour donjon.
+- Les prérequis sont modélisés en `pre` (**au moins un**) et `preAll` (**tous**), avec quêtes exclusives, suite déjà accomplie et quête déjà active : c'est plus précis que filtrer seulement sur le niveau.
+- Une quête trop basse est normalement écartée, **sauf** si elle est nécessaire pour une chaîne utile ou une quête de classe ; les étapes déjà rendues sont conservées comme acquises.
+- Une quête en attente de niveau peut être reportée temporairement, avec **limite d'anticipation de six étapes** ; cela évite d'envoyer le joueur à travers plusieurs zones au hasard.
+- Des corrections communautaires complètent QuestieDB ; exemple concret dans le ZIP : `A Light in the Darkness` (#98389) après `The Damned` (#376), information signalée comme observée en jeu le 12 octobre 2026.
+- `Data/Paths.lua` contient des waypoints enregistrés par les joueurs, distincts de coordonnées approximatives de la base ; intéressante séparation entre trajet empirique et estimation.
+- Le ZIP livré contient des chapitres Horde **Tirisfal / Silverpine / Barrens / Crossroads / Stonetalon / Hillsbrad** et régions de départ, mais **pas un parcours Horde 1–60 complet détaillé** (aucun chapitre Désolace dans ce ZIP).
+
+**Décision de conception :** reprendre les **principes** pertinents (état dérivé, dépendances AND/OR, maintien d'une quête-prérequis, preuves du terrain, retour après détour), tout en écrivant notre propre moteur et nos propres étapes, avec un état d'adaptation explicable. Le ZIP ne contient pas de licence de réutilisation identifiable : **ne pas copier son code ni ses routes** dans le nouveau projet sans permission.
+
 **Contradictions importantes :** les guides n'ont pas tous les mêmes tranches, alternent différentes régions, ne tiennent pas systématiquement compte des quêtes Forever et ne prouvent pas les XP/heure optimales. Il faut réconcilier à partir des `questId`, des prérequis, du niveau **minimum** et des PNJ. Un itinéraire sera dit « vérifié » seulement après contrôles et test terrain.
 
 ### Étude de cas de prérequis (Horde, Ruins of Lordaeron, source Wowhead)
