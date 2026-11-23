@@ -48,8 +48,13 @@ B.talentHints={
 }
 function B:TalentHint(key,rank)
   local source=self.talentHints[key]
-  if not source or type(rank)~="number" or rank<1 then return nil end
-  return source(rank)
+  if type(rank)~="number" or rank<1 then return nil end
+  if source then return source(rank) end
+  if self.TalentMetadata then
+    local node=self:TalentMetadata()[key]
+    return node and node[8] or nil
+  end
+  return nil
 end
 B.talentDependencies={
  ["Gore Drinker"]={"Blood Craze",3},
