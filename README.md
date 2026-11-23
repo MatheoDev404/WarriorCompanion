@@ -1,6 +1,6 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.3.0.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.3.1.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 
 ### Onglets
 1. **Talents** : 3 arbres Armes/Furie/Protection, icônes et infobulles, **point du niveau consulté surligné en or**, plan Fury pure ou hybride 13/38, prévisualisation libre.
-2. **Équipement** : quêtes et fabrication seulement, **4 objets classés par pertinence du palier choisi**, icônes/infobulles, niveau, source et bouton **Voir dans Parcours**. L'estimation n'est pas un calcul de DPS.
+2. **Équipement** : quêtes et fabrication seulement, **4 objets du niveau consulté (paliers futurs séparés)**, icônes/infobulles, niveau, source et bouton **Voir dans Parcours**. L'estimation n'est pas un calcul de DPS.
 3. **Parcours** : grande carte active, étapes suivantes façon PexGuide, plusieurs chaînes Horde 30–40 (Désolace) sourcées, Gelkis longue option 42–43 ; quêtes de groupe facultatives. Hors pilote, zones 1–60 non validées.
 4. **Rotation** : mode **monocible / multicible**, enchaînement d'ouverture, buffs à maintenir, boucle, réactions, gros CD offensifs/défensifs ; grimoire par familles/rangs, jamais d'autocast.
 
