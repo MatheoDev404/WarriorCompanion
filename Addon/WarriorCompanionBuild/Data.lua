@@ -69,6 +69,38 @@ B.talentBlocks={
  {55,55,"Piercing Howl"},{56,57,"Improved Intercept"},
  {58,60,"Booming Voice"},
 }
+-- Rotation de leveling : guide de priorites (pas une macro ni un bot).
+-- 4eme onglet separe pour garder l'arbre de talents lisible.
+-- Chaque sort est presente seulement a partir de son palier theorique,
+-- sans pretendre qu'il est appris si le client ne le confirme pas.
+-- {nom, spellID, niveau indicatif, justification / condition}
+B.rotation={
+  mono={
+    {"Cri de guerre",6673,1,"Maintenir le bonus de puissance d'attaque."},
+    {"Charge",100,4,"Pour engager hors combat, si disponible."},
+    {"Fulgurance",7384,12,"Sur une esquive, si la posture le permet."},
+    {"Enrager (talent passif)",12317,25,"Effet passif ; ne se lance pas."},
+    {"Tourbillon",1680,36,"Priorite lorsque la rage et la posture le permettent."},
+    {"Sanguinaire",23881,40,"Competence principale lorsque le talent est investi."},
+    {"Execution",5308,24,"Terminer une cible a faible sante."},
+    {"Frappe heroique",78,1,"Seulement sur surplus de rage : consomme la prochaine attaque."},
+  },
+  multi={
+    {"Cri de guerre",6673,1,"Maintenir avant l'engagement."},
+    {"Charge",100,4,"Engager une cible sans attirer un groupe trop fort."},
+    {"Cri demoralisant",1160,14,"Reduire les degats entrants sur plusieurs ennemis."},
+    {"Coup de tonnerre",6343,6,"Si la posture et les conditions le permettent."},
+    {"Tourbillon",1680,36,"Frappe de zone prioritaire si appris et en posture compatible."},
+    {"Enchainement",845,20,"Pour surplus de rage contre plusieurs cibles."},
+    {"Execution",5308,24,"Finir une cible dangereuse, selon le contexte."},
+  },
+}
+B.rotationWarnings={
+  "Priorites indicatives : verifier que les sorts sont appris et utilisables.",
+  "Ne pas pull plusieurs ennemis si les soins ou la rage sont insuffisants.",
+  "Les choix changent avec les talents, les armes et la situation.",
+}
+
 -- La carte globale est indicatrice, PAS une suite de quetes suffisamment verifiee.
 B.chapters={
  {1,12,"Clairieres de Tirisfal","Depart mort-vivant; etapes precises a auditer."},
@@ -155,6 +187,14 @@ B.route={
   questId=7064,gearId=17705,optional=true,group=true,
   note="Quete 45+, plusieurs versions 7064/7065 : revalider la faction et l'entree."},
 }
+-- Informations lisibles quand la fiche d'objet n'est pas en cache.
+B.gearDescriptions={
+ [3844]="Torse en mailles fabrique par Forge. Niveau requis 31. Plan et composants a reunir avant fabrication.",
+ [3843]="Jambieres fabriquees par Forge. Niveau requis 29. Plan et composants a verifier.",
+ [6802]="Arme a une main donnee par la quete Horde du Monastere ecarlate. Objectif de groupe facultatif.",
+ [17705]="Arme a une main en recompense de quete Maraudon. Palier 45+, option de groupe.",
+}
+
 B.references={
  "https://forevertavern.net/guides/leveling/horde/thousand-needles-33-34",
  "https://forevertavern.net/guides/leveling/horde/desolace-34-36",
