@@ -302,6 +302,17 @@ function B:CreateGearPage(page)
     end
   end)
 end
+-- Marqueurs explicites : distinguent XP, amelioration facultative et donjon.
+local function routeBadge(step)
+  if not step then return "APERCU",MUTED end
+  if step.gearId then return "EQUIPEMENT",{0.87,0.67,0.97,1} end
+  if step.group then return "GROUPE",RED end
+  if step.kind=="craft" then return "FORGE",GOLD end
+  if step.kind=="train" then return "MAITRE",{0.55,0.78,0.98,1} end
+  if step.optional then return "OPTION",{0.95,0.74,0.39,1} end
+  if step.kind=="quest" then return "QUETE XP",GREEN end
+  return "TRAJET",{0.61,0.77,0.96,1}
+end
 function B:CreateRoutePage(page)
   panel(page,0,0,700,347)
   label(page,16,-8,340,26,"GameFontNormalLarge","Parcours de progression",WHITE)
@@ -309,7 +320,9 @@ function B:CreateRoutePage(page)
   -- Une grande carte active, puis les etapes suivantes : lecture PexGuide.
   page.activeBg=rect(page,15,-39,669,109,CARD)
   page.activeAccent=rect(page,15,-39,3,109,GOLD)
-  page.zone=label(page,30,-46,625,25,"GameFontNormal","",GOLD)
+  page.zone=label(page,30,-46,476,25,"GameFontNormal","",GOLD)
+  page.activeKind=label(page,520,-46,147,25,
+    "GameFontNormal","",GREEN)
   page.note=label(page,30,-72,627,66,"GameFontHighlight","",WHITE)
   if page.note.SetWordWrap then page.note:SetWordWrap(true) end
   label(page,18,-150,300,22,"GameFontNormal","ETAPES SUIVANTES",MUTED)
@@ -324,9 +337,12 @@ function B:CreateRoutePage(page)
         if route[index] then B.routeIndex=index B:Refresh() end
       end
     end)
-    row.num=label(row,10,-2,31,27,"GameFontHighlightSmall","",GOLD)
-    row.name=label(row,47,-2,480,27,"GameFontHighlight","",WHITE)
-    row.state=label(row,534,-2,128,27,"GameFontHighlightSmall","",MUTED)
+    row.marker=rect(row,0,0,3,31,GOLD)
+    row.num=label(row,8,-2,31,27,"GameFontHighlightSmall","",GOLD)
+    row.kind=label(row,40,-2,112,27,
+      "GameFontHighlightSmall","",GREEN)
+    row.name=label(row,148,-2,390,27,"GameFontHighlight","",WHITE)
+    row.state=label(row,538,-2,124,27,"GameFontHighlightSmall","",MUTED)
     page.rows[i]=row
   end
   page.previous=button(page,16,-317,98,27,"Precedent",function()
@@ -593,6 +609,8 @@ function B:RefreshChapters()
   local chapter=self.chapters[index]
   page.count:SetText("PLAN 1-60 | Chapitres indicatifs")
   page.zone:SetText("Niveaux "..chapter[1].."-"..chapter[2].."  |  "..chapter[3])
+  page.activeKind:SetText("APERCU")
+  page.activeKind:SetTextColor(MUTED[1],MUTED[2],MUTED[3])
   page.note:SetText(chapter[4]..
     "\nEtapes de quetes non encore validees pour ce chapitre.")
   page.activeAccent:SetVertexColor(MUTED[1],MUTED[2],MUTED[3],1)
@@ -603,7 +621,10 @@ function B:RefreshChapters()
     if c then
       row:Show()
       row.num:SetText(tostring(start+j-1))
-      row.name:SetText(routeText(c[1].."-"..c[2].."  "..c[3],70))
+      row.kind:SetText("ZONE")
+      row.kind:SetTextColor(MUTED[1],MUTED[2],MUTED[3])
+      row.marker:SetVertexColor(MUTED[1],MUTED[2],MUTED[3],1)
+      row.name:SetText(routeText(c[1].."-"..c[2].."  "..c[3],63))
       row.state:SetText("APERÇU")
       row.bg:SetVertexColor(CARD[1],CARD[2],CARD[3],1)
     else row:Hide() end
@@ -623,7 +644,10 @@ function B:RefreshRoute()
   local step=ordered[i].step
   local state=self:StepState(step)
   page.count:SetText("Pilote 30-40  |  "..i.."/"..#ordered)
-  page.zone:SetText("Niv. "..step.level.."  |  "..step.zone.."   ["..state.."]")
+  page.zone:SetText("Niv. "..step.level.."  |  "..step.zone.." ["..state.."]")
+  local badge,shade=routeBadge(step)
+  page.activeKind:SetText(badge)
+  page.activeKind:SetTextColor(shade[1],shade[2],shade[3])
   local link=""
   if step.gearId then
     for _,item in ipairs(self.gear) do
@@ -634,7 +658,7 @@ function B:RefreshRoute()
     end
   end
   page.note:SetText(step.text.."\n"..(step.note or "")..link)
-  page.activeAccent:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],1)
+  page.activeAccent:SetVertexColor(shade[1],shade[2],shade[3],1)
   local start=math.min(#ordered+1,i+1)
   self.routeWindowStart=start
   for j,row in ipairs(page.rows) do
@@ -643,7 +667,11 @@ function B:RefreshRoute()
       row:Show()
       local nextStep=entry.step
       row.num:SetText(tostring(start+j-1))
-      row.name:SetText(routeText(nextStep.text,77))
+      local tag,color=routeBadge(nextStep)
+      row.kind:SetText(tag)
+      row.kind:SetTextColor(color[1],color[2],color[3])
+      row.marker:SetVertexColor(color[1],color[2],color[3],1)
+      row.name:SetText(routeText(nextStep.text,61))
       row.state:SetText(self:StepState(nextStep))
       row.bg:SetVertexColor(CARD[1],CARD[2],CARD[3],1)
     else row:Hide() end
