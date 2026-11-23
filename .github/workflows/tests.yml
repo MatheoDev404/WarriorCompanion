@@ -18,7 +18,7 @@ jobs:
         run: python3 tests/check_art.py
       - name: Verify syntax
         run: |
-          for file in Addon/WarriorCompanion/*.lua tests/*.lua; do
+          for file in Addon/WarriorCompanion/*.lua Addon/WarriorCompanionBuild/*.lua tests/*.lua; do
             luac${{ matrix.lua }} -p "$file"
           done
       - name: Run Lua simulations
@@ -45,3 +45,5 @@ jobs:
           lua${{ matrix.lua }} tests/test_equipment_review.lua
           lua${{ matrix.lua }} tests/test_equipment_targets.lua
           lua${{ matrix.lua }} tests/test_quest_plan.lua
+          lua${{ matrix.lua }} tests/test_build_planner.lua
+          lua${{ matrix.lua }} tests/test_build_ui.lua
