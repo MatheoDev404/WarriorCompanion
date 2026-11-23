@@ -22,6 +22,8 @@ function B:InitState()
   self.page="talents"
   self.selectedTree=(db.selectedTree and self.talentTrees and
     self.talentTrees[db.selectedTree]) and db.selectedTree or "Furie"
+  self.planVariant=(db.planVariant and self.talentPlans and
+    self.talentPlans[db.planVariant]) and db.planVariant or "fury"
   local savedScale=tonumber(db.scale) or 0.82
   self.scale=max(0.65,min(1.15,savedScale))
   self.routeIndex=nil
@@ -53,6 +55,17 @@ function B:ChangeScale(delta)
   if self.frame then self.frame:SetScale(self.scale) end
   return self.scale
 end
+function B:CurrentTalentBlocks()
+  return (self.talentPlans and self.talentPlans[self.planVariant or "fury"])
+    or self.talentBlocks
+end
+function B:SelectPlanVariant(id)
+  if not self.talentPlans or not self.talentPlans[id] then return false end
+  self.planVariant=id
+  if self.db then self.db.planVariant=id end
+  self.selectedTalent=nil
+  return true
+end
 -- Les trois arbres partagent les memes 51 points. Le plan peut donc
 -- allouer sur n'importe quel arbre sans modifier le moteur.
 function B:PlanAt(level,blocks)
@@ -61,7 +74,7 @@ function B:PlanAt(level,blocks)
   local ranks,ranksByTree={},{}
   for _,tree in ipairs(self.talentTreeOrder) do ranksByTree[tree]=0 end
   local nextPoint,nextTree=nil,nil
-  for _,block in ipairs(blocks or self.talentBlocks) do
+  for _,block in ipairs(blocks or self:CurrentTalentBlocks()) do
     local tree=block[4] or self:TreeForTalent(block[3]) or "Furie"
     for l=block[1],block[2] do
       if l<=level then
@@ -73,11 +86,11 @@ function B:PlanAt(level,blocks)
   return {ranks=ranks,nextKey=nextPoint,nextTree=nextTree,
     level=level,metadata=meta,pointsByTree=ranksByTree}
 end
-function B:TalentPointAt(level)
+function B:TalentPointAt(level,blocks)
   if type(level)~="number" or level<10 or level>60 then return nil end
-  for _,block in ipairs(self.talentBlocks) do
+  for _,block in ipairs(blocks or self:CurrentTalentBlocks()) do
     if level>=block[1] and level<=block[2] then
-      local plan=self:PlanAt(level)
+      local plan=self:PlanAt(level,blocks)
       return {key=block[3],rank=plan.ranks[block[3]],
         tree=block[4] or self:TreeForTalent(block[3]) or "Furie",
         level=level,metadata=plan.metadata[block[3]]}
@@ -164,6 +177,12 @@ end
 function B:ValidateContent()
   local ok,why=self:ValidateBuild()
   if not ok then return false,why end
+  if self.talentPlans then
+    for name,blocks in pairs(self.talentPlans) do
+      local valid,issue=self:ValidateBuild(blocks)
+      if not valid then return false,"Variante "..name.." : "..tostring(issue) end
+    end
+  end
   local routes,gear={},{}
   for _,step in ipairs(self.route) do
     if routes[step.id] then return false,"Etape en double "..step.id end
