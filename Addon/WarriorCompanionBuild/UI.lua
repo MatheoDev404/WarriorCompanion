@@ -259,13 +259,18 @@ function B:CreateGearPage(page)
 end
 function B:CreateRoutePage(page)
   panel(page,0,0,700,347)
-  label(page,16,-10,250,26,"GameFontNormalLarge","Parcours ordonne",WHITE)
-  page.count=label(page,300,-10,380,23,"GameFontHighlightSmall","",MUTED)
-  page.zone=label(page,16,-41,650,22,"GameFontNormal","",GOLD)
-  page.note=label(page,16,-65,664,52,"GameFontHighlight","",MUTED)
+  label(page,16,-8,340,26,"GameFontNormalLarge","Parcours de progression",WHITE)
+  page.count=label(page,367,-8,311,26,"GameFontHighlightSmall","",MUTED)
+  -- Une grande carte active, puis les etapes suivantes : lecture PexGuide.
+  page.activeBg=rect(page,15,-39,669,109,CARD)
+  page.activeAccent=rect(page,15,-39,3,109,GOLD)
+  page.zone=label(page,30,-46,625,25,"GameFontNormal","",GOLD)
+  page.note=label(page,30,-72,627,66,"GameFontHighlight","",WHITE)
+  if page.note.SetWordWrap then page.note:SetWordWrap(true) end
+  label(page,18,-150,300,22,"GameFontNormal","ETAPES SUIVANTES",MUTED)
   page.rows={}
   for i=1,4 do
-    local row=button(page,14,-120-(i-1)*44,672,39,"",function()
+    local row=button(page,16,-177-(i-1)*34,669,31,"",function()
       local index=(B.routeWindowStart or 1)+i-1
       if B.chapterMode then
         if B.chapters[index] then B.selectedChapter=index B:Refresh() end
@@ -274,24 +279,24 @@ function B:CreateRoutePage(page)
         if route[index] then B.routeIndex=index B:Refresh() end
       end
     end)
-    row.num=label(row,8,-6,35,25,"GameFontHighlightSmall","",GOLD)
-    row.name=label(row,45,-5,500,25,"GameFontHighlight","",WHITE)
-    row.state=label(row,548,-5,124,25,"GameFontHighlightSmall","",MUTED)
+    row.num=label(row,10,-2,31,27,"GameFontHighlightSmall","",GOLD)
+    row.name=label(row,47,-2,480,27,"GameFontHighlight","",WHITE)
+    row.state=label(row,534,-2,128,27,"GameFontHighlightSmall","",MUTED)
     page.rows[i]=row
   end
-  page.previous=button(page,16,-310,86,27,"Avant",function()
+  page.previous=button(page,16,-317,98,27,"Precedent",function()
     if B.chapterMode then
       B.selectedChapter=math.max(1,(B.selectedChapter or 1)-1)
     else B.routeIndex=math.max(1,(B:FocusRoute() or 1)-1) end
     B:Refresh()
   end)
-  page.next=button(page,115,-310,86,27,"Apres",function()
+  page.next=button(page,125,-317,97,27,"Suivant",function()
     if B.chapterMode then
       B.selectedChapter=math.min(#B.chapters,(B.selectedChapter or 1)+1)
     else B.routeIndex=math.min(#B:OrderedRoute(),(B:FocusRoute() or 1)+1) end
     B:Refresh()
   end)
-  page.done=button(page,480,-310,200,27,"Valider manuellement",function()
+  page.done=button(page,486,-317,198,27,"Marquer comme fait",function()
     B:MarkStep()
     B:Refresh()
   end)
@@ -463,6 +468,11 @@ function B:RefreshGear()
       or ("Non disponible : "..reason))
   end
 end
+local function routeText(text,maxLen)
+  if type(text)~="string" then return "" end
+  if #text>maxLen then return text:sub(1,maxLen-3).."..." end
+  return text
+end
 function B:RefreshChapters()
   local page=self.pages.parcours
   local level=self.viewLevel or 1
@@ -476,53 +486,69 @@ function B:RefreshChapters()
   index=math.max(1,math.min(#self.chapters,index))
   self.selectedChapter=index
   local chapter=self.chapters[index]
-  page.count:SetText("Vue d'ensemble 1-60 | quetes a verifier")
-  page.zone:SetText("Niveaux "..chapter[1].."-"..chapter[2].." : "..chapter[3])
+  page.count:SetText("PLAN 1-60 | Chapitres indicatifs")
+  page.zone:SetText("Niveaux "..chapter[1].."-"..chapter[2].."  |  "..chapter[3])
   page.note:SetText(chapter[4]..
-    "\nApercu de zones : aucune quete individuelle confirmee dans ce chapitre.")
-  local start=math.max(1,math.min(#self.chapters-3,index-1))
+    "\nEtapes de quetes non encore validees pour ce chapitre.")
+  page.activeAccent:SetVertexColor(MUTED[1],MUTED[2],MUTED[3],1)
+  local start=math.max(1,math.min(#self.chapters-3,index+1))
   self.routeWindowStart=start
   for j,row in ipairs(page.rows) do
     local c=self.chapters[start+j-1]
     if c then
       row:Show()
       row.num:SetText(tostring(start+j-1))
-      row.name:SetText(c[1].."-"..c[2].."  "..c[3])
-      row.state:SetText("PLAN")
-      local color=start+j-1==index and GOLD or CARD
-      row.bg:SetVertexColor(color[1],color[2],color[3],color[4])
+      row.name:SetText(routeText(c[1].."-"..c[2].."  "..c[3],70))
+      row.state:SetText("APERÇU")
+      row.bg:SetVertexColor(CARD[1],CARD[2],CARD[3],1)
     else row:Hide() end
   end
-  page.done.txt:SetText("Non valide")
+  page.done.txt:SetText("Non disponible")
 end
 function B:RefreshRoute()
   self.chapterMode=(self.viewLevel<30 or self.viewLevel>40)
     and not self.routeForced
   if self.chapterMode then self:RefreshChapters() return end
   self.selectedChapter=nil
-  self.pages.parcours.done.txt:SetText("Valider manuellement")
   local page=self.pages and self.pages.parcours
   if not page then return end
   local ordered=self:OrderedRoute()
   local i=self:FocusRoute()
   if not i then return end
   local step=ordered[i].step
-  page.count:SetText(i.." / "..#ordered.." | Niveau vu "..self.viewLevel)
-  page.zone:SetText("Niveau "..step.level.." | "..step.zone)
-  page.note:SetText(step.text.."\n"..(step.note or ""))
-  local start=math.max(1,math.min(#ordered-3,i-1))
+  local state=self:StepState(step)
+  page.count:SetText("Pilote 30-40  |  "..i.."/"..#ordered)
+  page.zone:SetText("Niv. "..step.level.."  |  "..step.zone.."   ["..state.."]")
+  local link=""
+  if step.gearId then
+    for _,item in ipairs(self.gear) do
+      if item.id==step.gearId then
+        link="\nEquipement : "..item.name
+        break
+      end
+    end
+  end
+  page.note:SetText(step.text.."\n"..(step.note or "")..link)
+  page.activeAccent:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],1)
+  local start=math.min(#ordered+1,i+1)
   self.routeWindowStart=start
   for j,row in ipairs(page.rows) do
     local entry=ordered[start+j-1]
     if entry then
-      local s=entry.step
       row:Show()
+      local nextStep=entry.step
       row.num:SetText(tostring(start+j-1))
-      row.name:SetText(s.text)
-      row.state:SetText(self:StepState(s))
-      local c=start+j-1==i and GOLD or CARD
-      row.bg:SetVertexColor(c[1],c[2],c[3],c[4])
+      row.name:SetText(routeText(nextStep.text,77))
+      row.state:SetText(self:StepState(nextStep))
+      row.bg:SetVertexColor(CARD[1],CARD[2],CARD[3],1)
     else row:Hide() end
+  end
+  if step.group or step.level>(self.realLevel or 1) then
+    page.done.txt:SetText("Option / plus tard")
+  elseif self.db and self.db.done and self.db.done[step.id] then
+    page.done.txt:SetText("Retirer validation")
+  else
+    page.done.txt:SetText("Marquer comme fait")
   end
 end
 function B:Refresh()
