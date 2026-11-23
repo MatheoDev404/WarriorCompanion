@@ -8,6 +8,7 @@ local function frame()
   function f:SetFrameStrata(v) self.strata=v end
   function f:SetMovable(v) end
   function f:EnableMouse(v) end
+  function f:EnableMouseWheel(v) self.wheelEnabled=v end
   function f:RegisterForDrag(v) end
   function f:SetClampedToScreen(v) end
   function f:StartMoving() end
@@ -20,6 +21,7 @@ local function frame()
   function f:CreateTexture()
     local t={}
     function t:SetTexture(v) self.texture=v end
+    function t:ClearAllPoints() self.point=nil end
     function t:SetPoint(...) self.point={...} end
     function t:SetSize(w,h) self.width=w self.height=h end
     function t:SetVertexColor(...) self.color={...} end
@@ -99,20 +101,26 @@ assert(B:IsKnownSpell({name="Cri de guerre",spellId=6673})==true,
 C_SpellBook.GetSpellBookItemInfo=getInfo
 B:BuildSpellbookCache()
 assert(B:PlayerBuffStatus("Cri de guerre",6673)==true)
+B.realLevel=34
+assert(B:SpellStatus({name="Cri de guerre",spellId=6673,level=1}):find("rang 3",1,true),
+  "un rang plus eleve est signale sans declarer le sort non appris")
+assert(B:SpellStatus({name="Charge",spellId=100,level=4})=="",
+  "un sort appris sans amelioration cache son statut")
 B:CreateUI()
 assert(B.frame.width==760 and B.frame.scale==0.82)
 assert(B.page=="talents" and B.pages.talents:IsShown())
 assert(B.pages.talents.trees.Armes and B.pages.talents.trees.Furie
   and B.pages.talents.trees.Protection,
   "les trois arbres doivent etre accessibles")
-B.pages.talents.treeTabs.Armes.handlers.OnClick()
-assert(B.selectedTree=="Armes"
-  and B.pages.talents.nodes["Deep Wounds"],"arbre Armes visible")
-B.pages.talents.treeTabs.Protection.handlers.OnClick()
-assert(B.selectedTree=="Protection"
-  and B.pages.talents.nodes["Shield Slam"],"arbre Protection visible")
-B.pages.talents.treeTabs.Furie.handlers.OnClick()
-assert(B.selectedTree=="Furie")
+assert(B.pages.talents.trees.Armes.frame:IsShown() and
+  B.pages.talents.trees.Furie.frame:IsShown() and
+  B.pages.talents.trees.Protection.frame:IsShown(),
+  "les trois arbres s'affichent simultanement")
+assert(B.pages.talents.trees.Armes.nodes["Deep Wounds"] and
+  B.pages.talents.trees.Protection.nodes["Shield Slam"],
+  "tous les talents ont une icone et une infobulle")
+assert(B.pages.talents.desc==nil and B.pages.talents.treeTabs==nil,
+  "suppression du descriptif et des boutons de sous-arbres")
 assert(B.tabs.rotation and B.pages.rotation,"4eme onglet Rotation")
 assert(B.pages.talents.levelPoint.text:find("Coups",1,true),
   "point de talent gagne au niveau 34 indique")
@@ -124,15 +132,13 @@ assert(B.pages.talents.nodes["Bloodthirst"])
 assert(#B.pages.talents.connections==2,"pre-requis visuels de l arbre Furie")
 B.pages.talents.nodes["Bloodthirst"].handlers.OnEnter()
 assert(lastTooltipSpell==23881,"tooltip de talent depuis le spellID")
-B.pages.talents.nodes["Cruelty"].handlers.OnClick()
-assert(B.selectedTalent=="Cruelty")
 B:ShowPage("equipement")
 assert(B.pages.equipement:IsShown() and not B.pages.talents:IsShown())
 B.pages.equipement.items[6802].handlers.OnEnter()
 assert(lastTooltipItem==6802,"infobulle vraie de l'objet dans le client")
 B.pages.equipement.items[6802].handlers.OnLeave()
 B.pages.equipement.items[6802].handlers.OnClick()
-assert(B.pages.equipement.previewName.text:find("Sword",1,true),
+assert(B.pages.equipement.previewName.text:find("Epee",1,true),
   "nom de l'objet selectionne dans la fiche")
 assert(B.pages.equipement.previewIcon.texture==106802,
   "icone d'objet recuperee par son ID")
@@ -145,21 +151,30 @@ B.pages.equipement.gotoButton.handlers.OnClick()
 assert(B.page=="parcours" and B.pages.parcours:IsShown())
 assert(B:OrderedRoute()[B.routeIndex].step.id=="quest-scarlet")
 assert(B.pages.parcours.zone.text:find("Monastere",1,true))
+assert(B.pages.parcours.activeKind.text=="EQUIPEMENT",
+  "les etapes d'equipement sont reconnaissables visuellement")
+assert(B.pages.parcours.rows[1].kind.text~=nil,
+  "les etapes suivantes ont un marqueur par type")
 B:SetPreview(39)
 B:ShowPage("equipement")
 local gearPanel=B.pages.equipement
-assert(not gearPanel.gearFuture)
+assert(gearPanel.moreButton==nil and gearPanel.wheelEnabled,
+  "la molette remplace le bouton de pagination")
+assert(gearPanel.gearOffset==0)
 for _,item in ipairs(gearPanel.displayed) do
-  assert(item.minLevel<=39,"objet futur hors des suggestions principales")
+  assert(item.minLevel<=39,"les premieres cibles correspondent au niveau")
 end
-gearPanel.moreButton.handlers.OnClick()
-assert(not gearPanel.gearFuture and gearPanel.displayed[1].minLevel<=39,
-  "les autres cibles du meme niveau sont accessibles")
-gearPanel.moreButton.handlers.OnClick()
-assert(gearPanel.gearFuture and gearPanel.displayed[1].minLevel>39,
-  "la navigation separe bien les paliers futurs")
-gearPanel.moreButton.handlers.OnClick()
-assert(not gearPanel.gearFuture,"retour au niveau courant")
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+assert(gearPanel.gearOffset==1,"defilement vertical d'une ligne")
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+local sawFuture=false
+for _,item in ipairs(gearPanel.displayed) do
+  if item.minLevel>39 then sawFuture=true end
+end
+assert(sawFuture,"les paliers futurs apparaissent a la fin de la liste")
+gearPanel.handlers.OnMouseWheel(gearPanel,1)
+assert(gearPanel.gearOffset==2,"defilement retour a la molette")
 B:SetPreview(34)
 B:ShowPage("talents")
 assert(B.pages.talents.nextLabel.text:find("Rafale",1,true))
@@ -177,8 +192,11 @@ assert(not B.pages.rotation.rows.maintain[1].note.text:find("Non appris",1,true)
 B.pages.rotation.rows.cycle[1].handlers.OnEnter()
 assert(lastTooltipSpell==23881,"infobulle du sort de la rotation")
 B.pages.rotation.rows.cycle[1].handlers.OnLeave()
-assert(B.pages.rotation.rows.cycle[3]:IsShown(),
-  "trois techniques de cycle restent visibles quand elles existent")
+assert(B.pages.rotation.rows.cycle[4]:IsShown() and
+  B.pages.rotation.rows.cycle[3].name.text=="Fracasser armure",
+  "la rotation monocible contient Fracasser armure")
+assert(B.pages.rotation.rows.reactive[2].entry.spellId==402927,
+  "identifiant Forever de l'Ivresse de la victoire")
 assert(B.pages.rotation.rows.defense[2]:IsShown(),
   "le deuxieme cooldown defensif est visible")
 assert(B.pages.rotation.rows.reactive[3]:IsShown(),
@@ -197,14 +215,14 @@ assert(B.planVariant=="hybrid" and B:PlanAt(60).pointsByTree.Armes==13,
 B:SetPreview(60)
 B:SelectTree("Armes")
 B:Refresh()
-assert(B.pages.talents.nodes["Deep Wounds"].edges[1].color[4]==1,
+assert(B.pages.talents.trees.Armes.nodes["Deep Wounds"].edges[1].color[4]==1,
   "point actuel hybride surligne dans l'arbre Armes")
 B:SelectPlanVariant("fury")
 B:SelectTree("Furie")
 B:Refresh()
 B:SetPreview(60)
 B:Refresh()
-assert(B.pages.talents.nextLabel.text:find("termine",1,true))
+assert(B.pages.talents.nextLabel.text:find("places",1,true))
 assert(B.chapterMode and B.pages.parcours.count.text:find("1-60",1,true),
   "les niveaux hors pilote affichent un plan de zones sans fausses quetes")
 assert(not B:MarkStep(),"pas de validation manuelle dans l'apercu non verifie")
