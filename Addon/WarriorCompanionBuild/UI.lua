@@ -75,6 +75,14 @@ function B:TooltipTalent(btn,node)
   if type(tooltip.AddLine)=="function" then
     tooltip:AddLine("Plan au niveau "..self.viewLevel..": "..rank.."/"..node[4],
       1,0.76,0.30)
+    local current=math.max(1,rank)
+    local hint=self:TalentHint(node[1],current)
+    if hint then tooltip:AddLine("Rang "..current.." : "..hint,0.86,0.91,0.95,true) end
+    if rank<node[4] then
+      local nextHint=self:TalentHint(node[1],rank+1)
+      if nextHint then tooltip:AddLine("Suivant "..(rank+1).." : "..nextHint,
+        0.72,0.82,0.91,true) end
+    end
     tooltip:AddLine("Palier "..node[2]..
       " - "..(5*(node[2]-1)).." points des paliers precedents",0.77,0.79,0.85)
     local dep=self.talentDependencies[node[1]]
@@ -288,7 +296,8 @@ function B:RefreshTalents()
       "\nPalier "..selected[2].." | Colonne "..selected[3]..
       "\nSort #"..selected[5]..
       (dep and ("\nRequis : "..dep[1].." "..dep[2].."/"..dep[2]) or "")..
-      "\n\nSurvole son icone pour la description du client.")
+      "\n\n"..(self:TalentHint(selected[1],math.max(1,rank)) or
+        "Survole l'icone pour obtenir plus de details."))
   end
   local l=self.viewLevel
   local advice=l>=40 and
