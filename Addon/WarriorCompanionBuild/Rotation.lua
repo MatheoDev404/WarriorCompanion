@@ -1,6 +1,6 @@
 local addon,B=...
--- Quatrieme onglet : enchainements conseilles selon mono / multicible.
--- Donnees sans lancement de sort automatique ; chaque priorite est conditionnelle.
+-- Rotation lisible par categorie : maintenance, ouverture, cycle,
+-- opportunites (dont Fulgurance avec GCD), offensifs et defensifs.
 local W=B.uiKit
 local GOLD,WHITE,MUTED,CARD=W.GOLD,W.WHITE,W.MUTED,W.CARD
 local function spellIcon(id)
@@ -20,17 +20,6 @@ local function spellIcon(id)
   end
   return "Interface\\Icons\\INV_Misc_QuestionMark"
 end
-local function knownSpell(id)
-  if type(IsPlayerSpell)=="function" then
-    local ok,value=pcall(IsPlayerSpell,id)
-    if ok and type(value)=="boolean" then return value end
-  end
-  if type(C_Spell)=="table" and type(C_Spell.IsSpellKnown)=="function" then
-    local ok,value=pcall(C_Spell.IsSpellKnown,id)
-    if ok and type(value)=="boolean" then return value end
-  end
-  return nil
-end
 function B:SpellTooltip(btn,entry)
   local t=GameTooltip
   if type(t)~="table" or type(t.SetOwner)~="function" then return end
@@ -41,71 +30,109 @@ function B:SpellTooltip(btn,entry)
   end
   if type(t.AddLine)=="function" then
     if not found then t:AddLine(entry.name) end
-    t:AddLine("Priorite du guide a partir du niveau "..entry.level,1,.78,.34)
+    t:AddLine("Guide a partir du niveau "..entry.level,1,.78,.34)
     t:AddLine(entry.note,.78,.85,.92,true)
-    local known=knownSpell(entry.spellId)
-    if known==false then
-      t:AddLine("Sort non observe dans le grimoire : verifier l'apprentissage.",1,.60,.40,true)
-    end
+    t:AddLine("Grimoire : "..self:SpellStatus(entry),.75,.82,.91)
   end
   if type(t.Show)=="function" then t:Show() end
 end
+local layout={
+  maintain={x=14,y=-78,w=326,count=1},
+  opener={x=14,y=-139,w=326,count=2,dy=36},
+  cycle={x=14,y=-238,w=326,count=2,dy=36},
+  reactive={x=358,y=-78,w=326,count=2,dy=36},
+  offense={x=358,y=-181,w=326,count=1},
+  defense={x=358,y=-247,w=326,count=1},
+}
+local function makeRow(page,section,i)
+  local cfg=layout[section]
+  local row=W.button(page,cfg.x,cfg.y-((i-1)*(cfg.dy or 36)),
+    cfg.w,33,"",function()
+      local item=page.rows[section][i].entry
+      if item then B.selectedSpell=item.spellId end
+    end)
+  row.icon=row:CreateTexture(nil,"ARTWORK")
+  row.icon:SetPoint("TOPLEFT",row,"TOPLEFT",7,-4)
+  row.icon:SetSize(25,25)
+  row.name=W.label(row,41,-1,cfg.w-49,18,"GameFontNormal","",WHITE)
+  row.note=W.label(row,41,-18,cfg.w-49,13,"GameFontHighlightSmall","",MUTED)
+  row:SetScript("OnEnter",function()
+    row.bg:SetVertexColor(.24,.29,.34,1)
+    if row.entry then B:SpellTooltip(row,row.entry) end
+  end)
+  row:SetScript("OnLeave",function()
+    row.bg:SetVertexColor(CARD[1],CARD[2],CARD[3],CARD[4])
+    if type(GameTooltip)=="table" and
+        type(GameTooltip.Hide)=="function" then GameTooltip:Hide() end
+  end)
+  return row
+end
 function B:CreateRotationPage(page)
   W.panel(page,0,0,700,347)
-  W.label(page,15,-7,666,25,"GameFontNormalLarge",
-    "Priorites de combat selon le niveau",WHITE)
-  W.label(page,15,-30,665,20,"GameFontHighlightSmall",
-    "Ce sont des priorites conditionnelles, pas une macro automatique.",MUTED)
-  page.rows={mono={},multi={}}
-  for col,descriptor in ipairs({
-    {"mono","MONOCIBLE"},
-    {"multi","MULTICIBLE"},
-  }) do
-    local key,name=descriptor[1],descriptor[2]
-    local x=14+(col-1)*348
-    W.label(page,x,-56,325,24,"GameFontNormal",name,GOLD)
-    for i=1,7 do
-      local row=W.button(page,x,-82-(i-1)*36,332,33,"",function()
-        local list=B:RotationAt(B.viewLevel,key)
-        if list[i] then B.selectedSpell=list[i].spellId end
+  W.label(page,14,-8,330,23,"GameFontNormalLarge",
+    "Enchainement de combat",WHITE)
+  page.modeButtons={}
+  for i,data in ipairs({{"mono","Monocible"},{"multi","Multicible"}}) do
+    local key=data[1]
+    page.modeButtons[key]=W.button(page,440+(i-1)*123,-7,117,26,
+      data[2],function()
+        B.rotationMode=key
+        B:RefreshRotation()
       end)
-      row.index=W.label(row,8,-2,20,27,"GameFontHighlightSmall",
-        tostring(i),GOLD)
-      row.icon=row:CreateTexture(nil,"ARTWORK")
-      row.icon:SetPoint("TOPLEFT",row,"TOPLEFT",30,-4)
-      row.icon:SetSize(25,25)
-      row.name=W.label(row,64,-1,256,19,"GameFontNormal","",WHITE)
-      row.note=W.label(row,64,-18,257,14,"GameFontHighlightSmall","",MUTED)
-      row:SetScript("OnEnter",function()
-        row.bg:SetVertexColor(.24,.29,.34,1)
-        local list=B:RotationAt(B.viewLevel,key)
-        if list[i] then B:SpellTooltip(row,list[i]) end
-      end)
-      row:SetScript("OnLeave",function()
-        row.bg:SetVertexColor(CARD[1],CARD[2],CARD[3],CARD[4])
-        if type(GameTooltip)=="table" and
-            type(GameTooltip.Hide)=="function" then GameTooltip:Hide() end
-      end)
-      page.rows[key][i]=row
+  end
+  W.label(page,14,-35,660,19,"GameFontHighlightSmall",
+    "Maintenir / engager / attaquer / reagir. Aucun lancement automatique.",MUTED)
+  W.label(page,14,-56,317,19,"GameFontNormal","A MAINTENIR",GOLD)
+  W.label(page,14,-117,317,18,"GameFontNormal","OUVERTURE",GOLD)
+  W.label(page,14,-216,317,18,"GameFontNormal","BOUCLE PRINCIPALE",GOLD)
+  W.label(page,358,-56,328,18,"GameFontNormal","REACTIONS ET PROCS",GOLD)
+  W.label(page,358,-158,328,18,"GameFontNormal","GROS CD OFFENSIFS",GOLD)
+  W.label(page,358,-224,328,18,"GameFontNormal","CD DEFENSIFS",GOLD)
+  page.rows={}
+  for _,section in ipairs({"maintain","opener","cycle","reactive","offense","defense"}) do
+    local cfg=layout[section]
+    page.rows[section]={}
+    for i=1,cfg.count do
+      page.rows[section][i]=makeRow(page,section,i)
     end
   end
+  page.warning=W.label(page,358,-296,328,42,"GameFontHighlightSmall",
+    "Fulgurance declenche le GCD : reaction, pas hors GCD.",MUTED)
 end
 function B:RefreshRotation()
   if not self.pages or not self.pages.rotation then return end
   local page=self.pages.rotation
-  for _,key in ipairs({"mono","multi"}) do
-    local list=self:RotationAt(self.viewLevel,key)
-    for i,row in ipairs(page.rows[key]) do
-      local e=list[i]
-      if not e then row:Hide()
+  local mode=self.rotationMode or "mono"
+  for key,btn in pairs(page.modeButtons) do
+    local c=key==mode and GOLD or CARD
+    btn.bg:SetVertexColor(c[1],c[2],c[3],c[4])
+    if btn.txt.SetTextColor then
+      btn.txt:SetTextColor(key==mode and .12 or .92,
+        key==mode and .16 or .94,key==mode and .22 or .97)
+    end
+  end
+  for section,rows in pairs(page.rows) do
+    local list=self:CombatSectionAt(self.viewLevel,mode,section)
+    for i,row in ipairs(rows) do
+      local item=list[i]
+      row.entry=item
+      if not item then row:Hide()
       else
         row:Show()
-        row.icon:SetTexture(spellIcon(e.spellId))
-        row.name:SetText(e.name)
-        local known=knownSpell(e.spellId)
-        local status=known==false and "Non appris" or "Si disponible"
-        row.note:SetText(status.." - niv. "..e.level.."+")
+        row.icon:SetTexture(spellIcon(item.spellId))
+        row.name:SetText(item.name)
+        local status=self:SpellStatus(item)
+        if section=="maintain" and item.spellId==6673 then
+          local aura=self:PlayerBuffStatus(item.name,item.spellId)
+          if aura==true then status="Buff actif"
+          elseif aura==false then status="A renouveler"
+          else status="A maintenir" end
+        end
+        row.note:SetText(status)
       end
     end
   end
+  page.warning:SetText(mode=="mono" and
+    "Fulgurance : reaction apres esquive, GCD 1,5 s.\nCDs selon PV, rage et posture."
+    or "Eviter les gros packs en solo.\nDefensifs si les PV baissent.")
 end
