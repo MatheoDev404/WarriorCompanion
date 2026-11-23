@@ -55,13 +55,14 @@ function IsPlayerSpell() return false end
 C_SpellBook={
   GetNumSpellBookSkillLines=function()return 1 end,
   GetSpellBookSkillLineInfo=function()return {
-    itemIndexOffset=0,numSpellBookItems=2
+    itemIndexOffset=0,numSpellBookItems=3
   }end,
   GetSpellBookItemInfo=function(slot)
-    return {spellID=slot==1 and 5242 or 100,itemType="SPELL"}
+    return {spellID=slot==1 and 5242 or (slot==2 and 100 or 1160),itemType="SPELL"}
   end,
   GetSpellBookItemName=function(slot)
-    return slot==1 and "Cri de guerre" or "Charge"
+    return slot==1 and "Cri de guerre" or
+      (slot==2 and "Charge" or "Cri démoralisant")
   end,
 }
 C_UnitAuras={GetAuraDataByIndex=function(_,index)
@@ -88,6 +89,15 @@ assert(B:ValidateContent())
 assert(B:BuildSpellbookCache())
 assert(B:IsKnownSpell({name="Cri de guerre",spellId=6673})==true,
   "le rang 2 appris est reconnu malgre le rang 1 inconnu")
+assert(B:IsKnownSpell({name="Cri demoralisant",spellId=1160})==true,
+  "les noms francais avec/sans accents doivent correspondre")
+local getInfo=C_SpellBook.GetSpellBookItemInfo
+C_SpellBook.GetSpellBookItemInfo=nil
+assert(B:BuildSpellbookCache(),"l'API grimoire sans ItemInfo reste lisible")
+assert(B:IsKnownSpell({name="Cri de guerre",spellId=6673})==true,
+  "une lecture par noms suffit si GetSpellBookItemInfo manque")
+C_SpellBook.GetSpellBookItemInfo=getInfo
+B:BuildSpellbookCache()
 assert(B:PlayerBuffStatus("Cri de guerre",6673)==true)
 B:CreateUI()
 assert(B.frame.width==760 and B.frame.scale==0.82)
@@ -135,6 +145,22 @@ B.pages.equipement.gotoButton.handlers.OnClick()
 assert(B.page=="parcours" and B.pages.parcours:IsShown())
 assert(B:OrderedRoute()[B.routeIndex].step.id=="quest-scarlet")
 assert(B.pages.parcours.zone.text:find("Monastere",1,true))
+B:SetPreview(39)
+B:ShowPage("equipement")
+local gearPanel=B.pages.equipement
+assert(not gearPanel.gearFuture)
+for _,item in ipairs(gearPanel.displayed) do
+  assert(item.minLevel<=39,"objet futur hors des suggestions principales")
+end
+gearPanel.moreButton.handlers.OnClick()
+assert(not gearPanel.gearFuture and gearPanel.displayed[1].minLevel<=39,
+  "les autres cibles du meme niveau sont accessibles")
+gearPanel.moreButton.handlers.OnClick()
+assert(gearPanel.gearFuture and gearPanel.displayed[1].minLevel>39,
+  "la navigation separe bien les paliers futurs")
+gearPanel.moreButton.handlers.OnClick()
+assert(not gearPanel.gearFuture,"retour au niveau courant")
+B:SetPreview(34)
 B:ShowPage("talents")
 assert(B.pages.talents.nextLabel.text:find("Rafale",1,true))
 B:SetPreview(40)
@@ -155,6 +181,10 @@ assert(B.pages.rotation.rows.cycle[3]:IsShown(),
   "trois techniques de cycle restent visibles quand elles existent")
 assert(B.pages.rotation.rows.defense[2]:IsShown(),
   "le deuxieme cooldown defensif est visible")
+assert(B.pages.rotation.rows.reactive[3]:IsShown(),
+  "Fulgurance, Ivresse et Execution visibles en meme temps")
+assert(B.pages.rotation.rotationSummary.text:find("Sanguinaire",1,true),
+  "la boucle niveau 40 apparait independamment des procs")
 B.pages.rotation.modeButtons.multi.handlers.OnClick()
 assert(B.rotationMode=="multi" and
  B.pages.rotation.rows.cycle[1].name.text=="Tourbillon")
