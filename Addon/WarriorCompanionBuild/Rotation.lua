@@ -32,14 +32,17 @@ function B:SpellTooltip(btn,entry)
     if not found then t:AddLine(entry.name) end
     t:AddLine("Guide a partir du niveau "..entry.level,1,.78,.34)
     t:AddLine(entry.note,.78,.85,.92,true)
-    t:AddLine("Grimoire : "..self:SpellStatus(entry),.75,.82,.91)
+    local status=self:SpellStatus(entry)
+    if status and status~="" then
+      t:AddLine(status,.95,.73,.44)
+    end
   end
   if type(t.Show)=="function" then t:Show() end
 end
 local layout={
   maintain={x=14,y=-75,w=326,count=2,dy=31},
   opener={x=14,y=-163,w=326,count=2,dy=31},
-  cycle={x=14,y=-244,w=326,count=3,dy=30},
+  cycle={x=14,y=-244,w=326,count=4,dy=24,h=23},
   reactive={x=358,y=-75,w=326,count=3,dy=27,h=26},
   offense={x=358,y=-184,w=326,count=2,dy=28,h=26},
   defense={x=358,y=-263,w=326,count=2,dy=28,h=26},
@@ -88,7 +91,7 @@ function B:CreateRotationPage(page)
     "Boucle selon le niveau ; buffs, procs et CD se gerent a part.",MUTED)
   W.label(page,14,-56,317,19,"GameFontNormal","A MAINTENIR",GOLD)
   W.label(page,14,-143,317,18,"GameFontNormal","OUVERTURE",GOLD)
-  W.label(page,14,-225,317,18,"GameFontNormal","BOUCLE PRINCIPALE",GOLD)
+  W.label(page,14,-224,317,18,"GameFontNormal","BOUCLE PRINCIPALE",GOLD)
   W.label(page,358,-56,328,18,"GameFontNormal","REACTIONS ET PROCS",GOLD)
   W.label(page,358,-163,328,18,"GameFontNormal","GROS CD OFFENSIFS",GOLD)
   W.label(page,358,-242,328,18,"GameFontNormal","CD DEFENSIFS",GOLD)
@@ -131,13 +134,14 @@ function B:RefreshRotation()
         local status=self:SpellStatus(item)
         if section=="maintain" and item.spellId==6673 then
           local aura=self:PlayerBuffStatus(item.name,item.spellId)
-          if aura==true then status="Buff actif"
-          elseif aura==false then status="A renouveler"
-          else status="A maintenir" end
+          local buff=aura==true and "Buff actif" or
+            (aura==false and "A renouveler" or "Maintenir le buff")
+          status=(status and status~="") and (status.." | "..buff) or buff
         end
-        local hint=item.note and item.note:sub(1,26) or ""
-        if #hint>23 then hint=hint.."..." end
-        row.note:SetText(status.." - "..hint)
+        local hint=item.note and item.note:sub(1,35) or ""
+        if #hint>32 then hint=hint.."..." end
+        row.note:SetText((status and status~="") and
+          (status.." - "..hint) or hint)
       end
     end
   end
