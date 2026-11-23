@@ -240,8 +240,21 @@ function B:CreateGearPage(page)
     "Recompenses de quetes ou objets fabriques uniquement.",MUTED)
   page.items={}
   page.gearOffset=0
-  page.gearFuture=false
   page.displayed={}
+  -- Defilement vertical a la molette (pas de changement de palier par bouton).
+  local function scrollGear(_,delta)
+    if type(delta)~="number" then return end
+    local list=B:GearListAt(B.viewLevel)
+    for _,item in ipairs(B:GearListAt(B.viewLevel,"future")) do
+      list[#list+1]=item
+    end
+    local maximum=math.max(0,#list-4)
+    page.gearOffset=math.max(0,math.min(maximum,
+      (page.gearOffset or 0)-(delta>0 and 1 or -1)))
+    B:RefreshGear()
+  end
+  if type(page.EnableMouseWheel)=="function" then page:EnableMouseWheel(true) end
+  page:SetScript("OnMouseWheel",scrollGear)
   for i,item in ipairs(self.gear) do
     local y=-61-(i-1)*62
     local row=button(page,16,y,411,56,"",function()
@@ -254,6 +267,8 @@ function B:CreateGearPage(page)
     row.icon:SetTexture(itemIcon(item.id))
     row.name=label(row,60,-5,342,23,"GameFontNormal","",WHITE)
     row.detail=label(row,60,-29,342,20,"GameFontHighlightSmall","",MUTED)
+    if type(row.EnableMouseWheel)=="function" then row:EnableMouseWheel(true) end
+    row:SetScript("OnMouseWheel",scrollGear)
     row:SetScript("OnEnter",function()
       row.bg:SetVertexColor(0.24,0.29,0.34,1)
       B:TooltipItem(row,item)
@@ -277,21 +292,10 @@ function B:CreateGearPage(page)
     page.previewDescription:SetWordWrap(true)
   end
   page.gearStatus=label(page,18,-318,288,27,"GameFontHighlightSmall","",GOLD)
-  page.moreButton=button(page,313,-312,179,31,"Paliers suivants",function()
-    local mode=page.gearFuture and "future" or "current"
-    local visible=B:GearListAt(B.viewLevel,mode)
-    if page.gearOffset+4<#visible then
-      page.gearOffset=page.gearOffset+4
-    elseif not page.gearFuture and #B:GearListAt(B.viewLevel,"future")>0 then
-      page.gearFuture=true
-      page.gearOffset=0
-    else
-      page.gearFuture=false
-      page.gearOffset=0
-    end
-    B.selectedItem=nil
-    B:RefreshGear()
-  end)
+  page.scrollHint=label(page,306,-318,193,21,
+    "GameFontHighlightSmall","Molette : faire defiler",MUTED)
+  page.scrollTrack=rect(page,430,-62,5,244,{0.26,0.29,0.32,1})
+  page.scrollThumb=rect(page,430,-62,5,70,GOLD)
   page.gotoButton=button(page,502,-312,181,31,"Voir dans Parcours",function()
     if B.selectedItem and B:GoToGear(B.selectedItem) then
       B:ShowPage("parcours")
@@ -471,12 +475,15 @@ function B:RefreshGear()
   local page=self.pages and self.pages.equipement
   if not page then return end
   local level=self.viewLevel
-  local ordered=self:GearListAt(level,page.gearFuture and "future" or "current")
-  local start=(page.gearOffset or 0)+1
-  if start>#ordered then
-    start=1
-    page.gearOffset=0
+  local ordered=self:GearListAt(level)
+  local availableCount=#ordered
+  for _,item in ipairs(self:GearListAt(level,"future")) do
+    ordered[#ordered+1]=item
   end
+  local count=#ordered
+  page.gearOffset=math.max(0,math.min(page.gearOffset or 0,
+    math.max(0,count-4)))
+  local start=page.gearOffset+1
   local shown={}
   page.displayed={}
   for pos=1,4 do
@@ -499,15 +506,16 @@ function B:RefreshGear()
       row:Show()
       row.icon:SetTexture(itemIcon(item.id))
       row.name:SetText(itemName(item))
+      local eligible=self:ItemEligible(item,level)
       local levelLabel=item.requiredLevel and
         ("Niv. requis "..item.requiredLevel) or
         ("Quete min. "..item.minLevel)
-      row.detail:SetText(item.slot.."  |  "..levelLabel.."  |  "..
+      row.detail:SetText((not eligible and "PLUS TARD  |  " or "")..
+        item.slot.."  |  "..levelLabel.."  |  "..
         (item.source=="quest" and "Quete" or "Forge")..
         (item.dps and ("  |  "..string.format("%.1f",item.dps).." DPS") or "")..
         (item.group and " (GROUPE)" or ""))
       local selected=self.selectedItem==item.id
-      local eligible=self:ItemEligible(item,level)
       local color=selected and {0.28,0.30,0.32,1} or
         (eligible and CARD or {0.14,0.16,0.18,1})
       row.bg:SetVertexColor(color[1],color[2],color[3],color[4])
@@ -551,19 +559,19 @@ function B:RefreshGear()
       " Les futurs objets sont consultables a part.")
     page.gearStatus:SetText("Pas de recommandation fiable a ce niveau.")
   end
-  local futureCount=#self:GearListAt(level,"future")
-  if start+3<#ordered then
-    page.moreButton:Show()
-    page.moreButton.txt:SetText("Autres cibles ("..(start+3).."/"..#ordered..")")
-  elseif not page.gearFuture and futureCount>0 then
-    page.moreButton:Show()
-    page.moreButton.txt:SetText("Paliers suivants ("..futureCount..")")
-  elseif page.gearFuture then
-    page.moreButton:Show()
-    page.moreButton.txt:SetText("Retour aux cibles")
-  else
-    page.moreButton:Hide()
+  page.scrollHint:SetText("Molette  |  "..(count==0 and "0/0" or
+    (start.."-"..math.min(count,start+3).."/"..count))..
+    "  |  "..availableCount.." actuels")
+  local height=244
+  local thumb= count>0 and math.max(22,math.floor(
+    height*math.min(4,count)/count)) or height
+  page.scrollThumb:SetSize(5,thumb)
+  if type(page.scrollThumb.ClearAllPoints)=="function" then
+    page.scrollThumb:ClearAllPoints()
   end
+  local maximum=math.max(1,count-4)
+  page.scrollThumb:SetPoint("TOPLEFT",page,"TOPLEFT",430,
+    -62-math.floor((height-thumb)*(page.gearOffset/maximum)))
 end
 local function routeText(text,maxLen)
   if type(text)~="string" then return "" end
