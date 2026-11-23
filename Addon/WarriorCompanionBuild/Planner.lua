@@ -20,6 +20,8 @@ function B:InitState()
     or self.realLevel
   self.mode=(db.preview and numberLevel(db.preview)) and "preview" or "follow"
   self.page="talents"
+  self.selectedTree=(db.selectedTree and self.talentTrees and
+    self.talentTrees[db.selectedTree]) and db.selectedTree or "Furie"
   local savedScale=tonumber(db.scale) or 0.82
   self.scale=max(0.65,min(1.15,savedScale))
   self.routeIndex=nil
@@ -51,31 +53,45 @@ function B:ChangeScale(delta)
   if self.frame then self.frame:SetScale(self.scale) end
   return self.scale
 end
-function B:PlanAt(level)
-  local meta,ranks={},{}
+-- Les trois arbres partagent les memes 51 points. Le plan peut donc
+-- allouer sur n'importe quel arbre sans modifier le moteur.
+function B:PlanAt(level,blocks)
   if not numberLevel(level) then return nil end
-  for _,node in ipairs(self.talents) do meta[node[1]]=node end
-  local nextPoint=nil
-  for _,block in ipairs(self.talentBlocks) do
+  local meta=self:TalentMetadata()
+  local ranks,ranksByTree={},{}
+  for _,tree in ipairs(self.talentTreeOrder) do ranksByTree[tree]=0 end
+  local nextPoint,nextTree=nil,nil
+  for _,block in ipairs(blocks or self.talentBlocks) do
+    local tree=block[4] or self:TreeForTalent(block[3]) or "Furie"
     for l=block[1],block[2] do
-      if l<=level then ranks[block[3]]=(ranks[block[3]] or 0)+1
-      elseif not nextPoint then nextPoint=block[3] end
+      if l<=level then
+        ranks[block[3]]=(ranks[block[3]] or 0)+1
+        ranksByTree[tree]=ranksByTree[tree]+1
+      elseif not nextPoint then nextPoint=block[3] nextTree=tree end
     end
   end
-  return {ranks=ranks,nextKey=nextPoint,level=level,metadata=meta}
+  return {ranks=ranks,nextKey=nextPoint,nextTree=nextTree,
+    level=level,metadata=meta,pointsByTree=ranksByTree}
 end
--- Renvoie le talent EXACTEMENT attribue au niveau consulte.
--- Distinct du prochain point (niveau +1) : important pour le surlignage.
 function B:TalentPointAt(level)
   if type(level)~="number" or level<10 or level>60 then return nil end
   for _,block in ipairs(self.talentBlocks) do
     if level>=block[1] and level<=block[2] then
       local plan=self:PlanAt(level)
       return {key=block[3],rank=plan.ranks[block[3]],
+        tree=block[4] or self:TreeForTalent(block[3]) or "Furie",
         level=level,metadata=plan.metadata[block[3]]}
     end
   end
   return nil
+end
+
+function B:SelectTree(tree)
+  if not self.talentTrees or not self.talentTrees[tree] then return false end
+  self.selectedTree=tree
+  self.selectedTalent=nil
+  if self.db then self.db.selectedTree=tree end
+  return true
 end
 
 function B:RotationAt(level,mode)
@@ -91,26 +107,32 @@ function B:RotationAt(level,mode)
   end
   return result
 end
-function B:ValidateBuild()
-  local metadata={}
-  for _,node in ipairs(self.talents) do
-    if metadata[node[1]] then return false,"Talent en double" end
-    metadata[node[1]]=node
+function B:ValidateBuild(blocks)
+  local metadata=self:TalentMetadata()
+  local keys={}
+  for _,tree in ipairs(self.talentTreeOrder) do
+    for _,node in ipairs(self.talentTrees[tree]) do
+      if keys[node[1]] then return false,"Talent en double : "..node[1] end
+      keys[node[1]]=tree
+    end
   end
-  local rankByKey={}
-  local rowCount={}
+  local rankByKey,rowCount={},{}
+  for _,tree in ipairs(self.talentTreeOrder) do rowCount[tree]={} end
   local level=10
-  for _,block in ipairs(self.talentBlocks) do
+  for _,block in ipairs(blocks or self.talentBlocks) do
     if block[1]~=level or block[2]<block[1] then
       return false,"Point manquant / intervalle talent au niveau "..level
     end
     for l=block[1],block[2] do
       local node=metadata[block[3]]
-      if not node then return false,"Talent inconnu "..block[3] end
+      local tree=block[4] or keys[block[3]]
+      if not node or not rowCount[tree] or keys[block[3]]~=tree then
+        return false,"Talent inconnu ou mauvais arbre : "..tostring(block[3])
+      end
       local count=rankByKey[block[3]] or 0
       if count>=node[4] then return false,"Rang excessif "..block[3] end
       local earlier=0
-      for row,n in pairs(rowCount) do
+      for row,n in pairs(rowCount[tree]) do
         if row<node[2] then earlier=earlier+n end
       end
       if earlier<5*(node[2]-1) then
@@ -121,7 +143,7 @@ function B:ValidateBuild()
         return false,"Prerequis "..dep[1].." pour "..block[3]
       end
       rankByKey[block[3]]=count+1
-      rowCount[node[2]]=(rowCount[node[2]] or 0)+1
+      rowCount[tree][node[2]]=(rowCount[tree][node[2]] or 0)+1
     end
     level=block[2]+1
   end
