@@ -54,6 +54,10 @@ end
 local function panel(p,x,y,w,h)
   return rect(p,x,y,w,h,PANEL)
 end
+-- Partage des composants avec l'onglet Rotation, sans dependance externe.
+B.uiKit={rect=rect,label=label,button=button,panel=panel,
+  BG=BG,PANEL=PANEL,CARD=CARD,GOLD=GOLD,WHITE=WHITE,MUTED=MUTED}
+
 local function textWithFallback(node)
   local name=node[7]
   if type(C_Spell)=="table" and type(C_Spell.GetSpellName)=="function" then
@@ -343,16 +347,17 @@ function B:CreateUI()
   button(f,638,-7,28,28,"+",function() B:ChangeScale(0.08) end)
   button(f,681,-7,62,28,"Fermer",function() f:Hide() end)
   self.tabs={}
-  local tabs={{"talents","Talents"},{"equipement","Equipement"},{"parcours","Parcours"}}
+  local tabs={{"talents","Talents"},{"equipement","Equipement"},
+    {"parcours","Parcours"},{"rotation","Rotation"}}
   for i,tab in ipairs(tabs) do
     local key=tab[1]
-    local b=button(f,22+(i-1)*242,-50,230,35,tab[2],function()
+    local b=button(f,22+(i-1)*180,-50,174,35,tab[2],function()
       B:ShowPage(key)
     end)
     self.tabs[key]=b
   end
   self.pages={}
-  for _,key in ipairs({"talents","equipement","parcours"}) do
+  for _,key in ipairs({"talents","equipement","parcours","rotation"}) do
     local page=CreateFrame("Frame",nil,f)
     page:SetPoint("TOPLEFT",f,"TOPLEFT",30,-96)
     page:SetSize(700,347)
@@ -361,6 +366,9 @@ function B:CreateUI()
   self:CreateTalentPage(self.pages.talents)
   self:CreateGearPage(self.pages.equipement)
   self:CreateRoutePage(self.pages.parcours)
+  if self.CreateRotationPage then
+    self:CreateRotationPage(self.pages.rotation)
+  end
   self.footer=label(f,29,-454,706,32,"GameFontHighlightSmall","",MUTED)
   f:Hide()
   self:ShowPage("talents")
@@ -558,5 +566,6 @@ function B:Refresh()
   self:RefreshTalents()
   self:RefreshGear()
   self:RefreshRoute()
+  if self.RefreshRotation then self:RefreshRotation() end
   self.footer:SetText("Pilote 30-40 : sources verifiees pour les objets ; route et DPS a tester en jeu.  "..self.dataVersion)
 end
