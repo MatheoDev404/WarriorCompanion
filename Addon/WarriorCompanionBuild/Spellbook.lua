@@ -8,8 +8,19 @@ local function safe(fn,...)
   if ok then return a,b end
 end
 local function normalize(name)
-  if type(name)~="string" then return nil end
-  return name:lower():gsub("%s*%([^)]*%)%s*$",""):gsub("^%s+",""):gsub("%s+$","")
+  if type(name)~="string" or name=="" then return nil end
+  -- Les libelles de repli sont parfois sans accents, le grimoire en VF.
+  local value=name:lower():gsub("%s*%([^)]*%)%s*$","")
+  local accents={
+    ["é"]="e",["è"]="e",["ê"]="e",["ë"]="e",
+    ["à"]="a",["â"]="a",["ä"]="a",
+    ["î"]="i",["ï"]="i",["ô"]="o",["ö"]="o",
+    ["ù"]="u",["û"]="u",["ü"]="u",["ç"]="c",
+  }
+  for accented,plain in pairs(accents) do
+    value=value:gsub(accented,plain)
+  end
+  return value:gsub("%s+"," "):gsub("^%s+",""):gsub("%s+$","")
 end
 local function named(id)
   if type(C_Spell)=="table" then
@@ -27,7 +38,8 @@ function B:BuildSpellbookCache()
   if type(book)~="table" or
      type(book.GetNumSpellBookSkillLines)~="function" or
      type(book.GetSpellBookSkillLineInfo)~="function" or
-     type(book.GetSpellBookItemInfo)~="function" then
+     (type(book.GetSpellBookItemInfo)~="function" and
+      type(book.GetSpellBookItemName)~="function") then
     self.knownSpells=nil
     return nil
   end
@@ -46,13 +58,19 @@ function B:BuildSpellbookCache()
           amount>=0 and amount<500 then
         for slot=offset+1,offset+amount do
           local info=safe(book.GetSpellBookItemInfo,slot,bank)
-          if type(info)=="table" and info.itemType~="FLYOUT" and
-              type(info.spellID)=="number" then
-            known.byId[info.spellID]=true
+          if not (type(info)=="table" and info.itemType=="FLYOUT") then
+            local spellId=type(info)=="table" and info.spellID or nil
             local name=safe(book.GetSpellBookItemName,slot,bank)
-            if type(name)~="string" then name=info.name or named(info.spellID) end
-            if normalize(name) then known.byName[normalize(name)]=true end
-            found=found+1
+            if type(name)~="string" then
+              name=type(info)=="table" and info.name or nil
+            end
+            if type(name)~="string" and type(spellId)=="number" then
+              name=named(spellId)
+            end
+            local normalized=normalize(name)
+            if normalized then known.byName[normalized]=true end
+            if type(spellId)=="number" then known.byId[spellId]=true end
+            if normalized or type(spellId)=="number" then found=found+1 end
           end
         end
       end
