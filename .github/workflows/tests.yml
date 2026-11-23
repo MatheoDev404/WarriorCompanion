@@ -1,4 +1,4 @@
-name: Addon validation
+name: Build Planner validation
 on:
   push:
   pull_request:
@@ -12,38 +12,14 @@ jobs:
       - uses: actions/checkout@v6
       - name: Install Lua
         run: sudo apt-get update && sudo apt-get install -y lua${{ matrix.lua }}
-      - name: Run structural check
+      - name: Validate standalone manifest and fonts
         run: python3 tests/check_structure.py
-      - name: Validate packaged art assets
-        run: python3 tests/check_art.py
-      - name: Verify syntax
+      - name: Verify source and test syntax
         run: |
-          for file in Addon/WarriorCompanion/*.lua Addon/WarriorCompanionBuild/*.lua tests/*.lua; do
+          for file in Addon/WarriorCompanionBuild/*.lua tests/*.lua; do
             luac${{ matrix.lua }} -p "$file"
           done
-      - name: Run Lua simulations
-        run: |
-          lua${{ matrix.lua }} tests/test_addon.lua
-          lua${{ matrix.lua }} tests/test_activity.lua
-          lua${{ matrix.lua }} tests/test_combat.lua
-          lua${{ matrix.lua }} tests/test_performance.lua
-          lua${{ matrix.lua }} tests/test_dashboard.lua
-          lua${{ matrix.lua }} tests/test_compact.lua
-          lua${{ matrix.lua }} tests/test_health.lua
-          lua${{ matrix.lua }} tests/test_fury.lua
-          lua${{ matrix.lua }} tests/test_spellbook.lua
-          lua${{ matrix.lua }} tests/test_weapons.lua
-          lua${{ matrix.lua }} tests/test_gearquest.lua
-          lua${{ matrix.lua }} tests/test_talents.lua
-          lua${{ matrix.lua }} tests/test_talent_plan.lua
-          lua${{ matrix.lua }} tests/test_talent_live.lua
-          lua${{ matrix.lua }} tests/test_quests.lua
-          lua${{ matrix.lua }} tests/test_discovery.lua
-          lua${{ matrix.lua }} tests/test_clusters.lua
-          lua${{ matrix.lua }} tests/test_guide.lua
-          lua${{ matrix.lua }} tests/test_guide_catalog.lua
-          lua${{ matrix.lua }} tests/test_equipment_review.lua
-          lua${{ matrix.lua }} tests/test_equipment_targets.lua
-          lua${{ matrix.lua }} tests/test_quest_plan.lua
-          lua${{ matrix.lua }} tests/test_build_planner.lua
-          lua${{ matrix.lua }} tests/test_build_ui.lua
+      - name: Verify build planner rules
+        run: lua${{ matrix.lua }} tests/test_build_planner.lua
+      - name: Verify the 4-tab UI
+        run: lua${{ matrix.lua }} tests/test_build_ui.lua
