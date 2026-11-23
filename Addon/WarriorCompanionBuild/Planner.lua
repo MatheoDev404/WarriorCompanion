@@ -33,11 +33,15 @@ function B:SetPreview(level)
   if not numberLevel(level) then return false end
   self.viewLevel=level
   self.mode="preview"
+  self.routeForced=false
+  self.routeIndex=nil
   if self.db then self.db.preview=level end
   return true
 end
 function B:ReturnToReal()
   self.mode="follow"
+  self.routeForced=false
+  self.routeIndex=nil
   self.viewLevel=self.realLevel or 1
   if self.db then self.db.preview=nil end
 end
@@ -183,6 +187,7 @@ function B:GoToGear(id)
   for i,entry in ipairs(self:OrderedRoute()) do
     if entry.step.gearId==id then
       self.routeIndex=i
+      self.routeForced=true
       self.page="parcours"
       return true,entry.step
     end
@@ -203,6 +208,7 @@ function B:FocusRoute()
   return self.routeIndex
 end
 function B:MarkStep()
+  if self.chapterMode then return false end
   local steps=self:OrderedRoute()
   local current=steps[self:FocusRoute()]
   if not current or not self.db or not self.db.done then return false end
