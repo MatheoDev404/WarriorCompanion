@@ -62,7 +62,7 @@ B.chapters={
 -- Aucune etiquette "disponible" sans tester le niveau et les contraintes.
 B.gear={
  {id=3844,slot="Torse",name="Green Iron Hauberk",
-  minLevel=31,source="craft",profession="Forge",skill=180,recipe=3508,
+  minLevel=31,source="craft",profession="Forge",skill=155,recipe=3508,
   routeId="craft-hauberk",group=false,
   note="Armure de mailles; fabrication personnelle ou artisan tiers si objet non lie.",
   sourceUrl="https://www.wowhead.com/forever/item=3844"},
@@ -100,11 +100,11 @@ B.route={
  {id="craft-leggings",level=29,zone="Atelier de forge",kind="craft",
   text="Si utile : faire fabriquer les Golden Scale Leggings (Forge 170).",
   gearId=3843,optional=true,
-  note="Recette 3507. Niveau requis 29; verifier le plan et les composants."},
+  note="Recette 3507 (Forge 170 selon Wowhead Forever). Niveau requis 29; verifier plan et composants."},
  {id="craft-hauberk",level=31,zone="Atelier de forge",kind="craft",
   text="Si utile : faire fabriquer la Green Iron Hauberk (Forge 180).",
   gearId=3844,optional=true,
-  note="Recette 3508; niveau requis 31. Artisan tiers possible si echangeable."},
+  note="Recette 3508 (Forge 155), niveau requis 31. Demande aussi une armure de cuir vert; artisan tiers possible."},
  {id="desolace-quest-hub",level=34,zone="Desolace",kind="travel",
   text="Regrouper les quetes du Poste des Marche-fantomes.",
   note="Verifier la chaine Alliance Relations avant ses suites."},
