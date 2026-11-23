@@ -196,6 +196,42 @@ function B:ValidateContent()
   end
   return true
 end
+-- L'ordre d'affichage n'est pas l'ordre du fichier. Les armes proches du
+-- palier consulte passent avant les anciennes pieces et les futurs donjons.
+function B:GearScore(item,level)
+  local difference=level-item.minLevel
+  local score=40-math.abs(difference)*4
+  if item.slot=="Arme 1 main" then score=score+25 end
+  if item.group then score=score-15 end
+  if difference>8 then score=score-65 end
+  if difference< -4 then score=score-90 end
+  if self.db and self.db.done and self.db.done[item.routeId] then
+    score=score-50
+  end
+  return score
+end
+function B:GearListAt(level)
+  local result={}
+  for _,item in ipairs(self.gear) do
+    result[#result+1]=item
+  end
+  table.sort(result,function(a,b)
+    local x,y=self:GearScore(a,level),self:GearScore(b,level)
+    if x==y then return a.minLevel>b.minLevel end
+    return x>y
+  end)
+  return result
+end
+function B:GearRelevance(item,level)
+  if item.minLevel>level then
+    return "Prochain palier ("..item.minLevel.."+)"
+  elseif level-item.minLevel>8 then
+    return "Ancien palier - comparer avant de fabriquer"
+  elseif item.group then
+    return "Option groupe / donjon"
+  end
+  return "A evaluer pour le niveau "..level
+end
 function B:ItemEligible(item,level)
   if item.minLevel>level then return false,"Niveau "..item.minLevel.." requis" end
   if item.source=="quest" then
@@ -219,6 +255,28 @@ function B:QuestCompletion(questId)
   if value==false then return false end
   return nil
 end
+-- nil: donnees manquantes; false: preuve de prerequis non rempli.
+function B:PrerequisitesMet(step)
+  if type(step.requiresAll)~="table" or #step.requiresAll==0 then
+    return true
+  end
+  local uncertain=false
+  for _,questId in ipairs(step.requiresAll) do
+    local done=self:QuestCompletion(questId)
+    if not done and self.db and self.db.done then
+      for _,candidate in ipairs(self.route) do
+        if candidate.questId==questId and self.db.done[candidate.id] then
+          done=true
+          break
+        end
+      end
+    end
+    if done==false then return false end
+    if done==nil then uncertain=true end
+  end
+  if uncertain then return nil end
+  return true
+end
 function B:StepState(step)
   if step.level>(self.realLevel or 1) then return "PLUS TARD" end
   if step.questId and self:QuestCompletion(step.questId)==true then
@@ -227,6 +285,9 @@ function B:StepState(step)
   if self.db and self.db.done and self.db.done[step.id] then
     return "FAIT (MANUEL)"
   end
+  local prerequisites=self:PrerequisitesMet(step)
+  if prerequisites==false then return "PREREQUIS MANQUANT" end
+  if prerequisites==nil then return "CHAINE A VERIFIER" end
   if step.group then return "OPTION GROUPE" end
   if step.optional then return "OPTION" end
   if step.questId then return "QUETE A VERIFIER" end
