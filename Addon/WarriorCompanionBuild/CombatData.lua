@@ -10,7 +10,7 @@ B.combatGuide={
     },
     opener={
       {"Charge",100,4,"Ouvrir hors combat sur une cible isolee."},
-      {"Rage sanguinaire",2687,10,"Si tu manques de rage et disposes de suffisamment de PV."},
+      {"Rage sanguinaire",2687,10,"HORS GCD : si rage insuffisante et PV suffisants (cout en sante)."},
     },
     cycle={
       {"Sanguinaire",23881,40,"Tourbillon et Sanguinaire sur leurs CD selon la rage.","Bloodthirst"},
@@ -19,7 +19,7 @@ B.combatGuide={
       {"Frappe heroique",78,1,"Uniquement en surplus de rage, pas en boucle permanente."},
     },
     reactive={
-      {"Fulgurance",7384,12,"Apres esquive, posture de combat. Declenche un GCD de 1,5 s.",nil,35},
+      {"Fulgurance",7384,12,"Apres esquive, passer en posture de combat si possible. GCD 1,5 s."},
       {"Ivresse de la victoire",34428,20,"Apres un ennemi tue : profiter de la fenetre avant expiration."},
       {"Execution",5308,24,"En dessous de 20% PV de la cible; coute toute la rage."},
     },
@@ -39,7 +39,7 @@ B.combatGuide={
     },
     opener={
       {"Charge",100,4,"Engager seulement un groupe maitrisable."},
-      {"Cri demoralisant",1160,14,"Reduire rapidement les degats recus."},
+      {"Rage sanguinaire",2687,10,"HORS GCD : si rage necessaire et PV securises."},
     },
     cycle={
       {"Tourbillon",1680,36,"Attaque de zone si posture et rage le permettent."},
@@ -60,6 +60,27 @@ B.combatGuide={
     },
   },
 }
+-- Enchainement concret a memoriser; procs et CD sont volontairement a part.
+function B:RotationCycleSummaryAt(level,mode)
+  if type(level)~="number" then return nil end
+  if mode=="multi" then
+    if level>=36 then
+      return "Boucle : Tourbillon > autos > Enchainement si rage en trop."
+    elseif level>=20 then
+      return "Boucle : autos > Enchainement si rage en trop."
+    end
+    return "Boucle : autos ; Coup de tonnerre si necessaire."
+  end
+  local plan=self:PlanAt(level)
+  if level>=40 and plan and (plan.ranks["Bloodthirst"] or 0)>0 then
+    return "Boucle : Sanguinaire > Tourbillon > autos ; selon rage et CD."
+  elseif level>=36 then
+    return "Boucle : Tourbillon > autos ; economiser la rage pour son CD."
+  elseif level>=4 then
+    return "Boucle : Pourfendre si combat long > autos ; Frappe heroique si surplus."
+  end
+  return "Boucle : autos ; Frappe heroique si surplus de rage."
+end
 function B:CombatSectionAt(level,mode,section)
   local modeData=self.combatGuide[mode]
   local list=modeData and modeData[section] or {}
