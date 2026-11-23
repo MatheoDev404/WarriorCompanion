@@ -72,6 +72,10 @@ assert(B.pages.talents.nextLabel.text:find("Rafale",1,true))
 B:SetPreview(60)
 B:Refresh()
 assert(B.pages.talents.nextLabel.text:find("termine",1,true))
+assert(B.chapterMode and B.pages.parcours.count.text:find("1-60",1,true),
+  "les niveaux hors pilote affichent un plan de zones sans fausses quetes")
+assert(not B:MarkStep(),"pas de validation manuelle dans l'apercu non verifie")
+
 B:ChangeScale(-0.08)
 assert(B.frame.scale==0.74)
 B:ReturnToReal()
