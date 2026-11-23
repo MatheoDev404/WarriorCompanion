@@ -177,7 +177,16 @@ function B:CreateTalentPage(page)
   page.connections=page.trees.Furie.connections
   page.levelPoint=label(page,376,-44,310,60,"GameFontNormal","",GOLD)
   page.nextLabel=label(page,376,-101,320,55,"GameFontHighlight","",GOLD)
-  page.desc=label(page,376,-168,310,171,"GameFontHighlight","",WHITE)
+  page.desc=label(page,376,-168,310,132,"GameFontHighlight","",WHITE)
+  page.variantButton=button(page,376,-308,305,30,
+    "Plan : Furie pure",function()
+      if B.planVariant=="hybrid" then
+        B:SelectPlanVariant("fury")
+      else B:SelectPlanVariant("hybrid") end
+      local point=B:TalentPointAt(B.viewLevel)
+      if point then B:SelectTree(point.tree) end
+      B:Refresh()
+    end)
 end
 -- Informations de fiche obtenues du client, avec repli pour les objets
 -- non encore charges en cache. Ne jamais inventer leurs statistiques.
@@ -450,6 +459,7 @@ function B:RefreshTalents()
   local distribution=string.format("Armes %d / Furie %d / Protection %d",
     plan.pointsByTree.Armes or 0,plan.pointsByTree.Furie or 0,
     plan.pointsByTree.Protection or 0)
+  page.variantButton.txt:SetText(self.talentPlanLabels[self.planVariant or "fury"])
   page.levelPoint:SetText(point and
     ("Niveau "..point.level.." - "..point.tree.."\n"..
       textWithFallback(point.metadata).."  ("..point.rank.."/"..
