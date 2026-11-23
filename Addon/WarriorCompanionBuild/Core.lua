@@ -37,7 +37,6 @@ events:RegisterEvent("PLAYER_ENTERING_WORLD")
 events:RegisterEvent("PLAYER_LEVEL_UP")
 events:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 events:RegisterEvent("SPELLS_CHANGED")
-events:RegisterEvent("LEARNED_SPELL_IN_TAB")
 events:RegisterEvent("UNIT_AURA")
 events:SetScript("OnEvent",function(_,event,arg1)
   if event=="ADDON_LOADED" and arg1==addon then
@@ -62,7 +61,7 @@ events:SetScript("OnEvent",function(_,event,arg1)
     if B.frame then B:Refresh() end
   elseif event=="GET_ITEM_INFO_RECEIVED" then
     if B.frame and B.frame:IsShown() then B:RefreshGear() end
-  elseif event=="SPELLS_CHANGED" or event=="LEARNED_SPELL_IN_TAB" then
+  elseif event=="SPELLS_CHANGED" or event=="LEARNED_SPELL_IN_SKILL_LINE" then
     if B.BuildSpellbookCache then B:BuildSpellbookCache() end
     if B.frame then B:RefreshRotation() end
   elseif event=="UNIT_AURA" and arg1=="player" then
