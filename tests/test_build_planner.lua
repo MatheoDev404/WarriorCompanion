@@ -69,6 +69,22 @@ assert(not B:ItemEligible(t,34),"Thrash Blade ne doit pas etre conseillee au 34"
 assert(B:ItemEligible(t,45))
 local relevant=B:GearListAt(39)
 assert(relevant[1].id==250607,"Dague de Forge 180 visee au niveau 39")
+local delayed
+for _,item in ipairs(B.gear) do
+  if item.id==271802 then delayed=item end
+end
+assert(delayed and delayed.questId==93128 and delayed.requiredLevel==35
+  and delayed.minLevel==43)
+assert(not B:ItemEligible(delayed,39),
+  "l'arme ne doit pas etre obtenable a 39 sans la longue chaine Gelkis")
+local finalQuest
+for _,step in ipairs(B.route) do
+  if step.gearId==271802 then finalQuest=step end
+end
+assert(finalQuest and finalQuest.questId==93128 and
+  finalQuest.requiresAll[3]==93122,
+  "le vrai Khan Jehn doit suivre Checking Things Out, pas quest 1374")
+
 for i=1,4 do
   assert(relevant[i].id~=3843,
     "Jambieres du niveau 29 ne doivent pas masquer les armes 35-39")
