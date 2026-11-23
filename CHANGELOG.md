@@ -1,5 +1,15 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.3.1-test — 23 novembre 2026
+
+- **Équipement par niveau** : la sélection principale exclut les objets dont le palier d'accès est futur ; pagination des cibles actuelles puis écran séparé pour les récompenses à venir. La fiche distingue niveau requis pour porter et palier conseillé pour obtenir.
+- **Grimoire** : reconnaissance des libellés français avec/sans accents et lecture de secours par les noms de sorts quand `GetSpellBookItemInfo` est absent, sans inventer « non appris ».
+- **Rotation** : boucle textuelle adaptée au palier, trois réactions visibles (Fulgurance, Ivresse de la victoire, Exécution). Rage sanguinaire mentionnée hors GCD ; Fulgurance reste une réaction sur GCD.
+- **Parcours** : The Islander #1718 puis The Affray #1719 (posture Berserker), Salt Flat Venom #1104 (chaîne à vérifier), Kodo Roundup #5561, Catch of the Day #5386 et arrêt de métier chez Wulan à Désolace. Ces ajouts ne constituent pas une route exhaustive 1–60.
+- **Tests de non-régression** : équipement accessible/futur, pages de navigation, sort de rang supérieur/accents, API incomplète, réactions et identifiants des nouvelles étapes.
+
+
+
 ## 0.3.0-test — 23 novembre 2026
 
 - **Trois arbres consultables** Armes, Furie et Protection, même budget de 51 points, positions/icônes et prérequis versionnés, surbrillance du point alloué au niveau demandé. Variantes **Furie pure 0/51/0** et hybride expérimental **13/38/0**, sans changement de spé du personnage.
