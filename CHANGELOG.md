@@ -1,5 +1,16 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.3.2-test — 23 novembre 2026
+
+- **Erreur de lancement corrigée** : suppression de l'enregistrement de `LEARNED_SPELL_IN_TAB`, événement inconnu de WoW Forever ; `SPELLS_CHANGED` reste écouté.
+- **Talents** : trois arbres affichés simultanément, avec grille complète, rangs, flèches de prérequis, surbrillance et infobulles, sans panneau explicatif latéral.
+- **Équipement** : liste ordonnée consultable à la molette et via glissière verticale compatible quand disponible ; objets atteignables d'abord, paliers futurs ensuite. Suppression de la pagination « Paliers suivants ».
+- **Parcours** : marqueurs visuels par type (quête XP, équipement, groupe, option, trajet, forge, maître), traduction des intitulés connus et ajouts de quêtes d'XP des Salines #1105 et #1175. Les intitulés non confirmés sont descriptifs, non présentés comme traductions officielles.
+- **Rotation** : Fracasser armure intégré au monocible pour les ennemis robustes, pas conseillé à chaque cible ; correction de l'ID Forever d'Ivresse de la victoire vers #402927. Le statut des sorts appris est masqué, les rangs documentés et accessibles chez le maître sont signalés pour Cri de guerre, Frappe héroïque et Fracasser armure. Lecture incomplète du grimoire = « à vérifier ».
+- **Tests** : simulation des trois arbres simultanés, du défilement vertical, des badges de route, de la reconnaissance des rangs et de l'absence d'événement inconnu. Compatibilité Lua 5.1/5.4 vérifiée en CI ; rendu final encore à essayer sur Forever.
+
+
+
 ## 0.3.1-test — 23 novembre 2026
 
 - **Équipement par niveau** : la sélection principale exclut les objets dont le palier d'accès est futur ; pagination des cibles actuelles puis écran séparé pour les récompenses à venir. La fiche distingue niveau requis pour porter et palier conseillé pour obtenir.
