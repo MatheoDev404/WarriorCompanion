@@ -11,6 +11,15 @@ local plan=B:PlanAt(34)
 assert(plan.ranks["Cruelty"]==5 and plan.ranks["Enrage"]==5
   and plan.ranks["Reckless Swings"]==1)
 assert(plan.nextKey=="Flurry")
+assert(B:TalentPointAt(34).key=="Reckless Swings" and
+  B:TalentPointAt(34).rank==1)
+assert(B:TalentPointAt(40).key=="Bloodthirst")
+assert(B:TalentPointAt(9)==nil,"pas de points avant le niveau 10")
+assert(#B:RotationAt(19,"mono")==4,"aucun sort de niveau 36/40 annonce au 19")
+assert(B:RotationAt(40,"mono")[1].name=="Sanguinaire")
+assert(B:RotationAt(40,"multi")[1].name=="Tourbillon")
+assert(#B:RotationAt(40,"multi")==7)
+
 assert(B:PlanAt(9).nextKey=="Cruelty")
 assert(B:PlanAt(60).nextKey==nil)
 assert(B:SetPreview(40) and B.viewLevel==40)
