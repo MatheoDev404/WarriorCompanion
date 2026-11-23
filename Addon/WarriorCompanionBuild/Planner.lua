@@ -64,6 +64,33 @@ function B:PlanAt(level)
   end
   return {ranks=ranks,nextKey=nextPoint,level=level,metadata=meta}
 end
+-- Renvoie le talent EXACTEMENT attribue au niveau consulte.
+-- Distinct du prochain point (niveau +1) : important pour le surlignage.
+function B:TalentPointAt(level)
+  if type(level)~="number" or level<10 or level>60 then return nil end
+  for _,block in ipairs(self.talentBlocks) do
+    if level>=block[1] and level<=block[2] then
+      local plan=self:PlanAt(level)
+      return {key=block[3],rank=plan.ranks[block[3]],
+        level=level,metadata=plan.metadata[block[3]]}
+    end
+  end
+  return nil
+end
+
+function B:RotationAt(level,mode)
+  if type(level)~="number" or (mode~="mono" and mode~="multi") then
+    return {}
+  end
+  local result={}
+  for _,entry in ipairs(self.rotation[mode] or {}) do
+    if level>=entry[3] then
+      result[#result+1]={name=entry[1],spellId=entry[2],
+        level=entry[3],note=entry[4]}
+    end
+  end
+  return result
+end
 function B:ValidateBuild()
   local metadata={}
   for _,node in ipairs(self.talents) do
