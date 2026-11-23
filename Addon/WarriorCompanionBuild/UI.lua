@@ -22,6 +22,13 @@ local function label(p,x,y,w,h,font,text,c)
   t:SetSize(w,h)
   t:SetJustifyH("LEFT")
   t:SetJustifyV("MIDDLE")
+  -- Arial Narrow est une police sans empattement incluse dans WoW.
+  -- Approche visuelle proche de Roboto, sans distribuer de fichier de police.
+  if t.SetFont then
+    local size=font=="GameFontNormalLarge" and 17 or
+      (font=="GameFontHighlightSmall" or font=="GameFontNormalSmall") and 12 or 14
+    pcall(t.SetFont,t,"Fonts\\ARIALN.TTF",size,"")
+  end
   if c and t.SetTextColor then t:SetTextColor(c[1],c[2],c[3]) end
   if text then t:SetText(text) end
   return t
@@ -42,12 +49,10 @@ local function button(p,x,y,w,h,title,action)
   end)
   return b
 end
+-- Important : un panneau doit etre une texture derriere les textes.
+-- Un Frame enfant couvre les FontStrings de son parent dans le client !
 local function panel(p,x,y,w,h)
-  local f=CreateFrame("Frame",nil,p)
-  f:SetPoint("TOPLEFT",p,"TOPLEFT",x,y)
-  f:SetSize(w,h)
-  rect(f,0,0,w,h,PANEL)
-  return f
+  return rect(p,x,y,w,h,PANEL)
 end
 local function textWithFallback(node)
   local name=node[7]
@@ -128,6 +133,12 @@ function B:CreateTalentPage(page)
     b:SetPoint("TOPLEFT",page,"TOPLEFT",x,y)
     b:SetSize(35,34)
     b.bg=rect(b,0,0,35,34,CARD)
+    b.edges={
+      rect(b,0,0,35,2,GOLD),
+      rect(b,0,-32,35,2,GOLD),
+      rect(b,0,0,2,34,GOLD),
+      rect(b,33,0,2,34,GOLD),
+    }
     local icon=b:CreateTexture(nil,"ARTWORK")
     icon:SetPoint("TOPLEFT",b,"TOPLEFT",3,-3)
     icon:SetSize(29,28)
@@ -145,7 +156,10 @@ function B:CreateTalentPage(page)
   end
   page.nextLabel=label(page,376,-52,320,43,"GameFontHighlight","",GOLD)
   page.desc=label(page,376,-105,315,122,"GameFontHighlight","",WHITE)
-  page.rotation=label(page,376,-222,317,105,"GameFontHighlight","",MUTED)
+  page.levelPoint=label(page,376,-44,310,60,"GameFontNormal","",GOLD)
+  page.nextLabel:SetPoint("TOPLEFT",page,"TOPLEFT",376,-101)
+  page.desc:SetPoint("TOPLEFT",page,"TOPLEFT",376,-170)
+  page.desc:SetSize(310,161)
 end
 function B:CreateGearPage(page)
   panel(page,0,0,700,347)
@@ -295,37 +309,44 @@ function B:RefreshTalents()
   if not page then return end
   local plan=self:PlanAt(self.viewLevel)
   if not plan then return end
+  local atLevel=self:TalentPointAt(self.viewLevel)
   for _,node in ipairs(self.talents) do
     local b=page.nodes[node[1]]
     local rank=plan.ranks[node[1]] or 0
     b.rank:SetText(rank.."/"..node[4])
-    local c=(rank>0) and GOLD or CARD
+    -- Les points deja investis restent visibles, mais SEUL celui gagne
+    -- au niveau choisi a un contour or clairement identifiable.
+    local c=(rank>0) and {0.21,0.26,0.30,1} or CARD
     b.bg:SetVertexColor(c[1],c[2],c[3],c[4])
+    local active=atLevel and node[1]==atLevel.key
+    for _,edge in ipairs(b.edges) do
+      edge:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],active and 1 or 0)
+    end
+    if b.rank.SetTextColor then
+      b.rank:SetTextColor(active and 1 or 0.69,
+        active and 0.77 or 0.74,active and 0.36 or 0.81)
+    end
   end
+  page.levelPoint:SetText(atLevel and
+    ("NIVEAU "..atLevel.level.."\n"..textWithFallback(atLevel.metadata)..
+    "  (rang "..atLevel.rank.."/"..atLevel.metadata[4]..")")
+    or "AUCUN POINT DE TALENT\nAvant le niveau 10.")
   local nextKey=plan.nextKey
   local node=nextKey and plan.metadata[nextKey]
   page.nextLabel:SetText(nextKey and
-    ("Prochain point : "..textWithFallback(node)) or "Plan termine au niveau 60")
-  local selected=plan.metadata[self.selectedTalent or nextKey]
+    ("Niveau suivant : "..textWithFallback(node)) or "Plan termine au niveau 60")
+  -- La fiche montre par defaut le talent du niveau selectionne.
+  local selected=plan.metadata[self.selectedTalent or (atLevel and atLevel.key) or nextKey]
   if selected then
     local rank=plan.ranks[selected[1]] or 0
     local dep=self.talentDependencies[selected[1]]
-    page.desc:SetText(textWithFallback(selected).."\n\nPlan : "..rank.."/"..selected[4]..
+    page.desc:SetText(textWithFallback(selected).."\n\nRang : "..rank.."/"..selected[4]..
       "\nPalier "..selected[2].." | Colonne "..selected[3]..
-      "\nSort #"..selected[5]..
-      (dep and ("\nRequis : "..dep[1].." "..dep[2].."/"..dep[2]) or "")..
+      (dep and ("\nRequis : "..dep[1].." "..dep[2].." rang(s)") or "")..
       "\n\n"..(self:TalentHint(selected[1],math.max(1,rank)) or
         "Survole l'icone pour obtenir plus de details."))
   end
-  local l=self.viewLevel
-  local advice=l>=40 and
-    "Monocible : Sanguinaire > Tourbillon selon rage et CD ; Execution en finition."
-    or l>=36 and "Monocible : Tourbillon si appris ; gerer la rage, eviter le spam Frappe heroique."
-    or l>=30 and "Gerer la rage ; posture Berserker si la quete de classe est terminee."
-    or l>=20 and "Maintenir Cri de guerre ; profiter de Victory Rush ; gerer les auto-attaques."
-    or "Charge, Cri de guerre et attaques connues ; eviter les combats difficiles."
-  page.rotation:SetText("PRIORITE DES SORTS (INDICATIVE)\n\n"..advice..
-    "\n\nAucun lancement automatique.")
+
 end
 function B:RefreshGear()
   local page=self.pages and self.pages.equipement
