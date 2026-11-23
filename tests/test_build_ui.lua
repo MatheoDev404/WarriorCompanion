@@ -32,6 +32,8 @@ local function frame()
     function t:SetJustifyV() end
     function t:SetText(v) self.text=v end
     function t:SetTextColor(...) self.color={...} end
+    function t:SetFont(path,size) self.fontPath=path self.fontSize=size end
+    function t:SetWordWrap(value) self.wordWrap=value end
     return t
   end
   return f
@@ -39,21 +41,31 @@ end
 UIParent=frame()
 function CreateFrame() return frame() end
 function UnitLevel() return 34 end
-local lastTooltipSpell
+local lastTooltipSpell, lastTooltipItem
+C_Item={GetItemIconByID=function(id) return 100000+id end}
 GameTooltip={
   SetOwner=function() end,
   SetSpellByID=function(_,id) lastTooltipSpell=id end,
+  SetItemByID=function(_,id) lastTooltipItem=id end,
   AddLine=function()end, Show=function()end, Hide=function()end,
 }
 local B={}
 assert(loadfile("Addon/WarriorCompanionBuild/Data.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Planner.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/UI.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Rotation.lua"))("WarriorCompanionBuild",B)
 B:InitState()
 assert(B:ValidateContent())
 B:CreateUI()
 assert(B.frame.width==760 and B.frame.scale==0.82)
 assert(B.page=="talents" and B.pages.talents:IsShown())
+assert(B.tabs.rotation and B.pages.rotation,"4eme onglet Rotation")
+assert(B.pages.talents.levelPoint.text:find("Coups",1,true),
+  "point de talent gagne au niveau 34 indique")
+assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]==1,
+  "seul le talent gagne au niveau consulte est souligne")
+assert(B.pages.talents.nodes["Cruelty"].edges[1].color[4]==0,
+  "les points plus anciens ne sont pas tous soulignes")
 assert(B.pages.talents.nodes["Bloodthirst"])
 assert(#B.pages.talents.connections==2,"pre-requis visuels de l arbre Furie")
 B.pages.talents.nodes["Bloodthirst"].handlers.OnEnter()
@@ -62,7 +74,18 @@ B.pages.talents.nodes["Cruelty"].handlers.OnClick()
 assert(B.selectedTalent=="Cruelty")
 B:ShowPage("equipement")
 assert(B.pages.equipement:IsShown() and not B.pages.talents:IsShown())
+B.pages.equipement.items[6802].handlers.OnEnter()
+assert(lastTooltipItem==6802,"infobulle vraie de l'objet dans le client")
+B.pages.equipement.items[6802].handlers.OnLeave()
 B.pages.equipement.items[6802].handlers.OnClick()
+assert(B.pages.equipement.previewName.text:find("Sword",1,true),
+  "nom de l'objet selectionne dans la fiche")
+assert(B.pages.equipement.previewIcon.texture==106802,
+  "icone d'objet recuperee par son ID")
+assert(B.pages.equipement.previewDescription.text:find("donjon",1,true)
+  or B.pages.equipement.previewDescription.text:find("groupe",1,true)
+  or B.pages.equipement.previewDescription.text:find("GROUPE",1,true),
+  "conditions de groupe explicites")
 assert(B.selectedItem==6802)
 B.pages.equipement.gotoButton.handlers.OnClick()
 assert(B.page=="parcours" and B.pages.parcours:IsShown())
@@ -70,6 +93,17 @@ assert(B:OrderedRoute()[B.routeIndex].step.id=="quest-scarlet")
 assert(B.pages.parcours.zone.text:find("Monastere",1,true))
 B:ShowPage("talents")
 assert(B.pages.talents.nextLabel.text:find("Rafale",1,true))
+B:SetPreview(40)
+B:Refresh()
+assert(B.pages.talents.nodes["Bloodthirst"].edges[1].color[4]==1,
+  "le talent de niveau 40 est en surbrillance")
+assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]==0)
+B:ShowPage("rotation")
+assert(B.pages.rotation:IsShown() and B.pages.rotation.rows.mono[1].name.text=="Sanguinaire")
+assert(B.pages.rotation.rows.multi[1].name.text=="Tourbillon")
+B.pages.rotation.rows.mono[1].handlers.OnEnter()
+assert(lastTooltipSpell==23881,"infobulle du sort de la rotation")
+B.pages.rotation.rows.mono[1].handlers.OnLeave()
 B:SetPreview(60)
 B:Refresh()
 assert(B.pages.talents.nextLabel.text:find("termine",1,true))
@@ -82,4 +116,4 @@ assert(B.frame.scale==0.74)
 B:ReturnToReal()
 B:Refresh()
 assert(B.levelText.text:find("34",1,true))
-print("OK: 3 tabs, spell tooltip, gear-to-route jump, level preview and compact scale")
+print("OK: four tabs, current-level talent highlight, mono/aoe rotation, gear tooltips, Pex route, scale")
