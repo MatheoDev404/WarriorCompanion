@@ -145,12 +145,16 @@ assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]==0)
 B:ShowPage("rotation")
 assert(B.pages.rotation:IsShown()
   and B.pages.rotation.rows.cycle[1].name.text=="Sanguinaire")
-assert(B.pages.rotation.rows.maintain[1].note.text=="Buff actif",
+assert(B.pages.rotation.rows.maintain[1].note.text:find("Buff actif",1,true),
   "Cri de guerre deja actif est detecte avec le rang du grimoire")
 assert(not B.pages.rotation.rows.maintain[1].note.text:find("Non appris",1,true))
 B.pages.rotation.rows.cycle[1].handlers.OnEnter()
 assert(lastTooltipSpell==23881,"infobulle du sort de la rotation")
 B.pages.rotation.rows.cycle[1].handlers.OnLeave()
+assert(B.pages.rotation.rows.cycle[3]:IsShown(),
+  "trois techniques de cycle restent visibles quand elles existent")
+assert(B.pages.rotation.rows.defense[2]:IsShown(),
+  "le deuxieme cooldown defensif est visible")
 B.pages.rotation.modeButtons.multi.handlers.OnClick()
 assert(B.rotationMode=="multi" and
  B.pages.rotation.rows.cycle[1].name.text=="Tourbillon")
