@@ -107,86 +107,79 @@ local function dismissTip()
   end
 end
 function B:CreateTalentPage(page)
-  panel(page,0,0,349,347)
-  panel(page,359,0,341,347)
-  label(page,16,-8,305,25,"GameFontNormalLarge","Arbres du Guerrier",WHITE)
-  label(page,375,-10,308,24,"GameFontNormalLarge","Plan de progression",WHITE)
-  page.treeTabs={}
+  -- Trois arbres visibles simultanement, aucune zone de texte superflue.
   page.trees={}
-  for tabIndex,treeName in ipairs(self.talentTreeOrder) do
-    page.treeTabs[treeName]=button(page,16+(tabIndex-1)*108,-38,103,27,
-      treeName,function()
-        B:SelectTree(treeName)
-        B:Refresh()
-      end)
+  page.treeHeadings={}
+  local width,spacing=226,10
+  for i,treeName in ipairs(self.talentTreeOrder) do
+    local left=(i-1)*(width+spacing)
+    panel(page,left,0,width,305)
+    page.treeHeadings[treeName]=label(page,left+12,-4,width-20,27,
+      "GameFontNormalLarge",treeName,WHITE)
     local holder=CreateFrame("Frame",nil,page)
-    holder:SetPoint("TOPLEFT",page,"TOPLEFT",0,0)
-    holder:SetSize(349,347)
+    holder:SetPoint("TOPLEFT",page,"TOPLEFT",left,-34)
+    holder:SetSize(width,270)
     local tree={frame=holder,nodes={},connections={}}
     page.trees[treeName]=tree
     local positions={}
     for _,node in ipairs(self.talentTrees[treeName]) do
       positions[node[1]]=node
     end
+    -- Relations visibles dans les trois panneaux, pas seulement Furie.
     for _,link in ipairs(self.talentArrows[treeName] or {}) do
       local from,to=positions[link[1]],positions[link[2]]
       if from and to and from[3]==to[3] then
-        local col=from[3]
-        local x=16+(col-1)*78+17
-        local y=-67-(from[2]-1)*36-32
-        local endY=-67-(to[2]-1)*36
+        local x=14+(from[3]-1)*52+14
+        local y=-8-(from[2]-1)*37-26
+        local length=math.max(2,(to[2]-from[2])*37-10)
         local line=holder:CreateTexture(nil,"ARTWORK")
         line:SetTexture("Interface\\Buttons\\WHITE8X8")
         line:SetPoint("TOPLEFT",holder,"TOPLEFT",x,y)
-        line:SetSize(2,math.max(2,y-endY))
-        line:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],0.7)
+        line:SetSize(2,length)
+        line:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],0.6)
         tree.connections[#tree.connections+1]=line
       end
     end
     for _,node in ipairs(self.talentTrees[treeName]) do
-      local x=16+(node[3]-1)*78
-      local y=-67-(node[2]-1)*36
+      local x=14+(node[3]-1)*52
+      local y=-8-(node[2]-1)*37
       local b=CreateFrame("Button",nil,holder)
       b:SetPoint("TOPLEFT",holder,"TOPLEFT",x,y)
-      b:SetSize(35,33)
-      b.bg=rect(b,0,0,35,33,CARD)
+      b:SetSize(38,35)
+      b.bg=rect(b,0,0,30,28,CARD)
       b.edges={
-        rect(b,0,0,35,2,GOLD),
-        rect(b,0,-31,35,2,GOLD),
-        rect(b,0,0,2,33,GOLD),
-        rect(b,33,0,2,33,GOLD),
+        rect(b,0,0,30,2,GOLD),rect(b,0,-26,30,2,GOLD),
+        rect(b,0,0,2,28,GOLD),rect(b,28,0,2,28,GOLD),
       }
       local icon=b:CreateTexture(nil,"ARTWORK")
-      icon:SetPoint("TOPLEFT",b,"TOPLEFT",3,-3)
-      icon:SetSize(29,27)
+      icon:SetPoint("TOPLEFT",b,"TOPLEFT",2,-2)
+      icon:SetSize(26,24)
       local ok=pcall(icon.SetTexture,icon,node[6])
-      if not ok then icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark") end
+      if not ok then
+        icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+      end
       b.icon=icon
-      b.rank=label(b,35,-2,40,27,"GameFontHighlightSmall","",MUTED)
+      b.rank=label(b,-1,-27,38,11,"GameFontHighlightSmall","",MUTED)
       b:SetScript("OnEnter",function() B:TooltipTalent(b,node) end)
       b:SetScript("OnLeave",dismissTip)
-      b:SetScript("OnClick",function()
-        B.selectedTalent=node[1]
-        B:Refresh()
-      end)
       tree.nodes[node[1]]=b
     end
-    holder:Hide()
   end
   page.nodes=page.trees.Furie.nodes
   page.connections=page.trees.Furie.connections
-  page.levelPoint=label(page,376,-44,310,60,"GameFontNormal","",GOLD)
-  page.nextLabel=label(page,376,-101,320,55,"GameFontHighlight","",GOLD)
-  page.desc=label(page,376,-168,310,132,"GameFontHighlight","",WHITE)
-  page.variantButton=button(page,376,-308,305,30,
+  page.variantButton=button(page,2,-310,294,31,
     "Plan : Furie pure",function()
       if B.planVariant=="hybrid" then
         B:SelectPlanVariant("fury")
-      else B:SelectPlanVariant("hybrid") end
-      local point=B:TalentPointAt(B.viewLevel)
-      if point then B:SelectTree(point.tree) end
+      else
+        B:SelectPlanVariant("hybrid")
+      end
       B:Refresh()
     end)
+  page.levelPoint=label(page,309,-309,387,18,
+    "GameFontHighlightSmall","",GOLD)
+  page.nextLabel=label(page,309,-325,387,17,
+    "GameFontHighlightSmall","",MUTED)
 end
 -- Informations de fiche obtenues du client, avec repli pour les objets
 -- non encore charges en cache. Ne jamais inventer leurs statistiques.
@@ -439,19 +432,12 @@ function B:RefreshTalents()
   if not page then return end
   local plan=self:PlanAt(self.viewLevel)
   if not plan then return end
-  local selectedTree=self.selectedTree or "Furie"
   local point=self:TalentPointAt(self.viewLevel)
   for _,treeName in ipairs(self.talentTreeOrder) do
     local tree=page.trees[treeName]
-    local tab=page.treeTabs[treeName]
-    local visible=treeName==selectedTree
-    if visible then tree.frame:Show() else tree.frame:Hide() end
-    local color=visible and GOLD or CARD
-    tab.bg:SetVertexColor(color[1],color[2],color[3],color[4])
-    if tab.txt.SetTextColor then
-      tab.txt:SetTextColor(visible and 0.12 or 0.93,
-        visible and 0.15 or 0.94,visible and 0.21 or 0.97)
-    end
+    tree.frame:Show()
+    local allocated=plan.pointsByTree[treeName] or 0
+    page.treeHeadings[treeName]:SetText(treeName.."  "..allocated.." pts")
     for _,node in ipairs(self.talentTrees[treeName]) do
       local b=tree.nodes[node[1]]
       local rank=plan.ranks[node[1]] or 0
@@ -468,36 +454,18 @@ function B:RefreshTalents()
       end
     end
   end
-  page.nodes=page.trees[selectedTree].nodes
-  page.connections=page.trees[selectedTree].connections
-  local distribution=string.format("Armes %d / Furie %d / Protection %d",
-    plan.pointsByTree.Armes or 0,plan.pointsByTree.Furie or 0,
-    plan.pointsByTree.Protection or 0)
+  page.nodes=page.trees.Furie.nodes
+  page.connections=page.trees.Furie.connections
   page.variantButton.txt:SetText(self.talentPlanLabels[self.planVariant or "fury"])
+  local pointNode=point and point.metadata
   page.levelPoint:SetText(point and
-    ("Niveau "..point.level.." - "..point.tree.."\n"..
-      textWithFallback(point.metadata).."  ("..point.rank.."/"..
-      point.metadata[4]..")")
+    ("Niv "..point.level.." : "..textWithFallback(pointNode)..
+      " ("..point.rank.."/"..pointNode[4]..")")
     or "Aucun point avant le niveau 10")
-  local nextKey=plan.nextKey
-  local nextNode=nextKey and plan.metadata[nextKey]
-  page.nextLabel:SetText((nextNode and
-    ("Prochain point : "..textWithFallback(nextNode)..
-      " ("..(plan.nextTree or "Furie")..")")
-      or "Plan termine au niveau 60").."\n"..distribution)
-  local selected=plan.metadata[self.selectedTalent or
-    (point and point.tree==selectedTree and point.key) or
-    (plan.nextTree==selectedTree and nextKey) or
-    self.talentTrees[selectedTree][1][1]]
-  if selected then
-    local rank=plan.ranks[selected[1]] or 0
-    local dep=self.talentDependencies[selected[1]]
-    page.desc:SetText(textWithFallback(selected).."\n\nRang : "..rank.."/"..
-      selected[4].."\nPalier "..selected[2].." | Colonne "..selected[3]..
-      (dep and ("\nRequis : "..dep[1].." "..dep[2].." rang(s)") or "")..
-      "\n\n"..(self:TalentHint(selected[1],math.max(1,rank)) or
-        "Survole l'icone pour plus de details."))
-  end
+  local nextNode=plan.nextKey and plan.metadata[plan.nextKey]
+  page.nextLabel:SetText(nextNode and
+    ("Ensuite : "..textWithFallback(nextNode).." ("..plan.nextTree..")")
+    or "Tous les points sont places")
 end
 function B:RefreshGear()
   local page=self.pages and self.pages.equipement
