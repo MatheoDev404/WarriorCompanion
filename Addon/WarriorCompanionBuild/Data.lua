@@ -24,6 +24,33 @@ B.talents={
  {"Flurry",6,3,3,12319,132152,"Rafale"},
  {"Bloodthirst",7,2,1,23881,136012,"Sanguinaire"},
 }
+-- Resume francais concis des effets documentes par l'export Zephras.
+-- Le tooltip du client prime et donne la formulation exacte du jeu.
+B.talentHints={
+ ["Booming Voice"]=function(r)return "Zone des cris +"..(r*10).."% ; couts reduits de "..(r*5).."%." end,
+ ["Cruelty"]=function(r)return "+"..r.."% de chances de critique en melee." end,
+ ["Lingering Rage"]=function(r)return "Rage conservee "..(r*2).." s de plus hors combat." end,
+ ["Unbridled Wrath"]=function(r)return (r*12).."% de chances de generer +1 Rage par degat d'arme." end,
+ ["Furious Precision"]=function(r)return "+"..({4,7,10})[r].."% de toucher avec la main gauche." end,
+ ["Piercing Howl"]=function(r)return "Hurlement : ralentit les ennemis proches de 50% pendant 6 s." end,
+ ["Blood Craze"]=function(r)return "Regeneration de "..r.."% des PV sur 6 s apres certains coups recus." end,
+ ["Enrage"]=function(r)return "Apres avoir subi un coup : 30% de chances de gagner +"..(r*2).."% degats physiques 12 s." end,
+ ["Dual Wield Specialization"]=function(r)return "Main gauche : +"..(r*5).."% degats, +"..(r*10).."% rage generee." end,
+ ["Reckless Swings"]=function(r)return "Les 4 prochaines attaques generent 5 Rage de plus (8 s)." end,
+ ["Improved Execute"]=function(r)return "Cout d'Execution reduit de "..(r==1 and 3 or 5).." Rage." end,
+ ["Improved Berserker Rage"]=function(r)return "Rage berserker : +"..(r*5).." Rage ; "..(r*50).."% de chance d'enlever les ralentissements." end,
+ ["Death Wish"]=function(r)return "+20% degats physiques pendant 30 s, mais +5% degats subis." end,
+ ["Gore Drinker"]=function(r)return "Apres certaines competences, 3 attaques rendent "..(r==1 and "0,5" or "1").."% des PV max chacune." end,
+ ["Improved Intercept"]=function(r)return "Recharge d'Interception reduite de "..(r*5).." s." end,
+ ["Improved Whirlwind"]=function(r)return "Tourbillon : recharge -"..r.." s, degats cible proche +"..(r*15).."%." end,
+ ["Flurry"]=function(r)return "Apres critique : vitesse d'attaque +"..(r*10).."% pour 3 attaques." end,
+ ["Bloodthirst"]=function(r)return "Attaque instantanee : 45% de la PA +30 degats, bonus de deplacement temporaire." end,
+}
+function B:TalentHint(key,rank)
+  local source=self.talentHints[key]
+  if not source or type(rank)~="number" or rank<1 then return nil end
+  return source(rank)
+end
 B.talentDependencies={
  ["Gore Drinker"]={"Blood Craze",3},
  ["Bloodthirst"]={"Death Wish",1},
