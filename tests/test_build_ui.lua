@@ -25,6 +25,7 @@ local function frame()
     function t:SetPoint(...) self.point={...} end
     function t:SetSize(w,h) self.width=w self.height=h end
     function t:SetVertexColor(...) self.color={...} end
+    function t:Hide() self.hidden=true end
     return t
   end
   function f:CreateFontString()
@@ -42,7 +43,26 @@ local function frame()
   return f
 end
 UIParent=frame()
-function CreateFrame() return frame() end
+function CreateFrame(kind)
+  local result=frame()
+  if kind=="Slider" then
+    function result:SetOrientation(value) self.orientation=value end
+    function result:SetMinMaxValues(low,high) self.low=low self.high=high end
+    function result:SetValueStep(step) self.step=step end
+    function result:SetThumbTexture(texture)
+      self.thumb={path=texture}
+      function self.thumb:SetVertexColor(...) self.color={...} end
+    end
+    function result:GetThumbTexture() return self.thumb end
+    function result:SetValue(value)
+      self.value=value
+      if self.handlers.OnValueChanged then
+        self.handlers.OnValueChanged(self,value)
+      end
+    end
+  end
+  return result
+end
 function UnitLevel() return 34 end
 local lastTooltipSpell, lastTooltipItem
 Enum={SpellBookSpellBank={Player=0}}
@@ -158,8 +178,9 @@ assert(B.pages.parcours.rows[1].kind.text~=nil,
 B:SetPreview(39)
 B:ShowPage("equipement")
 local gearPanel=B.pages.equipement
-assert(gearPanel.moreButton==nil and gearPanel.wheelEnabled,
-  "la molette remplace le bouton de pagination")
+assert(gearPanel.moreButton==nil and gearPanel.wheelEnabled and
+  gearPanel.scrollBar and gearPanel.scrollBar.orientation=="VERTICAL",
+  "la molette et le curseur vertical remplacent la pagination")
 assert(gearPanel.gearOffset==0)
 for _,item in ipairs(gearPanel.displayed) do
   assert(item.minLevel<=39,"les premieres cibles correspondent au niveau")
@@ -173,6 +194,10 @@ for _,item in ipairs(gearPanel.displayed) do
   if item.minLevel>39 then sawFuture=true end
 end
 assert(sawFuture,"les paliers futurs apparaissent a la fin de la liste")
+assert(gearPanel.scrollBar.value==gearPanel.gearOffset)
+gearPanel.scrollBar:SetValue(1)
+assert(gearPanel.gearOffset==1,"le curseur glissable deplace la liste")
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
 gearPanel.handlers.OnMouseWheel(gearPanel,1)
 assert(gearPanel.gearOffset==2,"defilement retour a la molette")
 B:SetPreview(34)
