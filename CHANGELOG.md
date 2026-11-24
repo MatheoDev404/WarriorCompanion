@@ -1,5 +1,13 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.3.5-test — 24 novembre 2026
+
+- **Correction du clic droit sur l'icône de minimap** : les nombres secrets de WoW Forever ne sont plus comparés dans `Session.lua` ; lecture protégée par `issecretvalue` et repli sécurisé. L'affichage compact montre `--` quand la donnée est inaccessible (temps, monnaie, objectifs de session).
+- **Protection supplémentaire** : même vérification des valeurs dans `CompactDashboard.lua` (horloge, solde, position sauvegardée, delta `OnUpdate`) et `MinimapButton.lua` (coordonnées du curseur, angle et échelle).
+- **Bouton rond** : habillage standard des addons utilisant LibDBIcon (31 px, fond `UI-Minimap-Background`, bordure dorée `MiniMap-TrackingBorder`, surbrillance ronde, icône de 20 px avec masque circulaire si l'API est disponible). Suppression de la grande icône carrée.
+- **Tests de non-régression** : nombres simulés comme secrets, comportement de l'XP, de la monnaie, de l'horloge, de la santé, du déplacement autour de la minimap ; contrôle des textures et dimensions du bouton.
+
+
 ## 0.3.4-test — 24 novembre 2026
 
 - **Minimap** : icône guerrier visible par défaut, déplaçable autour de la minimap avec angle enregistré. Clic gauche pour ouvrir/fermer le guide ; clic droit pour basculer le mini-bilan ; commande `/wcb minimap on/off`.
