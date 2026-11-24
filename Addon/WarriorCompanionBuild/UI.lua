@@ -468,7 +468,7 @@ function B:CreateUI()
   end)
   button(f,606,-7,28,28,"-",function() B:ChangeScale(-0.08) end)
   button(f,638,-7,28,28,"+",function() B:ChangeScale(0.08) end)
-  button(f,681,-7,62,28,"Fermer",function() f:Hide() end)
+  button(f,681,-7,62,28,"Fermer",function() B:CloseFull() end)
   self.tabs={}
   local tabs={{"talents","Talents"},{"equipement","Equipement"},
     {"parcours","Parcours"},{"rotation","Rotation"}}
