@@ -400,6 +400,22 @@ function B:QuestLiveState(questId)
   end
   return nil -- non observe, pas automatiquement absent.
 end
+-- Afficher le premier objectif non termine, directement depuis le journal.
+-- La base du guide ne devine ni le nombre de monstres, ni la progression.
+function B:QuestObjectiveSummary(questId)
+  if self:QuestLiveState(questId)~="ACTIVE" then return nil end
+  local api=C_QuestLog
+  if type(api)~="table" then return nil end
+  local objectives=questSafe(api.GetQuestObjectives,questId)
+  if type(objectives)~="table" then return nil end
+  for _,objective in ipairs(objectives) do
+    if type(objective)=="table" and objective.finished~=true and
+        type(objective.text)=="string" and objective.text~="" then
+      return objective.text
+    end
+  end
+  return nil
+end
 function B:IsStepDone(step)
   if step.questId and self:QuestCompletion(step.questId)==true then
     return true
