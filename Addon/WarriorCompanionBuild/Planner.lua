@@ -404,8 +404,8 @@ function B:IsStepDone(step)
   if step.questId and self:QuestCompletion(step.questId)==true then
     return true
   end
-  return not step.questId and self.db and self.db.done and
-    self.db.done[step.id]==true or false
+  -- Conserver les validations manuelles faites avant la version 0.3.3.
+  return self.db and self.db.done and self.db.done[step.id]==true or false
 end
 -- Ordre de passage pilote : regroupe les hubs sans imposer de donjon ni
 -- de chaine longue. Il ne pretend pas mesurer un trajet in-game.
@@ -454,23 +454,41 @@ function B:RouteSegmentEntries(index,showCompleted)
 end
 function B:FirstSuggestedStep(entries)
   local level=self.realLevel or 1
-  -- Ne pas conseiller en premier les quetes groupe, les prerequis
-  -- incertains, ou les ennemis d'un palier futur.
+  -- Les quetes accepte(e)s et pretes a rendre passent avant les nouvelles.
   for _,entry in ipairs(entries) do
-    local state=entry.state
-    if entry.step.level<=level and not entry.step.optional and
-       not entry.step.group and state~="PREREQUIS MANQUANT" and
-       state~="CHAINE A VERIFIER" and state~="CHAINE / GROUPE" then
+    if not entry.step.group and
+       (entry.state=="A RENDRE" or entry.state=="EN COURS") then
       return entry.step
     end
+  end
+  -- Priorite aux objectifs solo proches du niveau reel, sans te pousser
+  -- vers des ennemis au-dessus de ton niveau ni dans un donjon impose.
+  for low=level-2,1,-1 do
+    local candidates={}
+    for _,entry in ipairs(entries) do
+      local step=entry.step
+      if step.level>=low and step.level<=level and
+         not step.group and not step.optional and
+         entry.state~="PREREQUIS MANQUANT" and
+         entry.state~="CHAINE A VERIFIER" and
+         entry.state~="CHAINE / GROUPE" then
+        candidates[#candidates+1]=entry.step
+      end
+    end
+    if #candidates>0 then return candidates[1] end
+    if low<=level-2 then break end
   end
   for _,entry in ipairs(entries) do
     if entry.step.level<=level and not entry.step.group and
-        entry.state~="PREREQUIS MANQUANT" then
+       not entry.step.optional and
+       entry.state~="PREREQUIS MANQUANT" and
+       entry.state~="CHAINE A VERIFIER" then
       return entry.step
     end
   end
-  return entries[1] and entries[1].step or nil
+  -- Une option peut etre consulte(e), mais ne doit pas etre l'objectif
+  -- conseille par defaut pour le leveling XP solo.
+  return nil
 end
 -- nil: donnees manquantes; false: preuve de prerequis non rempli.
 function B:PrerequisitesMet(step)
@@ -503,7 +521,8 @@ function B:StepState(step)
     if live=="DONE" then return "QUETE TERMINEE" end
     if live=="READY" then return "A RENDRE" end
     if live=="ACTIVE" then return "EN COURS" end
-  elseif self.db and self.db.done and self.db.done[step.id] then
+  end
+  if self.db and self.db.done and self.db.done[step.id] then
     return "FAIT (MANUEL)"
   end
   if step.level>(self.realLevel or 1) then return "PLUS TARD" end
@@ -552,6 +571,17 @@ function B:MarkStep()
   local step=current.step
   if step.questId or step.group or
       step.level>(self.realLevel or 1) then return false end
+  self.db.done[step.id]=not self.db.done[step.id]
+  return true
+end
+
+-- Les quetes sont suivies automatiquement; on valide a la main seulement
+-- les trajets, visites de vendeur, forges et autres actions sans questId.
+function B:MarkRouteSelection(step)
+  if not step or not self.db or not self.db.done or
+      step.questId or step.group or step.level>(self.realLevel or 1) then
+    return false
+  end
   self.db.done[step.id]=not self.db.done[step.id]
   return true
 end
