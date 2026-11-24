@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: Warrior Companion | Build Planner (Test)
-## Notes: Guide de build Furie 1-60 - prototype 30-40
+## Notes: Guerrier Furie - guide par segments et quetes suivies
 ## Author: Warrior Companion
-## Version: 0.3.2-test
+## Version: 0.3.3-test
 ## SavedVariables: WCBuildDB
 Data.lua
 TalentTrees.lua
