@@ -179,6 +179,10 @@ assert(B.pages.parcours.segmentLabel.text=="Segment 30-40" and
   B.pages.parcours.wheelEnabled and B.pages.parcours.scrollBar,
   "segment 30-40 complet et liste scrollable")
 assert(#B.routeVisible>5,"les objectifs depassent la fenetre visible")
+-- Le saut depuis l'equipement positionne logiquement la liste sur la cible.
+assert(B.routeScroll>0,"la recompense de donjon est visible apres saut")
+B.routeScroll=0
+B:RefreshRoute()
 B.pages.parcours.handlers.OnMouseWheel(B.pages.parcours,-1)
 assert(B.routeScroll==1,"la liste defile sans changer de segment")
 B.pages.parcours.scrollBar:SetValue(3)
