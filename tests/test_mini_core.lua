@@ -15,7 +15,8 @@ function B:InitState() self.db={} end
 function B:ValidateContent() return true end
 function B:UpdateLevel() self.levelUpdated=(self.levelUpdated or 0)+1 end
 function B:StartSession()
-  self.metrics=self.metrics or {xpGained=0}
+  if self.metrics then return end
+  self.metrics={xpGained=0}
   self.started=(self.started or 0)+1
 end
 function B:OnSessionEvent(name)
