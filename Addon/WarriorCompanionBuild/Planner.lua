@@ -369,6 +369,17 @@ function B:ReadQuestLog()
     end
   end
   self.questLog=states
+  -- Secours Forever : certaines versions exposent la liste des quetes
+  -- rendues sans exposer IsQuestFlaggedCompleted.
+  local completed=questSafe(api.GetAllCompletedQuestIDs)
+  if type(completed)=="table" then
+    self.completedQuestSet={}
+    for _,id in ipairs(completed) do
+      if type(id)=="number" then self.completedQuestSet[id]=true end
+    end
+  else
+    self.completedQuestSet=nil
+  end
   return states
 end
 function B:QuestCompletion(questId)
@@ -377,6 +388,9 @@ function B:QuestCompletion(questId)
   if type(api)~="table" then return nil end
   local completed=questSafe(api.IsQuestFlaggedCompleted,questId)
   if completed==true then return true end
+  if self.completedQuestSet then
+    return self.completedQuestSet[questId]==true
+  end
   if completed==false then return false end
   return nil
 end
