@@ -175,6 +175,23 @@ assert(B.pages.parcours.activeKind.text=="EQUIPEMENT",
   "les etapes d'equipement sont reconnaissables visuellement")
 assert(B.pages.parcours.rows[1].kind.text~=nil,
   "les etapes suivantes ont un marqueur par type")
+assert(B.pages.parcours.segmentLabel.text=="Segment 30-40" and
+  B.pages.parcours.wheelEnabled and B.pages.parcours.scrollBar,
+  "segment 30-40 complet et liste scrollable")
+assert(#B.routeVisible>5,"les objectifs depassent la fenetre visible")
+B.pages.parcours.handlers.OnMouseWheel(B.pages.parcours,-1)
+assert(B.routeScroll==1,"la liste defile sans changer de segment")
+B.pages.parcours.scrollBar:SetValue(3)
+assert(B.routeScroll==3,"scroll vertical au curseur")
+B.pages.parcours.toggleCompleted.handlers.OnClick()
+assert(B.showCompleted and B.db.showCompleted,
+  "le mode montrer les quetes rendues est memorise")
+B.pages.parcours.toggleCompleted.handlers.OnClick()
+assert(not B.showCompleted)
+B.pages.parcours.nextSegment.handlers.OnClick()
+assert(B.pages.parcours.segmentLabel.text=="Segment 41-50")
+B.pages.parcours.prevSegment.handlers.OnClick()
+assert(B.pages.parcours.segmentLabel.text=="Segment 30-40")
 B:SetPreview(39)
 B:ShowPage("equipement")
 local gearPanel=B.pages.equipement
@@ -249,9 +266,12 @@ B:Refresh()
 B:SetPreview(60)
 B:Refresh()
 assert(B.pages.talents.nextLabel.text:find("places",1,true))
-assert(B.chapterMode and B.pages.parcours.count.text:find("1-60",1,true),
-  "les niveaux hors pilote affichent un plan de zones sans fausses quetes")
-assert(not B:MarkStep(),"pas de validation manuelle dans l'apercu non verifie")
+assert(B.pages.parcours.segmentLabel.text=="Segment 51-60" and
+  #B.routeVisible==0,
+  "un segment non documente ne propose pas de quetes inventees")
+assert(B.pages.parcours.note.text:find("Apercu",1,true),
+  "les chapitres 50-60 restent un apercu prudent")
+assert(not B:MarkRouteSelection(nil))
 
 B:ChangeScale(-0.08)
 assert(B.frame.scale==0.74)
