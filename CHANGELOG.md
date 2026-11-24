@@ -1,5 +1,16 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.3.3-test — 24 novembre 2026
+
+- **Segments de niveaux** : 1–9, 10–19, 20–29, 30–40 inclusif, 41–50 et 51–60 ; navigation directe d'une tranche a l'autre. Les segments sans quetes verifiees restent des apercus, pas des quetes inventees.
+- **Journal de quetes Forever** : utilisation de `C_QuestLog.GetNumQuestLogEntries`, `GetInfo`, `IsComplete` et `IsQuestFlaggedCompleted` (ou `GetAllCompletedQuestIDs` en secours) pour identifier quetes en cours, pretes a rendre et rendues. Ne jamais confondre objectif termine et quete rendue.
+- **Liste complete a defilement vertical** : molette et glissiere; cinq lignes visibles en permanence sur la totalite des objectifs du segment; filtre « Afficher les terminees ». Les quetes deja rendues sont masquees par defaut.
+- **Recommandations prudentes** : quetes pretes a rendre, puis actives, puis objectifs solo proches du niveau. Regroupement explicite des hubs connus 30–40, sans imposer donjon ou longue chaine facultative. Aucun calcul mensonger de distance ni de DPS.
+- **Informations dynamiques** : texte du premier objectif en cours depuis `GetQuestObjectives` lorsqu'il est disponible, et rafraichissement sur les evenements de journal/acceptation/abandon/rendu.
+- **Interface** : statuts et reperes couleur quete XP, groupe, option, equipement, trajet, forge; progression de segment; saut depuis la fiche d'equipement vers l'etape correspondante. Footer de diagnostic superflu supprime.
+- **Tests** : cas de quete acceptee/en cours/prete a rendre/rendue, liste filtree, variantes d'API Forever, tranches 30–40 et 51–60, curseur et choix de l'objectif propose. Validation Lua 5.1/5.4 en CI.
+
+
 ## 0.3.2-test — 23 novembre 2026
 
 - **Erreur de lancement corrigée** : suppression de l'enregistrement de `LEARNED_SPELL_IN_TAB`, événement inconnu de WoW Forever ; `SPELLS_CHANGED` reste écouté.
