@@ -8,7 +8,7 @@ modules=[line for line in lines if not line.startswith("#")]
 assert modules==["Data.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","CombatData.lua","UI.lua","Rotation.lua","Core.lua"], modules
 assert "## Interface: 16001" in toc
 assert "## SavedVariables: WCBuildDB" in toc
-assert "## Version: 0.3.2-test" in toc
+assert "## Version: 0.3.3-test" in toc
 assert set(modules)=={p.name for p in root.glob("*.lua")}
 assert not list(root.glob("*.ttf")), "La police systeme WoW suffit, ne pas distribuer de police"
 ui=(root/"UI.lua").read_text(encoding="utf-8")
@@ -18,4 +18,4 @@ assert "GetItemIconByID" in ui
 assert "TalentPointAt" in ui
 core=(root/"Core.lua").read_text(encoding="utf-8")
 assert 'LEARNED_SPELL_IN_TAB' not in core, "Evenement inconnu du client Forever"
-print("OK: Build Planner 0.3.2-test, manifest 8 modules, events valides et interface")
+print("OK: Build Planner 0.3.3-test, manifest 8 modules, events valides et interface")
