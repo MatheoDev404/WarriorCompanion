@@ -1,12 +1,12 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.3.4.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.3.5.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
 
 ## Installation
 
 Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev404/WarriorCompanion/tree/feature/build-planner) puis copier le dossier `Addon/WarriorCompanionBuild` dans le dossier `Interface/AddOns/` de WoW Forever. Le dossier final doit contenir `WarriorCompanionBuild.toc`. Redémarrer le client.
 
-**Minimap :** une icône de guerrier apparaît autour de la minimap, déplaçable en la faisant glisser. **Clic gauche** : ouvrir/fermer le guide complet ; **clic droit** : afficher/masquer l'ancien mini-bilan **304 × 88 px** (XP gagnée, temps, morts, solde de session et conseil). Dans le mini, le bouton **>>** ouvre le guide. Les positions sont conservées.
+**Minimap :** une icône ronde de guerrier (style Questie/LibDBIcon) apparaît autour de la minimap, déplaçable en la faisant glisser. **Clic gauche** : ouvrir/fermer le guide complet ; **clic droit** : afficher/masquer l'ancien mini-bilan **304 × 88 px** (XP gagnée, temps, morts, solde de session et conseil). Dans le mini, le bouton **>>** ouvre le guide. Les positions sont conservées.
 
 **Commandes :** `/wcb` ouvre/ferme le guide, `/wcb mini`, `/wcb full`, `/wcb hide`, et les onglets `/wcb talents`, `/wcb equipement`, `/wcb parcours`, `/wcb rotation`, `/wcb reel`. Pour les anciennes options : `/wcb reset` (remise à zéro du bilan), `/wcb autostart on/off` (ouverture auto désactivée par défaut), `/wcb alerts on/off` (ligne de conseil), `/wcb minimap on/off`. Taille du guide par `+`/`-` ; le mini conserve son format d'origine.
 
@@ -23,4 +23,4 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 - Ancien addon archivé dans `main`. Seul le nouveau `WarriorCompanionBuild` est présent dans ce paquet.
 - Licence et sources : [README du module](Addon/WarriorCompanionBuild/README.md), [recherche](docs/RESEARCH_FOREVER.md), [audit legacy](docs/LEGACY_AUDIT.md).
 
-**À valider en jeu** : nouvel icône minimap, raccourcis gauche/droit, mini-bilan, compteurs XP/monnaie, quatre onglets et absence de superpositions. Tests de règles et maquettes Lua 5.1/5.4 ne remplacent pas les captures du client.
+**À valider en jeu** : nouvel icône minimap, raccourcis gauche/droit, mini-bilan, valeurs protégées du client (affichées comme indisponibles), compteurs XP/monnaie, quatre onglets et absence de superpositions. Tests de règles et maquettes Lua 5.1/5.4 ne remplacent pas les captures du client.
