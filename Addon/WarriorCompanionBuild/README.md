@@ -1,4 +1,4 @@
-# Warrior Companion | Build Planner — 0.3.4-test
+# Warrior Companion | Build Planner — 0.3.5-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
 
@@ -15,8 +15,8 @@
 
 - Mini-fenêtre **304 × 88 px** fidèle à l'ancien `CompactDashboard.lua` : XP gagnée, temps écoulé, morts, delta de monnaie de la session (or/argent/cuivre, couleurs positives/négatives) et une ligne d'alerte. Actualisation périodique toutes les trois secondes ou à un événement de session.
 - **Déplacement libre**, position du mini mémorisée dans `WCBuildDB.compactPoint`, bouton **>>** pour développer. La fermeture du guide après un développement depuis le mini le restaure.
-- **Icône autour de la minimap**, position angulaire mémorisée ; clic gauche : guide complet ; clic droit : mini ; glisser-déposer : repositionner l'icône.
-- Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si les APIs ne répondent pas, la monnaie reste inconnue plutôt que d'être inventée.
+- **Icône circulaire style LibDBIcon/Questie autour de la minimap** (fond noir et contour doré Blizzard, icône de 20 px recadrée / masquée quand disponible), position angulaire mémorisée ; clic gauche : guide complet ; clic droit : mini ; glisser-déposer : repositionner l'icône.
+- Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si une API renvoie un nombre secret (mécanisme de protection Forever), l'addon ne le compare ni ne le calcule : il affiche une valeur indisponible au lieu de planter. Les positions et le drag de la minimap appliquent la même protection.
 - **Options identiques** : `/wcb mini`, `/wcb full`, `/wcb hide`, `/wcb autostart on/off`, `/wcb reset`, `/wcb alerts on/off`. Ajout de `/wcb minimap on/off`. Par défaut, l'ouverture automatique est **désactivée** ; activable pour retrouver l'ancienne expérience. Les préférences sont dans `WCBuildDB`.
 - L'ancienne logique générale de conseils n'est pas importée intégralement : la ligne conserve les alertes sûres (points non dépensés si API présente, vie basse, morts répétées). Le mini reste autonome du vieux dossier `WarriorCompanion`.
 
