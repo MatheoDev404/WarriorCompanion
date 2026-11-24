@@ -1,4 +1,8 @@
 local _, B = ...
+local function safeNumber(value)
+  if type(B.SafeNumber)~="function" then return nil end
+  return B:SafeNumber(value)
+end
 -- Portage fidele du HUD original 304x88 : XP, temps, morts, solde, conseil.
 -- Le guide complet utilise une fenetre distincte ; minimap toujours accessible.
 local function font(parent, x, y, w, h, family, value)
@@ -19,9 +23,9 @@ end
 local function goodPoint(frame,options)
   if type(options.compactPoint)=="table" then
     local p=options.compactPoint
-    if type(p.x)=="number" and type(p.y)=="number" and
-       p.x==p.x and p.y==p.y and math.abs(p.x)<=4000 and math.abs(p.y)<=4000 then
-      frame:SetPoint("CENTER",UIParent,"CENTER",p.x,p.y)
+    local x,y=safeNumber(p.x),safeNumber(p.y)
+    if x and y and math.abs(x)<=4000 and math.abs(y)<=4000 then
+      frame:SetPoint("CENTER",UIParent,"CENTER",x,y)
       return
     end
   end
@@ -41,8 +45,9 @@ function B:CreateCompactDashboard()
        type(UIParent.GetCenter)=="function" then
       local ok,x,y=pcall(frame.GetCenter,frame)
       local wok,bx,by=pcall(UIParent.GetCenter,UIParent)
-      if ok and wok and type(x)=="number" and type(y)=="number" and
-         type(bx)=="number" and type(by)=="number" then
+      x,y=safeNumber(x),safeNumber(y)
+      bx,by=safeNumber(bx),safeNumber(by)
+      if ok and wok and x and y and bx and by then
         local dx,dy=x-bx,y-by
         if math.abs(dx)<=4000 and math.abs(dy)<=4000 then
           self:Profile().compactPoint={x=dx,y=dy}
@@ -93,15 +98,16 @@ function B:CreateCompactDashboard()
   f:Hide()
   local elapsed=0
   f:SetScript("OnUpdate",function(frame,delta)
-    if not frame:IsShown() or type(delta)~="number" then return end
+    delta=safeNumber(delta)
+    if not frame:IsShown() or not delta then return end
     elapsed=elapsed+delta
     if elapsed>=3 then elapsed=0;B:RefreshCompactDashboard() end
   end)
 end
 -- Solde en cuivre ; deux chiffres minimum par denomination.
 local function moneyParts(copper)
-  if type(copper)~="number" or copper~=copper
-      or copper==math.huge or copper==-math.huge then
+  copper=safeNumber(copper)
+  if not copper then
     return "", "--", "--", "--", "unknown"
   end
   local n=math.floor(math.abs(copper))
@@ -118,12 +124,12 @@ local moneyColors={
   zero="|cffD4D4D4",unknown="|cff888888"
 }
 
--- Duree ecoulee depuis le debut de la session ; remise a zero avec /wc reset.
+-- Duree ecoulee depuis le debut de la session ; /wcb reset pour repartir.
 local function sessionTime(self)
-  local started=self.metrics and self.metrics.started
-  if type(started)~="number" or
-      not self.Now or type(self:Now())~="number" then return "--:--:--" end
-  local seconds=self:Now()-started
+  local started=safeNumber(self.metrics and self.metrics.started)
+  local now=self.Now and safeNumber(self:Now()) or nil
+  if not started or not now then return "--:--:--" end
+  local seconds=now-started
   if seconds<0 or seconds~=seconds then return "--:--:--" end
   seconds=math.floor(seconds)
   local hours=math.floor(seconds/3600)
@@ -135,8 +141,8 @@ function B:RefreshCompactDashboard()
   local m=self.metrics or {}
   local balance=self.MoneyDelta and self:MoneyDelta()
   local values={
-    tostring(m.xpGained or 0),sessionTime(self),
-    tostring(m.deaths or 0),
+    tostring(safeNumber(m.xpGained) or 0),sessionTime(self),
+    tostring(safeNumber(m.deaths) or 0),
   }
   for i=1,3 do self.compactStats[i]:SetText(values[i]) end
   local sign,gold,silver,bronze,state=moneyParts(balance)
