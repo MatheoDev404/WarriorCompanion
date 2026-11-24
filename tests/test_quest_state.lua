@@ -23,6 +23,13 @@ C_QuestLog={
   GetNumQuestLogEntries=function() return #log,2 end,
   GetInfo=function(index) return log[index] end,
   IsComplete=function(id) return false end,
+  GetQuestObjectives=function(id)
+    if id==5561 then
+      return {{text="Kodos captures : 2/5",finished=false},
+        {text="Retour au donneur de quete",finished=false}}
+    end
+    return {}
+  end,
   GetLogIndexForQuestID=function(id)
     for i,entry in ipairs(log) do
       if entry.questID==id then return i end
@@ -32,6 +39,8 @@ C_QuestLog={
 }
 assert(B:ReadQuestLog())
 assert(B:QuestLiveState(5561)=="ACTIVE")
+assert(B:QuestObjectiveSummary(5561)=="Kodos captures : 2/5",
+  "la progression vient de l'objectif actif lu dans le journal")
 assert(B:QuestLiveState(1362)=="READY")
 assert(B:QuestLiveState(1105)=="DONE")
 local byId={}
