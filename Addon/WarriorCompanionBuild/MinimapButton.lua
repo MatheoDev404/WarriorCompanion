@@ -34,7 +34,8 @@ local function atan2(y,x)
 end
 function B:CreateMinimapButton()
   if self.minimapButton then return self.minimapButton end
-  if type(Minimap)~="table" or type(CreateFrame)~="function" then
+  if not Minimap or type(Minimap.GetCenter)~="function" or
+      type(CreateFrame)~="function" then
     return nil
   end
   local b=CreateFrame("Button","WarriorCompanionBuildMinimap",Minimap)
@@ -88,8 +89,7 @@ function B:CreateMinimapButton()
     if type(x)~="number" or type(y)~="number" or
         type(cx)~="number" or type(cy)~="number" then return end
     local scale=1
-    if type(UIParent)=="table" and
-        type(UIParent.GetEffectiveScale)=="function" then
+    if UIParent and type(UIParent.GetEffectiveScale)=="function" then
       local value=UIParent:GetEffectiveScale()
       if type(value)=="number" and value>0 then scale=value end
     end
