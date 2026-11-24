@@ -5,6 +5,7 @@ local function frame()
   function f:SetPoint(...) self.point={...} end
   function f:ClearAllPoints() self.point=nil end
   function f:SetFrameStrata(value) self.strata=value end
+  function f:SetFrameLevel(value) self.frameLevel=value end
   function f:SetMovable(value) self.movable=value end
   function f:EnableMouse(value) self.mouseEnabled=value end
   function f:RegisterForDrag(value) self.dragButton=value end
@@ -25,6 +26,8 @@ local function frame()
     function texture:SetAllPoints(...) self.allPoints={...} end
     function texture:SetSize(w,h) self.width=w self.height=h end
     function texture:SetVertexColor(...) self.color={...} end
+    function texture:SetTexCoord(...) self.texCoord={...} end
+    function texture:SetMask(path) self.mask=path end
     return texture
   end
   function f:CreateFontString()
@@ -81,7 +84,20 @@ assert(not B.frame:IsShown() and not B.compactDashboard:IsShown() and
 B:AutoOpenDashboard()
 assert(not B.frame:IsShown() and not B.compactDashboard:IsShown(),
   "ne jamais ouvrir automatiquement par defaut")
-assert(B.minimapButton.normalTexture:find("BattleShout",1,true))
+assert(B.minimapButton.normalTexture==nil,
+  "aucune icone carree en texture de bouton")
+assert(B.minimapButton.icon and B.minimapButton.icon.width==20
+    and B.minimapButton.icon.height==20 and
+    B.minimapButton.icon.texture:find("BattleShout",1,true),
+  "icone 20px au centre du bouton rond")
+assert(B.minimapButton.border and B.minimapButton.border.width==53 and
+    B.minimapButton.background and B.minimapButton.background.width==20,
+  "fond et bordure ronde native LibDBIcon")
+assert(B.minimapButton.icon.mask and
+  B.minimapButton.icon.mask:find("TempPortraitAlphaMask",1,true),
+  "masque de portrait circulaire quand disponible")
+assert(B.minimapButton.highlightTexture:find("ZoomButton",1,true),
+  "surbrillance circulaire Blizzard")
 assert(B.minimapButton.point[2]==Minimap,"bouton ancre a la minimap")
 assert(B.minimapButton.clickButtons[2]=="RightButtonUp")
 B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
@@ -150,6 +166,48 @@ B.minimapButton.scripts.OnUpdate(B.minimapButton,0.016)
 assert(type(B.db.minimapAngle)=="number")
 B.minimapButton.scripts.OnDragStop()
 assert(B.minimapButton.scripts.OnUpdate==nil)
+-- Simuler les numeros opaques de Forever : type(secret) reste number,
+-- mais le code de l'addon ne doit jamais les comparer ni les soustraire.
+issecretvalue=function(value)
+  return type(value)=="number" and value==777
+end
+assert(B:SafeNumber(777)==nil and B:SafeNumber(42)==42,
+  "une valeur numerique secrete est rejetee avant calcul")
+local validMoney=money
+money=777
+B:OnSessionEvent("PLAYER_MONEY")
+assert(B:MoneyDelta()==nil and
+  B.compactMoneyParts[1].text:find("%-%-"),
+  "montant secret : solde indisponible, sans exception Lua")
+money=validMoney
+B:OnSessionEvent("PLAYER_MONEY")
+local clockFunction=GetTime
+GetTime=function() return 777 end
+B:RefreshCompactDashboard()
+assert(B.compactStats[2].text=="--:--:--",
+  "temps secret : chronometre indisponible")
+GetTime=clockFunction
+B:ResetSession()
+local healthFunction=UnitHealth
+UnitHealth=function() return 777 end
+assert(B:AdviceLines()=="Aucune alerte prioritaire.",
+  "PV secrets : aucune comparaison interdite ni fausse alerte")
+UnitHealth=healthFunction
+local xpFunction=UnitXP
+UnitXP=function() return 777 end
+B:OnSessionEvent("PLAYER_XP_UPDATE")
+assert(B.metrics.xpAvailable==false,"XP secrete : suivi en attente")
+UnitXP=xpFunction
+local cursorFunction=GetCursorPosition
+local beforeAngle=B.db.minimapAngle
+GetCursorPosition=function() return 777,580 end
+B.minimapButton.scripts.OnDragStart()
+B.minimapButton.scripts.OnUpdate(B.minimapButton,0.016)
+assert(B.db.minimapAngle==beforeAngle,
+  "curseur secret : conserver la position sans erreur")
+B.minimapButton.scripts.OnDragStop()
+GetCursorPosition=cursorFunction
+issecretvalue=nil
 B:HideDashboard()
 B.db.autoOpen=true
 B.db.displayMode="compact"
