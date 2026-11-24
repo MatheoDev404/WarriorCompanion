@@ -1,4 +1,4 @@
-# Warrior Companion | Build Planner — 0.3.3-test
+# Warrior Companion | Build Planner — 0.3.4-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
 
@@ -8,7 +8,17 @@
 2. Extraire **uniquement** `Addon/WarriorCompanionBuild` vers `World of Warcraft/Interface/AddOns/WarriorCompanionBuild/`.
 3. Vérifier que `Interface/AddOns/WarriorCompanionBuild/WarriorCompanionBuild.toc` existe.
 4. Pour tester sans chevauchement, désactiver temporairement l'ancien addon `WarriorCompanion` dans le sélecteur d'addons. Redémarrer WoW Forever.
-5. Utiliser `/wcb` pour ouvrir/fermer le nouveau planner.
+5. **Par défaut**, aucune fenêtre ne s'ouvre automatiquement ; un bouton guerrier apparaît autour de la minimap. Clic gauche pour ouvrir/fermer le guide, clic droit pour afficher/masquer le mini-bilan.
+6. Utiliser `/wcb` si le bouton est masqué ou si la minimap n'est pas disponible.
+
+### Mini-bilan d'origine et accès depuis la minimap
+
+- Mini-fenêtre **304 × 88 px** fidèle à l'ancien `CompactDashboard.lua` : XP gagnée, temps écoulé, morts, delta de monnaie de la session (or/argent/cuivre, couleurs positives/négatives) et une ligne d'alerte. Actualisation périodique toutes les trois secondes ou à un événement de session.
+- **Déplacement libre**, position du mini mémorisée dans `WCBuildDB.compactPoint`, bouton **>>** pour développer. La fermeture du guide après un développement depuis le mini le restaure.
+- **Icône autour de la minimap**, position angulaire mémorisée ; clic gauche : guide complet ; clic droit : mini ; glisser-déposer : repositionner l'icône.
+- Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si les APIs ne répondent pas, la monnaie reste inconnue plutôt que d'être inventée.
+- **Options identiques** : `/wcb mini`, `/wcb full`, `/wcb hide`, `/wcb autostart on/off`, `/wcb reset`, `/wcb alerts on/off`. Ajout de `/wcb minimap on/off`. Par défaut, l'ouverture automatique est **désactivée** ; activable pour retrouver l'ancienne expérience. Les préférences sont dans `WCBuildDB`.
+- L'ancienne logique générale de conseils n'est pas importée intégralement : la ligne conserve les alertes sûres (points non dépensés si API présente, vie basse, morts répétées). Le mini reste autonome du vieux dossier `WarriorCompanion`.
 
 ### Contrôles
 
@@ -31,7 +41,7 @@
 
 **Pilote détaillé : niveaux 30–40, avec les quêtes de classe Guerrier #1718/#1719, les objectifs de Désolace #5561 et #5386, l'arrêt Wulan (Cuisine experte), les quêtes XP des Salines #1105/#1175, et une chaîne Gelkis facultative jusqu'aux niveaux 42–43**. L'ordre des hubs a été recoupé entre ForeverTavern et plusieurs guides Horde; les **PNJ et quêtes individuelles non confirmées** restent explicitement « à vérifier ». En-dessous de 30 ou au-dessus de 40 : **simple vue d'ensemble des zones 1–60**, non une route de quêtes exhaustivement validée. Les options donjon (Monastère écarlate / Maraudon à 45+) ne sont pas obligatoires en solo.
 
-**Non encore validé en jeu :** l'état du journal et le défilement sur le client réel, la lecture des icônes par FileDataID, la récupération des icônes d'objets via le cache client sur la version du client, l'apparence des infobulles, l'échelle selon résolution, les traductions des noms qui ne figurent pas dans le client, les récompenses locales et les raccourcis `/wcb`. Le build Furie pur et la variante 13/38 sont des points de comparaison, **pas une démonstration du DPS maximum**. Les descriptions de rang exactes proviennent du tooltip jeu lorsqu'il est accessible.
+**Non encore validé en jeu :** les clics de l'icône, le déplacement autour de la minimap, les compteurs après un changement de niveau, l'état du journal et le défilement sur le client réel, la lecture des icônes par FileDataID, la récupération des icônes d'objets via le cache client sur la version du client, l'apparence des infobulles, l'échelle selon résolution, les traductions des noms qui ne figurent pas dans le client, les récompenses locales et les raccourcis `/wcb`. Le build Furie pur et la variante 13/38 sont des points de comparaison, **pas une démonstration du DPS maximum**. Les descriptions de rang exactes proviennent du tooltip jeu lorsqu'il est accessible.
 
 Aucun achat, déplacement, allocation de talent ou lancement de sort automatique.
 
