@@ -681,7 +681,7 @@ function B:RefreshRoute()
     if self:IsStepDone(entry.step) then doneCount=doneCount+1 end
   end
   page.segmentLabel:SetText("Segment "..segment[3])
-  page.count:SetText((#all-doneCount).." a faire / "..#all.." objectifs")
+  page.count:SetText((#all-doneCount).." restants / "..#all.." objectifs")
   page.toggleCompleted.txt:SetText(self.showCompleted and
     "Masquer les terminees" or "Afficher les terminees")
   local selected=nil
@@ -698,6 +698,15 @@ function B:RefreshRoute()
     self.routeSelectedId=selected and selected.id or nil
   end
   self.activeRouteStep=selected
+  if selected and self.routeForced then
+    for index,entry in ipairs(entries) do
+      if entry.step.id==selected.id then
+        self.routeScroll=math.max(0,index-3)
+        break
+      end
+    end
+    self.routeForced=false
+  end
   if selected then
     local state=self:StepState(selected)
     local tag,shade=routeBadge(selected)
