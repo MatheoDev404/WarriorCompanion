@@ -37,6 +37,7 @@ function B:CreateCompactDashboard()
   self.compactCreated=(self.compactCreated or 0)+1
 end
 function B:CreateMinimapButton()
+  if self.minimapButton then return self.minimapButton end
   self.minimapButton=displayFrame()
   self.minimapButton:Show()
   self.iconCreated=(self.iconCreated or 0)+1
