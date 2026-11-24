@@ -737,9 +737,13 @@ function B:RefreshRoute()
         break
       end
     end
-    if #all>0 then
+    if #all>0 and #entries==0 then
       page.note:SetText("Tous les objectifs suivis sont termines."..
         "\nActive « Afficher les terminees » pour les consulter.")
+    elseif #all>0 then
+      page.note:SetText("Aucun objectif XP solo prioritaire documente ici."..
+        "\nLes options, donjons et objectifs futurs restent consultables."..
+        "\nSelectionne une ligne pour voir ses conditions.")
     else
       page.note:SetText(chapter and
         ("Apercu : "..chapter[3].."\n"..chapter[4]..
