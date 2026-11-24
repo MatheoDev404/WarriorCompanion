@@ -37,6 +37,10 @@ events:RegisterEvent("PLAYER_ENTERING_WORLD")
 events:RegisterEvent("PLAYER_LEVEL_UP")
 events:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 events:RegisterEvent("SPELLS_CHANGED")
+events:RegisterEvent("QUEST_LOG_UPDATE")
+events:RegisterEvent("QUEST_ACCEPTED")
+events:RegisterEvent("QUEST_REMOVED")
+events:RegisterEvent("QUEST_TURNED_IN")
 events:RegisterEvent("UNIT_AURA")
 events:SetScript("OnEvent",function(_,event,arg1)
   if event=="ADDON_LOADED" and arg1==addon then
@@ -50,6 +54,7 @@ events:SetScript("OnEvent",function(_,event,arg1)
   elseif event=="PLAYER_ENTERING_WORLD" then
     if not B.db then return end
     B:UpdateLevel()
+    if B.ReadQuestLog then B:ReadQuestLog() end
     if not B.invalidPlan then
       if not B.frame then B:CreateUI() end
       if B.db.hidden~=true then B.frame:Show() end
@@ -59,6 +64,13 @@ events:SetScript("OnEvent",function(_,event,arg1)
     if not B.db then return end
     B:UpdateLevel()
     if B.frame then B:Refresh() end
+  elseif event=="QUEST_LOG_UPDATE" or event=="QUEST_ACCEPTED" or
+      event=="QUEST_REMOVED" or event=="QUEST_TURNED_IN" then
+    if not B.db then return end
+    if B.ReadQuestLog then B:ReadQuestLog() end
+    if B.frame and B.frame:IsShown() and B.page=="parcours" then
+      B:RefreshRoute()
+    end
   elseif event=="GET_ITEM_INFO_RECEIVED" then
     if B.frame and B.frame:IsShown() then B:RefreshGear() end
   elseif event=="SPELLS_CHANGED" or event=="LEARNED_SPELL_IN_SKILL_LINE" then
