@@ -1,5 +1,15 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.3.4-test — 24 novembre 2026
+
+- **Minimap** : icône guerrier visible par défaut, déplaçable autour de la minimap avec angle enregistré. Clic gauche pour ouvrir/fermer le guide ; clic droit pour basculer le mini-bilan ; commande `/wcb minimap on/off`.
+- **Mini-bilan 304 × 88 px restauré** depuis le `CompactDashboard.lua` d'origine : XP gagnée, durée de session, morts, solde en or/argent/cuivre avec code couleur, conseil, déplacement libre avec position sauvegardée et bouton `>>` pour développer le guide.
+- **Sessions** : suivi indépendant via `PLAYER_XP_UPDATE`, `PLAYER_LEVEL_UP`, `PLAYER_DEAD`, `PLAYER_MONEY` ; remise à zéro par `/wcb reset`. Aucune XP supposée en cas de données ambiguës.
+- **Comportement au login** : seule la minimap s'affiche par défaut, sans ouverture forcée de la grande application. `/wcb autostart on/off` restaure l'ouverture automatique dans le dernier mode sélectionné.
+- **Compatibilité** : mini / guide n'utilisent pas les mêmes fenêtres que l'ancien addon ; les versions peuvent coexister, mais on recommande de désactiver l'ancien addon lors des tests pour éviter les doublons de suivi de session.
+- **Tests** : mini-bilan, monnaie positive/négative, XP/temps/morts, commandes de modes, minimap, position, réinitialisation, autostart et validation syntaxique Lua 5.1/5.4.
+
+
 ## 0.3.3-test — 24 novembre 2026
 
 - **Segments de niveaux** : 1–9, 10–19, 20–29, 30–40 inclusif, 41–50 et 51–60 ; navigation directe d'une tranche a l'autre. Les segments sans quetes verifiees restent des apercus, pas des quetes inventees.
