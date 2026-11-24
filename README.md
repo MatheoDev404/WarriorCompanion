@@ -1,12 +1,14 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.3.3.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.3.4.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
 
 ## Installation
 
 Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev404/WarriorCompanion/tree/feature/build-planner) puis copier le dossier `Addon/WarriorCompanionBuild` dans le dossier `Interface/AddOns/` de WoW Forever. Le dossier final doit contenir `WarriorCompanionBuild.toc`. Redémarrer le client.
 
-**Commande :** `/wcb` ouvre ou ferme le guide. `/wcb talents`, `/wcb equipement`, `/wcb parcours`, `/wcb rotation`, `/wcb reel` naviguent ou remettent le niveau automatique. **La taille se règle avec les boutons `+` et `-`, sans mode compact séparé.**
+**Minimap :** une icône de guerrier apparaît autour de la minimap, déplaçable en la faisant glisser. **Clic gauche** : ouvrir/fermer le guide complet ; **clic droit** : afficher/masquer l'ancien mini-bilan **304 × 88 px** (XP gagnée, temps, morts, solde de session et conseil). Dans le mini, le bouton **>>** ouvre le guide. Les positions sont conservées.
+
+**Commandes :** `/wcb` ouvre/ferme le guide, `/wcb mini`, `/wcb full`, `/wcb hide`, et les onglets `/wcb talents`, `/wcb equipement`, `/wcb parcours`, `/wcb rotation`, `/wcb reel`. Pour les anciennes options : `/wcb reset` (remise à zéro du bilan), `/wcb autostart on/off` (ouverture auto désactivée par défaut), `/wcb alerts on/off` (ligne de conseil), `/wcb minimap on/off`. Taille du guide par `+`/`-` ; le mini conserve son format d'origine.
 
 ### Onglets
 1. **Talents** : 3 arbres Armes/Furie/Protection affichés côte à côte, icônes et infobulles, **point du niveau consulté surligné en or**, plan Fury pure ou hybride 13/38, prévisualisation libre.
@@ -21,4 +23,4 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 - Ancien addon archivé dans `main`. Seul le nouveau `WarriorCompanionBuild` est présent dans ce paquet.
 - Licence et sources : [README du module](Addon/WarriorCompanionBuild/README.md), [recherche](docs/RESEARCH_FOREVER.md), [audit legacy](docs/LEGACY_AUDIT.md).
 
-**À valider en jeu** : quatre onglets, taille, infobulles, noms locaux, icônes d'objets, absence de superpositions. Tests de règles et maquettes Lua 5.1/5.4 ne remplacent pas les captures du client.
+**À valider en jeu** : nouvel icône minimap, raccourcis gauche/droit, mini-bilan, compteurs XP/monnaie, quatre onglets et absence de superpositions. Tests de règles et maquettes Lua 5.1/5.4 ne remplacent pas les captures du client.
