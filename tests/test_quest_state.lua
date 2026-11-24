@@ -84,6 +84,13 @@ for _,entry in ipairs(B:RouteSegmentEntries(4,false)) do
 end
 assert(B:QuestCompletion(99999)==false,
   "une API disponible peut confirmer la non-completion")
+-- Variante du client qui n'expose que la liste globale des quetes rendues.
+C_QuestLog.IsQuestFlaggedCompleted=nil
+C_QuestLog.GetAllCompletedQuestIDs=function() return {1718,1105,5561} end
+B:ReadQuestLog()
+assert(B:QuestCompletion(5561)==true and
+  B:QuestCompletion(99999)==false,
+  "fallback GetAllCompletedQuestIDs sans flag individuel")
 -- API degradee : ne jamais conclure a la completion ou a l'acceptation.
 C_QuestLog=nil
 B.questLog=nil
