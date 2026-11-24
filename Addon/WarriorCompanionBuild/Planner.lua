@@ -454,10 +454,14 @@ function B:RouteSegmentEntries(index,showCompleted)
 end
 function B:FirstSuggestedStep(entries)
   local level=self.realLevel or 1
-  -- Les quetes accepte(e)s et pretes a rendre passent avant les nouvelles.
+  -- Une quete prete a rendre prime sur les objectifs encore en cours.
   for _,entry in ipairs(entries) do
-    if not entry.step.group and
-       (entry.state=="A RENDRE" or entry.state=="EN COURS") then
+    if not entry.step.group and entry.state=="A RENDRE" then
+      return entry.step
+    end
+  end
+  for _,entry in ipairs(entries) do
+    if not entry.step.group and entry.state=="EN COURS" then
       return entry.step
     end
   end
