@@ -714,8 +714,11 @@ function B:RefreshRoute()
         end
       end
     end
+    local objective=selected.questId and
+      self:QuestObjectiveSummary(selected.questId) or nil
     page.note:SetText(selected.text..
-      "\n"..(selected.note or "")..gear)
+      "\n"..(objective and ("En cours : "..objective) or
+        (selected.note or ""))..gear)
     page.activeAccent:SetVertexColor(shade[1],shade[2],shade[3],1)
     if selected.questId then
       page.done.txt:SetText("Suivi auto (journal)")
