@@ -160,6 +160,13 @@ function B:CreateTalentPage(page)
       end
       b.icon=icon
       b.rank=label(b,-1,-27,38,11,"GameFontHighlightSmall","",MUTED)
+      -- Marqueur visible meme quand plusieurs arbres sont compares.
+      -- Investi (ambre), non investi (gris), point de niveau (or vif).
+      b.allocatedMarker=b:CreateTexture(nil,"OVERLAY")
+      b.allocatedMarker:SetTexture("Interface\\Buttons\\WHITE8X8")
+      b.allocatedMarker:SetPoint("TOPLEFT",b,"TOPLEFT",28,-1)
+      b.allocatedMarker:SetSize(7,7)
+      b.allocatedMarker:SetVertexColor(0,0,0,0)
       b:SetScript("OnEnter",function() B:TooltipTalent(b,node) end)
       b:SetScript("OnLeave",dismissTip)
       tree.nodes[node[1]]=b
@@ -527,15 +534,29 @@ function B:RefreshTalents()
       local b=tree.nodes[node[1]]
       local rank=plan.ranks[node[1]] or 0
       b.rank:SetText(rank.."/"..node[4])
-      local c=rank>0 and {0.21,0.26,0.30,1} or CARD
-      b.bg:SetVertexColor(c[1],c[2],c[3],c[4])
+      local invested=rank>0
       local active=point and point.tree==treeName and point.key==node[1]
-      for _,edge in ipairs(b.edges) do
-        edge:SetVertexColor(GOLD[1],GOLD[2],GOLD[3],active and 1 or 0)
+      local color=active and {0.58,0.37,0.12,1} or
+        (invested and {0.39,0.29,0.17,1} or {0.11,0.13,0.16,1})
+      b.bg:SetVertexColor(color[1],color[2],color[3],color[4])
+      if b.icon.SetDesaturated then b.icon:SetDesaturated(not invested) end
+      if b.icon.SetVertexColor then
+        local bright=invested and 1 or 0.42
+        b.icon:SetVertexColor(bright,bright,bright,1)
       end
+      for _,edge in ipairs(b.edges) do
+        edge:SetVertexColor(active and 1 or 0.84,
+          active and 0.85 or 0.57,
+          active and 0.27 or 0.21,
+          active and 1 or (invested and 0.96 or 0))
+      end
+      b.allocatedMarker:SetVertexColor(active and 1 or 0.88,
+        active and 0.89 or 0.63,active and 0.21 or 0.34,
+        invested and 1 or 0)
       if b.rank.SetTextColor then
-        b.rank:SetTextColor(active and 1 or 0.69,
-          active and 0.77 or 0.74,active and 0.36 or 0.81)
+        b.rank:SetTextColor(active and 1 or (invested and 0.99 or 0.57),
+          active and 0.90 or (invested and 0.75 or 0.62),
+          active and 0.35 or (invested and 0.40 or 0.67))
       end
     end
   end
