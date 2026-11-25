@@ -1,6 +1,6 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.3.7.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.4.0.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
 
 ## Installation
 
@@ -13,8 +13,14 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 ### Onglets
 1. **Talents** : talents investis ambrés et non investis estompés, 3 arbres Armes/Furie/Protection affichés côte à côte, icônes et infobulles, **point du niveau consulté surligné en or**, plan Fury pure ou hybride 13/38, prévisualisation libre.
 2. **Équipement** : quêtes, forge et butins de donjons sélectionnés (Hérode : casque/épaulières ; Glouton : hache 1M), **liste pleine largeur à la molette / glissière** (cinq objets visibles ; objets du niveau d'abord, futurs ensuite), icônes/infobulles natives, source du boss et bouton **Voir dans Parcours**. L'estimation n'est pas un calcul de DPS.
-3. **Parcours** : icône de récompense avec tooltip au survol, bouton **Détails** et information d'acquisition de recettes, tranches de niveaux (30–40 inclusif), **liste complète à défilement**, suivi du journal (acceptée, en cours, prête à rendre, rendue), filtre des quêtes déjà terminées et repères par type ; parcours solo prioritaire avec étapes facultatives séparées. Les autres tranches restent incomplètes.
+3. **Parcours** : **vue Guide détaillé 30–40 (302 étapes dans 14 sections)**, liste scrollable, reprise selon le niveau/les quêtes acceptées/la zone, étapes réellement acceptées, objectifs prêts et quêtes rendues suivis dans le journal. Un bouton bascule vers la vue synthétique précédente, conservée pour les quêtes d'équipement, métiers et donjons. Les autres tranches restent incomplètes.
 4. **Rotation** : mode **monocible / multicible**, enchaînement d'ouverture, buffs à maintenir, boucle, réactions, gros CD offensifs/défensifs ; Fracasser armure sur cible résistante, rangs à apprendre chez le maître et grimoire par familles, jamais d'autocast.
+
+### Nouvelle boussole et guide détaillé 30–40
+
+- La flèche dirige vers les coordonnées de l'étape du guide sélectionnée et indique une **distance en ligne droite**, jamais un trajet routier. Si la position, le sens ou la zone est inaccessible, elle affiche une explication plutôt qu'un chiffre inventé. La flèche se déplace par glisser-déposer et sa position est enregistrée. `/wcb compass on/off` permet de l'activer ou la masquer ; `/wcb guide` ouvre directement le guide ; `/wcb guideaudit` affiche son inventaire.
+- Les 302 étapes réimportées sont issues d'une adaptation antérieure OpenXP/RestedXP dans le dépôt. Leur licence **CC BY-NC-SA 4.0** et l'attribution sont conservées dans `DetailedData30_40.lua` et `LICENSE-GUIDE.txt`.
+- **Audit du contenu** : 285 destinations dans 14 zones cartographiées ; 217 actions de quêtes renvoyant à 108 identifiants distincts, recoupés avec l'export de WoW Forever. Le comportement des 302 étapes **n'est pas encore validé individuellement en jeu**, notamment certains prérequis non documentés et des textes anglais qui subsistent.
 
 ### Important
 - Ne pas confondre le pilote testable et une route de quêtes 1–60 intégralement validée.
@@ -23,4 +29,4 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 - Ancien addon archivé dans `main`. Seul le nouveau `WarriorCompanionBuild` est présent dans ce paquet.
 - Licence et sources : [README du module](Addon/WarriorCompanionBuild/README.md), [recherche](docs/RESEARCH_FOREVER.md), [audit legacy](docs/LEGACY_AUDIT.md).
 
-**À valider en jeu** : nouvel icône minimap, raccourcis gauche/droit, mini-bilan, valeurs protégées du client (affichées comme indisponibles), compteurs XP/monnaie, quatre onglets et absence de superpositions. Tests de règles et maquettes Lua 5.1/5.4 ne remplacent pas les captures du client.
+**À valider en jeu** : nouvel icône minimap, raccourcis gauche/droit, mini-bilan, valeurs protégées du client (affichées comme indisponibles), compteurs XP/monnaie, quatre onglets et absence de superpositions. Tests de règles, d'état de quêtes, de boussole et de maquettes Lua 5.1/5.4 ne remplacent pas les captures du client.
