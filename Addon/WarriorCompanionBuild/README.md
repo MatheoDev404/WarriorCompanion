@@ -1,4 +1,4 @@
-# Warrior Companion | Build Planner — 0.3.6-test
+# Warrior Companion | Build Planner — 0.3.7-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
 
@@ -8,14 +8,14 @@
 2. Extraire **uniquement** `Addon/WarriorCompanionBuild` vers `World of Warcraft/Interface/AddOns/WarriorCompanionBuild/`.
 3. Vérifier que `Interface/AddOns/WarriorCompanionBuild/WarriorCompanionBuild.toc` existe.
 4. Pour tester sans chevauchement, désactiver temporairement l'ancien addon `WarriorCompanion` dans le sélecteur d'addons. Redémarrer WoW Forever.
-5. **Par défaut**, aucune fenêtre ne s'ouvre automatiquement ; un bouton guerrier apparaît autour de la minimap. Clic gauche pour ouvrir/fermer le guide, clic droit pour afficher/masquer le mini-bilan.
+5. **Par défaut**, aucune fenêtre ne s'ouvre automatiquement ; un bouton guerrier apparaît autour de la minimap. Clic gauche pour ouvrir le guide, clic droit pour ouvrir le mini-bilan, sans fermeture par répétition d'un clic.
 6. Utiliser `/wcb` si le bouton est masqué ou si la minimap n'est pas disponible.
 
 ### Mini-bilan d'origine et accès depuis la minimap
 
 - Mini-fenêtre **304 × 88 px** reprenant les informations de l'ancien mais avec palette anthracite/bronze cohérente avec la grande interface ; fidèle à l'ancien `CompactDashboard.lua` : XP gagnée, temps écoulé, morts, delta de monnaie de la session (or/argent/cuivre, couleurs positives/négatives) et une ligne d'alerte. Actualisation périodique toutes les trois secondes ou à un événement de session.
 - **Déplacement libre**, position du mini mémorisée dans `WCBuildDB.compactPoint`, bouton **>>** pour développer. La fermeture du guide après un développement depuis le mini le restaure.
-- **Icône circulaire style LibDBIcon/GearQuest autour de la minimap** (taille réelle de la minimap / 2 + 5, icône de 20 px centrée sans masque déformant, contour Blizzard), position angulaire mémorisée ; clic gauche : guide complet ; clic droit : mini ; glisser-déposer : repositionner l'icône.
+- **Icône circulaire style LibDBIcon/GearQuest autour de la minimap** (taille réelle de la minimap / 2 + 5, icône de 20 px centrée sans masque déformant, contour Blizzard), position angulaire mémorisée ; clic gauche : ouvrir le guide complet ; clic droit : ouvrir le mini, sans fermer au second clic ; glisser-déposer : repositionner l'icône.
 - Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si une API renvoie un nombre secret (mécanisme de protection Forever), l'addon ne le compare ni ne le calcule : il affiche une valeur indisponible au lieu de planter. Les positions et le drag de la minimap appliquent la même protection.
 - **Options identiques** : `/wcb mini`, `/wcb full`, `/wcb hide`, `/wcb autostart on/off`, `/wcb reset`, `/wcb alerts on/off`. Ajout de `/wcb minimap on/off`. Par défaut, l'ouverture automatique est **désactivée** ; activable pour retrouver l'ancienne expérience. Les préférences sont dans `WCBuildDB`.
 - L'ancienne logique générale de conseils n'est pas importée intégralement : la ligne conserve les alertes sûres (points non dépensés si API présente, vie basse, morts répétées). Le mini reste autonome du vieux dossier `WarriorCompanion`.
