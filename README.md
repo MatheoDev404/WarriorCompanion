@@ -1,6 +1,6 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.4.1.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.5.0.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
 
 ## Installation
 
@@ -13,7 +13,7 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 ### Onglets
 1. **Talents** : talents investis ambrés et non investis estompés, 3 arbres Armes/Furie/Protection affichés côte à côte, icônes et infobulles, **point du niveau consulté surligné en or**, plan Fury pure ou hybride 13/38, prévisualisation libre.
 2. **Équipement** : quêtes, forge et butins de donjons sélectionnés (Hérode : casque/épaulières ; Glouton : hache 1M), **liste pleine largeur à la molette / glissière** (cinq objets visibles ; objets du niveau d'abord, futurs ensuite), icônes/infobulles natives, source du boss et bouton **Voir dans Parcours**. L'estimation n'est pas un calcul de DPS.
-3. **Parcours** : **vue Guide détaillé 30–40 (302 étapes dans 14 sections)**, liste scrollable, reprise selon le niveau/les quêtes acceptées/la zone, étapes réellement acceptées, objectifs prêts et quêtes rendues suivis dans le journal. Un bouton bascule vers la vue synthétique précédente, conservée pour les quêtes d'équipement, métiers et donjons. Les autres tranches restent incomplètes.
+3. **Parcours** : **vue Guide détaillé 30–40 (302 étapes dans 14 sections)**, enrichie avec les **détours facultatifs** par catégorie (Armes, Armure, Métiers, Donjons), les modes **Sécurité / XP rapide**, le regroupement par zone et la sélection dynamique selon le niveau et le journal. Bouton **Reprendre** pour recalculer après une déviation, et possibilité de sélectionner manuellement une étape. La vue synthétique précédente reste disponible pour les équipements et les quêtes particulières. Les autres tranches restent incomplètes.
 4. **Rotation** : mode **monocible / multicible**, enchaînement d'ouverture, buffs à maintenir, boucle, réactions, gros CD offensifs/défensifs ; Fracasser armure sur cible résistante, rangs à apprendre chez le maître et grimoire par familles, jamais d'autocast.
 
 ### Nouvelle boussole et guide détaillé 30–40
@@ -21,6 +21,13 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 - La boussole est désormais un **HUD transparent** : une flèche de 68 px avec contour/halo bronze, sans panneau opaque, accompagnée d'une distance et d'un nom d'objectif discrets. On la déplace en glissant la flèche ; la zone transparente ne bloque pas les clics du jeu. Elle dirige vers les coordonnées de l'étape du guide sélectionnée et indique une **distance en ligne droite**, jamais un trajet routier. Si la position, le sens ou la zone est inaccessible, elle affiche une explication plutôt qu'un chiffre inventé. La flèche se déplace par glisser-déposer et sa position est enregistrée. `/wcb compass on/off` permet de l'activer ou la masquer ; `/wcb guide` ouvre directement le guide ; `/wcb guideaudit` affiche son inventaire.
 - Les 302 étapes réimportées sont issues d'une adaptation antérieure OpenXP/RestedXP dans le dépôt. Leur licence **CC BY-NC-SA 4.0** et l'attribution sont conservées dans `DetailedData30_40.lua` et `LICENSE-GUIDE.txt`.
 - **Audit du contenu** : 285 destinations dans 14 zones cartographiées ; 217 actions de quêtes renvoyant à 108 identifiants distincts, recoupés avec l'export de WoW Forever. Le comportement des 302 étapes **n'est pas encore validé individuellement en jeu**, notamment certains prérequis non documentés et des textes anglais qui subsistent.
+
+### Étape B — Parcours adaptatif
+
+- **Sécurité** (par défaut) privilégie les objectifs solo à un palier compatible avec le niveau réel, en pénalisant les étapes au-dessus du niveau actuel. **XP rapide** autorise un palier supérieur d'un niveau et privilégie davantage le regroupement des objectifs voisins. Ces règles reposent sur les niveaux des *sections du guide*, pas sur une lecture exacte des niveaux des ennemis ; il n'y a pas encore de mesure XP/heure intégrée au moteur.
+- **Reprise après déviation** : changement de zone, niveau ou état de quête → nouvelle proposition. Une sélection manuelle est épinglée tant qu'elle est pertinente, puis libérée si son objectif disparaît ou si le personnage change de zone.
+- **Détours facultatifs** : quatre filtres Armes / Armure / Métiers / Donjons dans le Parcours. Les options sont associées aux sections correspondantes, sans coordonnées inventées et sans imposer de donjon au Guerrier solo.
+- Commandes : `/wcb mode securite`, `/wcb mode xp`, `/wcb reprendre` et `/wcb guide`. Les filtres et le mode sont mémorisés dans `WCBuildDB`.
 
 ### Important
 - Ne pas confondre le pilote testable et une route de quêtes 1–60 intégralement validée.
