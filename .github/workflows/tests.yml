@@ -29,6 +29,8 @@ jobs:
         run: python3 tests/test_guide_source_audit.py
       - name: Verify the 302-step adaptive guide
         run: lua${{ matrix.lua }} tests/test_detailed_guide.lua
+      - name: Verify XP/Safety modes, optional detours and recovery
+        run: lua${{ matrix.lua }} tests/test_adaptive_route.lua
       - name: Verify compass distances and protected values
         run: lua${{ matrix.lua }} tests/test_compass.lua
       - name: Verify minimap icon and original compact HUD
