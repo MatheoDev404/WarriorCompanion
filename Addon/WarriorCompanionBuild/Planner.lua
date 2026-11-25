@@ -611,6 +611,7 @@ function B:GoToGear(id)
   for i,entry in ipairs(self:OrderedRoute()) do
     if entry.step.gearId==id then
       self.routeIndex=i
+      if self.db then self.db.detailedMode=false end
       self.routeSelectedId=entry.step.id
       self.routeSegment=self:SegmentAt(entry.step.level)
       self.routeScroll=0
