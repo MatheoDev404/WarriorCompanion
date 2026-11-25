@@ -31,10 +31,11 @@ B:UpdateLevel()
 assert(B.realLevel==35 and B.viewLevel==40,"ne pas ecraser l'apercu manuel")
 B:ReturnToReal()
 assert(B.mode=="follow" and B.viewLevel==35)
-local questSource,craftSource=0,0
+local questSource,craftSource,dungeonSource=0,0,0
 for _,g in ipairs(B.gear) do
   if g.source=="quest" then questSource=questSource+1
   elseif g.source=="craft" then craftSource=craftSource+1
+  elseif g.source=="dungeon" then dungeonSource=dungeonSource+1
   else error("source interdite") end
   local found=false
   for _,step in ipairs(B.route) do
@@ -46,7 +47,13 @@ for _,g in ipairs(B.gear) do
   end
   assert(found,"objet sans quete ou forge dans le parcours")
 end
-assert(questSource==4 and craftSource==3)
+assert(questSource==4 and craftSource==3 and dungeonSource==2)
+assert(B:FindGearForStep({gearId=7719}).boss=="Herode")
+assert(B:FindGearForStep({gearId=7718}).source=="dungeon")
+assert(B:RouteHelp({gearId=7719}):find("Butin aleatoire",1,true),
+  "aucun butin de boss garanti")
+assert(B:RouteHelp({gearId=250607}):find("251459",1,true),
+  "la recette doit indiquer le plan et l'acquisition prudente")
 assert(#B.talentTrees.Armes==17 and #B.talentTrees.Furie==18
   and #B.talentTrees.Protection==18,
   "trois arbres complets du guerrier Forever")
@@ -77,6 +84,9 @@ local future=B:GearListAt(39,"future")
 assert(#future==2 and future[1].id==271802 and future[2].id==17705,
   "les objets du niveau 43/45 restent consultables dans un panneau separe")
 assert(relevant[1].id==250607,"Dague de Forge 180 visee au niveau 39")
+assert(B:ItemEligible(B:FindGearForStep({gearId=7719}),37))
+assert(not B:ItemEligible(B:FindGearForStep({gearId=7719}),35),
+  "butin du boss non accessible au niveau 35")
 local delayed
 for _,item in ipairs(B.gear) do
   if item.id==271802 then delayed=item end
