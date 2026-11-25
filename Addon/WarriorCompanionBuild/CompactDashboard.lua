@@ -10,6 +10,9 @@ local function font(parent, x, y, w, h, family, value)
   t:SetPoint("TOPLEFT",parent,"TOPLEFT",x,y)
   t:SetWidth(w);t:SetHeight(h)
   t:SetJustifyH("LEFT");t:SetJustifyV("MIDDLE")
+  if t.SetFont then
+    pcall(t.SetFont,t,"Fonts\\ARIALN.TTF",family=="GameFontNormalSmall" and 11 or 12,"")
+  end
   if value then t:SetText(value) end
   return t
 end
@@ -55,17 +58,19 @@ function B:CreateCompactDashboard()
       end
     end
   end)
-  block(f,0,0,304,88,.48,.30,.19)
-  block(f,2,-2,300,84,.065,.045,.05)
-  block(f,3,-3,298,21,.20,.065,.055)
-  block(f,3,-24,298,1,.67,.23,.17)
+  -- Meme direction artistique que la grande interface : anthracite et
+  -- bronze, sans les contours bordeaux de l'ancien mini.
+  block(f,0,0,304,88,.52,.38,.21)
+  block(f,2,-2,300,84,.062,.077,.097)
+  block(f,3,-3,298,21,.112,.140,.173)
+  block(f,3,-24,298,1,.43,.32,.19)
   font(f,9,-4,252,18,"GameFontNormalSmall",
-       "|cffF2D3A0WARRIOR COMPANION|r  |cffB19B8FMini-bilan|r")
+       "|cffE9F0F7WARRIOR COMPANION|r  |cffF5B855Mini-bilan|r")
   local expand=CreateFrame("Button",nil,f)
   expand:SetPoint("TOPRIGHT",f,"TOPRIGHT",-4,-3)
   expand:SetSize(27,19)
-  block(expand,0,0,27,19,.53,.29,.16)
-  block(expand,2,-2,23,15,.12,.07,.06)
+  block(expand,0,0,27,19,.46,.35,.22)
+  block(expand,2,-2,23,15,.163,.191,.226)
   font(expand,6,-1,20,17,"GameFontNormalSmall",">>")
   expand:SetScript("OnClick",function() B:OpenFullDashboard() end)
   self.compactExpand=expand
@@ -74,12 +79,12 @@ function B:CreateCompactDashboard()
   self.compactStats={}
   for i,item in ipairs(names) do
     font(f,item[2],-30,item[3],17,"GameFontNormalSmall",
-      "|cffC9A987"..item[1].."|r")
+      "|cffAABACA"..item[1].."|r")
     self.compactStats[i]=font(f,item[2]+item[3],-30,item[4],17,
       "GameFontHighlightSmall")
   end
-  block(f,5,-49,294,1,.35,.21,.17)
-  font(f,7,-52,59,15,"GameFontNormalSmall","|cffC9A987SOLDE|r")
+  block(f,5,-49,294,1,.32,.29,.24)
+  font(f,7,-52,59,15,"GameFontNormalSmall","|cffAABACASOLDE|r")
   self.compactMoneySign=font(f,67,-52,15,15,"GameFontHighlightSmall")
   self.compactMoneyParts={}
   local positions={83,154,225}
@@ -92,7 +97,7 @@ function B:CreateCompactDashboard()
     coin:SetPoint("TOPLEFT",f,"TOPLEFT",positions[i]+35,-52)
     coin:SetSize(14,14)
   end
-  block(f,5,-69,294,1,.35,.21,.17)
+  block(f,5,-69,294,1,.32,.29,.24)
   self.compactAdvice=font(f,8,-70,289,14,"GameFontHighlightSmall")
   self.compactDashboard=f
   f:Hide()
