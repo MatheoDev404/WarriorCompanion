@@ -1,4 +1,4 @@
-# Warrior Companion | Build Planner — 0.3.7-test
+# Warrior Companion | Build Planner — 0.4.0-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
 
@@ -19,6 +19,18 @@
 - Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si une API renvoie un nombre secret (mécanisme de protection Forever), l'addon ne le compare ni ne le calcule : il affiche une valeur indisponible au lieu de planter. Les positions et le drag de la minimap appliquent la même protection.
 - **Options identiques** : `/wcb mini`, `/wcb full`, `/wcb hide`, `/wcb autostart on/off`, `/wcb reset`, `/wcb alerts on/off`. Ajout de `/wcb minimap on/off`. Par défaut, l'ouverture automatique est **désactivée** ; activable pour retrouver l'ancienne expérience. Les préférences sont dans `WCBuildDB`.
 - L'ancienne logique générale de conseils n'est pas importée intégralement : la ligne conserve les alertes sûres (points non dépensés si API présente, vie basse, morts répétées). Le mini reste autonome du vieux dossier `WarriorCompanion`.
+
+### Guide détaillé et boussole — pilote 30–40
+
+- **302 étapes importées** d'une adaptation OpenXP/RestedXP précédemment conservée sur `main` : 14 sections, 285 positions sur les cartes, 217 actions de quête avec 108 IDs distincts. Attribution dans `DetailedData30_40.lua`, texte de licence dans `LICENSE-GUIDE.txt` (**CC BY-NC-SA 4.0** : utilisation et réutilisation non commerciales avec attribution et partage aux mêmes conditions).
+- **Vue par défaut** : dans le segment 30–40, le bouton « Vue synthèse » permet de retrouver l'ancien parcours (forge, équipement, donjons), tandis que « Guide détaillé » affiche toutes les étapes de la tranche. L'étape recommandée est centrée dans la liste quand la progression change.
+- **Adaptation au niveau/à la zone** : reprise dans une section proche du niveau réel et du hub dominant ; une quête en cours ou prête à rendre peut devenir prioritaire. L'import n'invente pas les liens de prérequis manquants ; seules les dépendances de quêtes explicitement renseignées dans le guide synthétique sont appliquées. Les autres restent à confirmer.
+- **Suivi automatique** par `C_QuestLog` : « accepter » devient fait lorsque la quête figure dans le journal, « objectifs » lorsqu'elle est prête à rendre, « rendre » uniquement une fois la quête effectivement rendue. Les étapes de combat sans ID de quête ne sont pas considérées comme terminées par simple proximité.
+- **Manuel** : une étape sans preuve peut être marquée faite ou ignorée. Cette action reste séparée du journal du jeu et peut être annulée ; la quête n'est jamais déclarée rendue artificiellement.
+- **Boussole** : `/wcb compass on/off`. Flèche déplaçable avec position enregistrée ; met à jour l'orientation et la distance en ligne droite (~ toutes les 0,2 s) depuis les fonctions de carte/position du client, avec fallback strictement dans la même zone lorsque les coordonnées mondiales ne sont pas disponibles. Le parcours n'invente ni itinéraire de vol, ni distance à travers les continents. Étapes sans coordonnées : affichage d'un diagnostic. Seuls les simples déplacements peuvent être cochés automatiquement à l'arrivée.
+- **Audit** : `/wcb guideaudit` et `tests/test_guide_source_audit.py`. Les 108 IDs uniques ont été recoupés avec le fichier `Data/VanillaQuestIDs.lua` de `prezus/ForeverGuide` (export Forever), les 285 coordonnées se situent dans l'intervalle 0–100 de 14 zones reconnues. Il ne s'agit pas d'une vérification des points géographiques, chemins, difficultés et chaînes en jeu.
+- **Limitations du pilote** : descriptions historiques parfois anglaises, actions sans ID qu'il faut confirmer manuellement, ordre originel à optimiser, prérequis non encore catalogués pour toutes les quêtes. La flèche est un indicateur de direction, pas un pathfinding.
+- **Démarrage rapide** : `/wcb guide` pour ouvrir directement le segment et `/wcb compass on` pour l'afficher.
 
 ### Contrôles
 
