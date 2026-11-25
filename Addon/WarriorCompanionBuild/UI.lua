@@ -344,7 +344,8 @@ function B:TooltipRoute(btn,step)
   if type(tip.ClearLines)=="function" then tip:ClearLines() end
   if type(tip.AddLine)~="function" then return end
   if step.guide then
-    local details=self:GuideStepHelp(step) or step.text
+    local details=(self.AdaptiveStepHelp and self:AdaptiveStepHelp(step)) or
+      self:GuideStepHelp(step) or step.text
     for line in details:gmatch("[^\n]+") do
       tip:AddLine(line,0.89,0.90,0.91,true)
     end
@@ -379,6 +380,12 @@ end
 local function routeBadge(step)
   if not step then return "APERCU",MUTED end
   if step.guide then
+    if step.detour then
+      if step.category=="dungeons" then return "DONJON",{0.83,0.50,0.93,1} end
+      if step.category=="professions" then return "METIER",{0.52,0.84,0.72,1} end
+      if step.category=="weapons" then return "ARME",{0.98,0.75,0.42,1} end
+      return "EQUIPEMENT",{0.87,0.67,0.97,1}
+    end
     if step.group then return "GROUPE",RED end
     if step.action=="accept" then return "ACCEPTER",GREEN end
     if step.action=="complete" then return "OBJECTIF",{0.55,0.78,0.98,1} end
@@ -406,7 +413,11 @@ function B:CreateRoutePage(page)
     B:SelectRouteSegment(math.min(#B.levelSegments,B:CurrentRouteSegment()+1))
     B:RefreshRoute()
   end)
-  page.count=label(page,483,-5,205,27,"GameFontHighlightSmall","",MUTED)
+  page.modeButton=button(page,480,-5,106,27,"Securite",function()
+    if B.AdaptiveToggleMode then B:AdaptiveToggleMode() end
+    B:RefreshRoute()
+  end)
+  page.count=label(page,592,-5,97,27,"GameFontHighlightSmall","",MUTED)
   page.activeBg=rect(page,13,-39,673,101,CARD)
   page.activeAccent=rect(page,13,-39,3,101,GOLD)
   page.zone=label(page,27,-43,474,23,"GameFontNormal","",GOLD)
@@ -431,8 +442,20 @@ function B:CreateRoutePage(page)
     B:TooltipRoute(btn,B.activeRouteStep)
   end)
   page.howButton:SetScript("OnLeave",dismissTip)
-  page.listTitle=label(page,17,-144,350,23,"GameFontNormal",
-    "OBJECTIFS DU SEGMENT",MUTED)
+  page.listTitle=label(page,17,-144,117,23,"GameFontNormal",
+    "OBJECTIFS",MUTED)
+  page.optionButtons={}
+  local filters={{"weapons","Armes"},{"armor","Armure"},
+    {"professions","Metiers"},{"dungeons","Donjons"}}
+  for i,filter in ipairs(filters) do
+    local category=filter[1]
+    page.optionButtons[category]=button(page,137+(i-1)*72,-145,68,25,
+      filter[2],function()
+        if B.AdaptiveToggleOption then B:AdaptiveToggleOption(category) end
+        B.routeScroll=0
+        B:RefreshRoute()
+      end)
+  end
   page.toggleCompleted=button(page,505,-145,181,25,
     "Afficher les terminees",function()
       B.showCompleted=not B.showCompleted
@@ -456,7 +479,11 @@ function B:CreateRoutePage(page)
       local entry=B.routeVisible and B.routeVisible[(B.routeScroll or 0)+i]
       if entry then
         B.routeSelectedId=entry.step.id
-        if entry.step.guide then B:GuideSelect(entry.step) end
+        if entry.step.guide and B.AdaptiveChoose then
+          B:AdaptiveChoose(entry.step,true)
+        elseif entry.step.guide then
+          B:GuideSelect(entry.step)
+        end
         B:RefreshRoute()
       end
     end)
@@ -496,13 +523,17 @@ function B:CreateRoutePage(page)
   end
   page.switchGuide=button(page,16,-317,152,27,"Guide detaille",function()
     if B.db then B.db.detailedMode=not (B.db.detailedMode~=false) end
+    if B.AdaptiveResume then B:AdaptiveResume() end
     B.routeSelectedId=nil
     B.routeScroll=0
     B:RefreshRoute()
   end)
-  page.nextAvailable=button(page,173,-317,125,27,"Conseille",function()
-    B.routeSelectedId=nil
-    if B.db then B.db.guideSelectedId=nil end
+  page.nextAvailable=button(page,173,-317,125,27,"Reprendre",function()
+    if B.AdaptiveResume then B:AdaptiveResume()
+    else
+      B.routeSelectedId=nil
+      if B.db then B.db.guideSelectedId=nil end
+    end
     B.routeScroll=0
     B:RefreshRoute()
   end)
@@ -760,43 +791,65 @@ function B:RefreshRoute()
   local segment=self.levelSegments[segmentIndex]
   local detailed=segmentIndex==4 and self.DetailedEntries and
     self.db and self.db.detailedMode~=false
-  local entries=detailed and self:DetailedEntries(self.showCompleted) or
+  local adaptive=detailed and type(self.AdaptiveEntries)=="function"
+  local entries=adaptive and self:AdaptiveEntries(self.showCompleted) or
+    (detailed and self:DetailedEntries(self.showCompleted)) or
     self:RouteSegmentEntries(segmentIndex,self.showCompleted)
-  local all=detailed and self:DetailedEntries(true) or
+  local all=adaptive and self:AdaptiveEntries(true) or
+    (detailed and self:DetailedEntries(true)) or
     self:RouteSegmentEntries(segmentIndex,true)
   self.routeVisible=entries
   local doneCount=0
   for _,entry in ipairs(all) do
-    if (detailed and self:GuideStepDone(entry.step)) or
+    if (adaptive and self:AdaptiveStepDone(entry.step)) or
+      (detailed and not adaptive and self:GuideStepDone(entry.step)) or
       (not detailed and self:IsStepDone(entry.step)) then
       doneCount=doneCount+1
     end
   end
   page.segmentLabel:SetText("Segment "..segment[3]..
     (detailed and " · guide" or ""))
-  page.count:SetText((#all-doneCount).." restants / "..#all.." etapes")
+  page.count:SetText((#all-doneCount).."/"..#all.." étapes")
+  page.modeButton.txt:SetText(
+    self.AdaptiveMode and self:AdaptiveMode()=="xp" and "XP rapide" or
+      "Sécurité")
+  for category,buttonFrame in pairs(page.optionButtons) do
+    local enabled=adaptive and self:AdaptiveOptionEnabled(category)
+    local labels={weapons="Armes",armor="Armure",
+      professions="Métiers",dungeons="Donjons"}
+    buttonFrame.txt:SetText((enabled and "+ " or "- ")..
+      (labels[category] or category))
+  end
   page.switchGuide.txt:SetText(detailed and "Vue synthese" or "Guide detaille")
   page.toggleCompleted.txt:SetText(self.showCompleted and
     "Masquer les terminees" or "Afficher les terminees")
   local selected=nil
-  if self.routeSelectedId then
-    for _,entry in ipairs(entries) do
-      if entry.step.id==self.routeSelectedId then
-        selected=entry.step
-        break
+  local prior=self.routeSelectedId
+  if adaptive then
+    selected=self:AdaptiveSuggestedStep(entries)
+    if selected then
+      self:AdaptiveChoose(selected,false)
+      if prior~=selected.id then self.routeForced=true end
+    else
+      self.routeSelectedId=nil
+    end
+  else
+    if self.routeSelectedId then
+      for _,entry in ipairs(entries) do
+        if entry.step.id==self.routeSelectedId then
+          selected=entry.step
+          break
+        end
       end
     end
-  end
-  if not selected then
-    local prior=self.routeSelectedId
-    selected=detailed and self:GuideSuggestedStep(entries) or
-      self:FirstSuggestedStep(entries)
-    self.routeSelectedId=selected and selected.id or nil
-    if detailed and selected then
-      self:GuideSelect(selected)
-      -- Lors d'une reprise ou d'une auto-validation, montrer la nouvelle
-      -- ligne recommandée sans déplacer le scroll pendant une lecture.
-      if prior~=selected.id then self.routeForced=true end
+    if not selected then
+      selected=detailed and self:GuideSuggestedStep(entries) or
+        self:FirstSuggestedStep(entries)
+      self.routeSelectedId=selected and selected.id or nil
+      if detailed and selected then
+        self:GuideSelect(selected)
+        if prior~=selected.id then self.routeForced=true end
+      end
     end
   end
   self.activeRouteStep=selected
@@ -810,7 +863,8 @@ function B:RefreshRoute()
     self.routeForced=false
   end
   if selected then
-    local state=detailed and self:GuideStepState(selected) or
+    local state=adaptive and self:AdaptiveStepState(selected) or
+      (detailed and self:GuideStepState(selected)) or
       self:StepState(selected)
     local tag,shade=routeBadge(selected)
     page.zone:SetText((detailed and ("Etape "..selected.guideIndex) or
@@ -838,8 +892,9 @@ function B:RefreshRoute()
       local cut=instructions:sub(1,122)
       instructions=(cut:match("^(.*)%s+") or cut).."... (Details)"
     end
-    page.note:SetText((detailed and self:GuideText(selected) or
-      selected.text).."\n"..instructions)
+    page.note:SetText((adaptive and self:AdaptiveText(selected) or
+      (detailed and self:GuideText(selected)) or selected.text)..
+      "\n"..instructions)
     local item=self:FindGearForStep(selected)
     if item then
       page.routeItem.icon:SetTexture(itemIcon(item.id))
@@ -850,7 +905,7 @@ function B:RefreshRoute()
     page.activeAccent:SetVertexColor(shade[1],shade[2],shade[3],1)
     if detailed then
       page.done.txt:SetText(selected.questId and "Ignorer (manuel)" or
-        "Etape effectuee")
+        "Etape effectuée")
     elseif selected.questId then
       page.done.txt:SetText("Suivi auto (journal)")
     elseif selected.group or selected.level>(self.realLevel or 1) then
@@ -890,7 +945,8 @@ function B:RefreshRoute()
   end
   if self.SetCompassTarget then
     self:SetCompassTarget(detailed and selected and
-      self:GuideTarget(selected) or nil)
+      (adaptive and self:AdaptiveTarget(selected) or
+        self:GuideTarget(selected)) or nil)
   end
   local count=#entries
   local maxOffset=math.max(0,count-5)
@@ -907,10 +963,11 @@ function B:RefreshRoute()
       row.kind:SetText(tag)
       row.kind:SetTextColor(shade[1],shade[2],shade[3])
       row.marker:SetVertexColor(shade[1],shade[2],shade[3],1)
-      row.name:SetText(routeText(detailed and self:GuideText(step) or
-        step.text,65))
-      row.state:SetText(detailed and self:GuideStepState(step) or
-        self:StepState(step))
+      row.name:SetText(routeText(
+        adaptive and self:AdaptiveText(step) or
+          (detailed and self:GuideText(step)) or step.text,65))
+      row.state:SetText(adaptive and self:AdaptiveStepState(step) or
+        (detailed and self:GuideStepState(step)) or self:StepState(step))
       local active=selected and selected.id==step.id
       local color=active and {0.28,0.31,0.34,1} or CARD
       row.bg:SetVertexColor(color[1],color[2],color[3],color[4])
