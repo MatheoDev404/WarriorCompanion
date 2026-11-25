@@ -52,6 +52,23 @@ local function slash(msg)
     B.db.showAlerts=false
     B:RefreshCompactDashboard()
     message("Conseils du mini-bilan desactives.")
+  elseif msg=="compass on" then
+    B:SetCompassEnabled(true)
+  elseif msg=="compass off" then
+    B:SetCompassEnabled(false)
+  elseif msg=="guide" then
+    B:OpenFullDashboard()
+    if B.db then B.db.detailedMode=true end
+    B:ShowPage("parcours")
+  elseif msg=="guideaudit" then
+    local audit=B:DetailedAudit()
+    message("Guide 30-40 : "..audit.steps.." etapes, "..
+      audit.packs.." sections, "..audit.coords.." points, "..
+      audit.questActions.." actions de quetes.")
+    if audit.badQuestIDs>0 or audit.unknownMaps>0 then
+      message("A verifier : "..audit.badQuestIDs.." identifiants et "..
+        audit.unknownMaps.." cartes non resolues.")
+    end
   elseif msg=="minimap on" then
     B:SetMinimapVisible(true)
   elseif msg=="minimap off" then
@@ -59,6 +76,7 @@ local function slash(msg)
   elseif msg=="help" then
     message("/wcb : ouvrir/fermer | mini | full | hide | talents | equipement | parcours | rotation | reel")
     message("/wcb reset | autostart on/off | alerts on/off | minimap on/off")
+    message("/wcb guide | guideaudit | compass on/off")
   else
     B:ToggleDashboard()
   end
@@ -79,6 +97,7 @@ events:RegisterEvent("QUEST_LOG_UPDATE")
 events:RegisterEvent("QUEST_ACCEPTED")
 events:RegisterEvent("QUEST_REMOVED")
 events:RegisterEvent("QUEST_TURNED_IN")
+events:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 events:RegisterEvent("UNIT_AURA")
 events:SetScript("OnEvent",function(_,event,arg1)
   if event=="ADDON_LOADED" then
@@ -106,12 +125,14 @@ events:SetScript("OnEvent",function(_,event,arg1)
     if not B.frame then B:CreateUI() end
     if not B.compactDashboard then B:CreateCompactDashboard() end
     B:CreateMinimapButton()
+    if B.CreateCompass then B:CreateCompass() end
     B:AutoOpenDashboard()
     if B.frame and B.frame:IsShown() then B:Refresh() end
   elseif event=="PLAYER_LEVEL_UP" then
     B:OnSessionEvent(event,arg1)
     B:UpdateLevel()
     if B.frame then B:Refresh() end
+    if B.UpdateCompass then B:UpdateCompass() end
   elseif event=="PLAYER_XP_UPDATE" or event=="PLAYER_DEAD" or
       event=="PLAYER_MONEY" then
     B:OnSessionEvent(event,arg1)
@@ -121,6 +142,13 @@ events:SetScript("OnEvent",function(_,event,arg1)
     if B.frame and B.frame:IsShown() and B.page=="parcours" then
       B:RefreshRoute()
     end
+    if B.UpdateCompass then B:UpdateCompass() end
+  elseif event=="ZONE_CHANGED_NEW_AREA" then
+    if B.frame and B.frame:IsShown() and B.page=="parcours" then
+      B.routeSelectedId=nil
+      B:RefreshRoute()
+    end
+    if B.UpdateCompass then B:UpdateCompass() end
   elseif event=="GET_ITEM_INFO_RECEIVED" then
     if B.frame and B.frame:IsShown() then B:RefreshGear() end
   elseif event=="SPELLS_CHANGED" then
