@@ -59,6 +59,11 @@ assert(someDungeon and B:AdaptiveTarget(someDungeon)==nil,
 assert(B:AdaptiveChoose(someDungeon,true) and B.db.guidePinned)
 assert(B:AdaptiveSuggestedStep(withDungeons).id==someDungeon.id,
   "l'utilisateur peut consulter explicitement un donjon")
+currentMap=1441
+B:AdaptiveInvalidate("zone")
+assert(not B.db.guidePinned,
+  "un donjon sans coordonnées ne doit pas rester bloqué après un voyage")
+currentMap=1443
 B:AdaptiveResume()
 assert(not B.db.guidePinned and B.db.guideSelectedId==nil,
   "reprendre libère le choix manuel")
