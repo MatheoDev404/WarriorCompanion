@@ -47,6 +47,9 @@ function UIParent:GetCenter() return 500,500 end
 function UIParent:GetEffectiveScale() return 1 end
 Minimap=frame()
 function Minimap:GetCenter() return 800,600 end
+function Minimap:GetWidth() return self.mapWidth or 140 end
+function Minimap:GetHeight() return self.mapHeight or 140 end
+function Minimap:HookScript(name,handler) self.scripts[name]=handler end
 function CreateFrame() return frame() end
 local clock=100
 local xp=50
@@ -88,17 +91,24 @@ assert(B.minimapButton.normalTexture==nil,
   "aucune icone carree en texture de bouton")
 assert(B.minimapButton.icon and B.minimapButton.icon.width==20
     and B.minimapButton.icon.height==20 and
-    B.minimapButton.icon.texture:find("BattleShout",1,true),
-  "icone 20px au centre du bouton rond")
-assert(B.minimapButton.border and B.minimapButton.border.width==53 and
-    B.minimapButton.background and B.minimapButton.background.width==20,
-  "fond et bordure ronde native LibDBIcon")
-assert(B.minimapButton.icon.mask and
-  B.minimapButton.icon.mask:find("TempPortraitAlphaMask",1,true),
-  "masque de portrait circulaire quand disponible")
+    B.minimapButton.icon.texture:find("BerserkerRage",1,true),
+  "icone de guerrier centree de 20px")
+assert(B.minimapButton.icon.point[1]=="CENTER" and
+  B.minimapButton.border and B.minimapButton.border.width==53,
+  "icone centree et contour Blizzard comme les autres addons")
+assert(B.minimapButton.icon.mask==nil,
+  "pas de masque de portrait deformant l'icone")
 assert(B.minimapButton.highlightTexture:find("ZoomButton",1,true),
   "surbrillance circulaire Blizzard")
 assert(B.minimapButton.point[2]==Minimap,"bouton ancre a la minimap")
+local xBefore,yBefore=B.minimapButton.point[4],B.minimapButton.point[5]
+Minimap.mapWidth,Minimap.mapHeight=200,200
+if Minimap.scripts.OnSizeChanged then Minimap.scripts.OnSizeChanged() end
+assert(B.minimapButton.point[4]~=xBefore and
+  B.minimapButton.point[5]~=yBefore,
+  "le rayon suit le redimensionnement de la minimap")
+Minimap.mapWidth,Minimap.mapHeight=140,140
+B:UpdateMinimapButton()
 assert(B.minimapButton.clickButtons[2]=="RightButtonUp")
 B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
 assert(B.frame:IsShown() and B.db.displayMode=="full")
