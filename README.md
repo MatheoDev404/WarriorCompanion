@@ -1,6 +1,6 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.4.0.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.4.1.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
 
 ## Installation
 
@@ -18,7 +18,7 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 
 ### Nouvelle boussole et guide détaillé 30–40
 
-- La flèche dirige vers les coordonnées de l'étape du guide sélectionnée et indique une **distance en ligne droite**, jamais un trajet routier. Si la position, le sens ou la zone est inaccessible, elle affiche une explication plutôt qu'un chiffre inventé. La flèche se déplace par glisser-déposer et sa position est enregistrée. `/wcb compass on/off` permet de l'activer ou la masquer ; `/wcb guide` ouvre directement le guide ; `/wcb guideaudit` affiche son inventaire.
+- La boussole est désormais un **HUD transparent** : une flèche de 68 px avec contour/halo bronze, sans panneau opaque, accompagnée d'une distance et d'un nom d'objectif discrets. On la déplace en glissant la flèche ; la zone transparente ne bloque pas les clics du jeu. Elle dirige vers les coordonnées de l'étape du guide sélectionnée et indique une **distance en ligne droite**, jamais un trajet routier. Si la position, le sens ou la zone est inaccessible, elle affiche une explication plutôt qu'un chiffre inventé. La flèche se déplace par glisser-déposer et sa position est enregistrée. `/wcb compass on/off` permet de l'activer ou la masquer ; `/wcb guide` ouvre directement le guide ; `/wcb guideaudit` affiche son inventaire.
 - Les 302 étapes réimportées sont issues d'une adaptation antérieure OpenXP/RestedXP dans le dépôt. Leur licence **CC BY-NC-SA 4.0** et l'attribution sont conservées dans `DetailedData30_40.lua` et `LICENSE-GUIDE.txt`.
 - **Audit du contenu** : 285 destinations dans 14 zones cartographiées ; 217 actions de quêtes renvoyant à 108 identifiants distincts, recoupés avec l'export de WoW Forever. Le comportement des 302 étapes **n'est pas encore validé individuellement en jeu**, notamment certains prérequis non documentés et des textes anglais qui subsistent.
 
