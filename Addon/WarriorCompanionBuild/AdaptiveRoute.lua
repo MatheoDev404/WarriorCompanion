@@ -343,6 +343,10 @@ function B:AdaptiveInvalidate(reason)
     -- Un objectif épinglé qui n'existe plus dans le catalogue ne doit
     -- jamais immobiliser la reprise automatique après un changement de zone.
     if not selected then pinned=false
+    elseif selected.detour and not selected.mapID then
+      -- Les détours sans waypoint ne doivent pas immobiliser le
+      -- navigateur lorsque le joueur quitte sa région.
+      pinned=false
     elseif selected.mapID and map and selected.mapID~=map then
       pinned=false
     end
