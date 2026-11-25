@@ -5,10 +5,10 @@ assert root.is_dir(), "Le dossier du nouvel addon est absent"
 toc=(root/"WarriorCompanionBuild.toc").read_text(encoding="utf-8")
 lines=[line.strip() for line in toc.splitlines() if line.strip()]
 modules=[line for line in lines if not line.startswith("#")]
-assert modules==["Data.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","CombatData.lua","UI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","MinimapButton.lua","Core.lua"], modules
+assert modules==["Data.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","DetailedGuide.lua","DetailedData30_40.lua","Compass.lua","CombatData.lua","UI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","MinimapButton.lua","Core.lua"], modules
 assert "## Interface: 16001" in toc
 assert "## SavedVariables: WCBuildDB" in toc
-assert "## Version: 0.3.7-test" in toc
+assert "## Version: 0.4.0-test" in toc
 assert set(modules)=={p.name for p in root.glob("*.lua")}
 assert not list(root.glob("*.ttf")), "La police systeme WoW suffit, ne pas distribuer de police"
 ui=(root/"UI.lua").read_text(encoding="utf-8")
@@ -32,6 +32,17 @@ assert 'GetWidth' in minimap and 'GetHeight' in minimap
 assert 'BattleShout' in minimap
 assert 'OnSizeChanged' in minimap
 assert 'GetRadius' not in minimap
+guide=(root/"DetailedData30_40.lua").read_text(encoding="utf-8")
+assert guide.count("B:RegisterGuidePack")>=14
+assert guide.count("{text=")==302, "Guide source 30-40 incomplet"
+assert (root/"LICENSE-GUIDE.txt").exists(), "Licence du guide source manquante"
+engine=(root/"DetailedGuide.lua").read_text(encoding="utf-8")
+assert "function B:DetailedEntries" in engine
+assert "function B:GuideSuggestedStep" in engine
+compass=(root/"Compass.lua").read_text(encoding="utf-8")
+assert "GetWorldPosFromMapPos" in compass
+assert "GetPlayerFacing" in compass
+assert "issecretvalue" in compass
 session=(root/"Session.lua").read_text(encoding="utf-8")
 assert 'issecretvalue' in session and 'function B:SafeNumber' in session
-print("OK: Build Planner 0.3.7-test, manifest 11 modules, events valides et interface")
+print("OK: Build Planner 0.4.0-test, manifest 14 modules, events valides et interface")
