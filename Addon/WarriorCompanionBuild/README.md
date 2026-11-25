@@ -1,4 +1,4 @@
-# Warrior Companion | Build Planner — 0.4.1-test
+# Warrior Companion | Build Planner — 0.5.0-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
 
@@ -19,6 +19,16 @@
 - Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si une API renvoie un nombre secret (mécanisme de protection Forever), l'addon ne le compare ni ne le calcule : il affiche une valeur indisponible au lieu de planter. Les positions et le drag de la minimap appliquent la même protection.
 - **Options identiques** : `/wcb mini`, `/wcb full`, `/wcb hide`, `/wcb autostart on/off`, `/wcb reset`, `/wcb alerts on/off`. Ajout de `/wcb minimap on/off`. Par défaut, l'ouverture automatique est **désactivée** ; activable pour retrouver l'ancienne expérience. Les préférences sont dans `WCBuildDB`.
 - L'ancienne logique générale de conseils n'est pas importée intégralement : la ligne conserve les alertes sûres (points non dépensés si API présente, vie basse, morts répétées). Le mini reste autonome du vieux dossier `WarriorCompanion`.
+
+### Parcours adaptatif — étape B (30–40)
+
+- **Modes XP/Sécurité** : bouton dans le bandeau du Parcours. Sécurité par défaut filtre les paliers supérieurs et privilégie les quêtes solo ; XP rapide autorise des sections jusqu'à un niveau au-dessus et valorise davantage les quêtes rapprochées. Ce classement est **heuristique** : les niveaux de sections ne sont ni des niveaux d'ennemis certifiés ni une mesure d'XP/heure.
+- **Enchaînement et statut** : une action « Faire » ne peut être proposée si sa quête n'est pas acceptée ; « Rendre » attend que les objectifs soient prêts. Les prérequis connus sont vérifiés, les inconnus signalés. Les actions déjà accomplies disparaissent des recommandations.
+- **Regroupement par région** : les étapes sont comparées par mapID et, lorsque les données sont disponibles, par proximité sur **la même carte**. Aucun coût de trajet intercontinental ou estimation de voyage n'est fabriqué.
+- **Récupération après déviation** : le moteur révise la proposition sur les événements de quête, de changement de niveau ou de zone. La sélection manuelle épinglée reste distincte de la sélection automatique ; le bouton « Reprendre » libère le choix manuel et recalcule le meilleur objectif.
+- **Détours filtrables** : Armes, Armure, Métiers, Donjons. Les détours puisent dans le guide synthétique déjà documenté (forge, livres de cuisine, équipements de quête et boss). Ils se glissent près de la section pertinente, sans remplacer les 302 étapes originales. Aucun donjon ou butin n'est imposé automatiquement, même si la catégorie Donjons est affichée.
+- **Réglages persistants** : `WCBuildDB.routeMode`, `WCBuildDB.routeOptions` et `WCBuildDB.guidePinned`. Commandes `/wcb mode securite`, `/wcb mode xp`, `/wcb reprendre` et `/wcb guide`.
+- **Limites** : les coordonnées des détours ajoutés ne sont pas inventées ; ils n'affichent pas de flèche tant qu'un waypoint vérifié manque. L'optimisation XP/heure, les niveaux exacts des monstres et toutes les chaînes de prérequis restent à mesurer ou confirmer en jeu.
 
 ### Guide détaillé et boussole — pilote 30–40
 
