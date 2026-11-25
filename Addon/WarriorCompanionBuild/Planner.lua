@@ -213,7 +213,8 @@ function B:ValidateContent()
     if not numberLevel(item.minLevel) then
       return false,"Niveau objet invalide"
     end
-    if item.source~="quest" and item.source~="craft" then
+    if item.source~="quest" and item.source~="craft" and
+       item.source~="dungeon" then
       return false,"Source objet interdite"
     end
     local step=routes[item.routeId]
@@ -229,6 +230,11 @@ function B:ValidateContent()
       (step.kind~="craft" or type(item.recipe)~="number" or
        type(item.skill)~="number") then
       return false,"Recette mal liee : "..item.name
+    end
+    if item.source=="dungeon" and
+       (step.kind~="dungeon" or not step.group or
+        type(item.boss)~="string" or not item.group) then
+      return false,"Butin de boss mal lie : "..item.name
     end
   end
   return true
@@ -282,6 +288,33 @@ function B:GearListAt(level,mode)
     return x>y
   end)
   return result
+end
+function B:FindGearForStep(step)
+  if type(step)~="table" or not step.gearId then return nil end
+  for _,item in ipairs(self.gear) do
+    if item.id==step.gearId then return item end
+  end
+  return nil
+end
+
+-- Informations conservatrices : le client garde l'autorite sur les
+-- recompenses et recettes reelles; un butin aleatoire n'est jamais garanti.
+function B:RouteHelp(step)
+  if type(step)~="table" then return nil end
+  local gear=self:FindGearForStep(step)
+  if gear and gear.source=="craft" then
+    return "Forge "..gear.skill.." : "..(gear.recipeHow or
+      ("Recette #"..gear.recipe.."; source a verifier chez les maitres, vendeurs ou a l'HV."))..
+      " Fabrication personnelle ou par un artisan si l'objet le permet."
+  elseif gear and gear.source=="dungeon" then
+    return "Butin aleatoire : "..gear.boss.." ("..gear.dungeon..
+      "). Prevoir un groupe et comparer avec l'equipement porte."
+  end
+  if step.questId then
+    return step.how or step.note or
+      "Ouvrir le journal pour verifier les objectifs et le donneur."
+  end
+  return step.note
 end
 function B:GearRelevance(item,level)
   if item.minLevel>level then
