@@ -340,7 +340,10 @@ function B:AdaptiveInvalidate(reason)
       end
     end
     local map=self:GuideCurrentMap()
-    if selected and selected.mapID and map and selected.mapID~=map then
+    -- Un objectif épinglé qui n'existe plus dans le catalogue ne doit
+    -- jamais immobiliser la reprise automatique après un changement de zone.
+    if not selected then pinned=false
+    elseif selected.mapID and map and selected.mapID~=map then
       pinned=false
     end
   end
