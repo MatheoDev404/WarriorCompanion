@@ -231,8 +231,17 @@ function B:TooltipItem(btn,item)
     if item.requiredLevel and item.minLevel~=item.requiredLevel then
       tooltip:AddLine("Palier conseille pour la quete : "..item.minLevel,0.9,0.7,0.4)
     end
-    tooltip:AddLine(item.source=="quest" and "Source : recompense de quete" or
-      "Source : fabrication "..(item.profession or ""),0.7,0.85,0.98)
+    local source=item.source=="dungeon" and
+      ("Butin : "..(item.boss or "boss").." / "..(item.dungeon or "donjon"))
+      or item.source=="quest" and "Source : recompense de quete"
+      or ("Source : fabrication "..(item.profession or ""))
+    tooltip:AddLine(source,0.7,0.85,0.98)
+    if item.source=="craft" then
+      tooltip:AddLine("Forge "..(item.skill or "?").." | Recette #"..(item.recipe or "?"),0.8,0.75,0.44)
+      if item.recipeHow then
+        tooltip:AddLine(item.recipeHow,0.75,0.82,0.88,true)
+      end
+    end
     if item.group then tooltip:AddLine("OPTION GROUPE / DONJON",1,0.63,0.35) end
     tooltip:AddLine(self.gearDescriptions[item.id] or item.note or
       "Description indisponible",0.74,0.78,0.85,true)
@@ -325,9 +334,43 @@ function B:CreateGearPage(page)
     end
   end)
 end
+-- Fiche contextuelle pour le parcours : quetes, objectifs en cours,
+-- conditions de craft, boss et recompense liee. Aucune condition inventee.
+function B:TooltipRoute(btn,step)
+  if not step or not GameTooltip or
+      type(GameTooltip.SetOwner)~="function" then return end
+  local tip=GameTooltip
+  tip:SetOwner(btn,"ANCHOR_RIGHT")
+  if type(tip.ClearLines)=="function" then tip:ClearLines() end
+  if type(tip.AddLine)~="function" then return end
+  tip:AddLine(step.text or "Etape de parcours",1,0.76,0.32,true)
+  tip:AddLine(step.zone or "Zone non renseignee",0.74,0.82,0.95)
+  if step.questId then
+    tip:AddLine("Quete #"..step.questId.." | "..self:StepState(step),
+      0.82,0.84,0.88,true)
+    local objective=self:QuestObjectiveSummary(step.questId)
+    if objective then tip:AddLine("Objectif en cours : "..objective,0.54,0.91,0.64,true) end
+  end
+  local detail=self:RouteHelp(step)
+  if detail then tip:AddLine("Comment faire : "..detail,0.89,0.90,0.91,true) end
+  if step.note and step.note~=detail then
+    tip:AddLine(step.note,0.75,0.81,0.87,true)
+  end
+  local gear=self:FindGearForStep(step)
+  if gear then
+    tip:AddLine("Recompense / cible : "..itemName(gear),0.9,0.73,0.4,true)
+    if gear.source=="craft" then
+      tip:AddLine("Recette #"..gear.recipe..
+        (gear.recipeItemId and " | Plan #"..gear.recipeItemId or ""),
+        0.8,0.83,0.91)
+    end
+  end
+  if type(tip.Show)=="function" then tip:Show() end
+end
 -- Marqueurs explicites : distinguent XP, amelioration facultative et donjon.
 local function routeBadge(step)
   if not step then return "APERCU",MUTED end
+  if step.kind=="dungeon" then return "DONJON",{0.83,0.50,0.93,1} end
   if step.gearId then return "EQUIPEMENT",{0.87,0.67,0.97,1} end
   if step.group then return "GROUPE",RED end
   if step.kind=="craft" then return "FORGE",GOLD end
@@ -353,8 +396,26 @@ function B:CreateRoutePage(page)
   page.activeAccent=rect(page,13,-39,3,101,GOLD)
   page.zone=label(page,27,-43,474,23,"GameFontNormal","",GOLD)
   page.activeKind=label(page,520,-43,158,23,"GameFontNormal","",GREEN)
-  page.note=label(page,27,-68,642,67,"GameFontHighlight","",WHITE)
+  page.note=label(page,27,-68,557,67,"GameFontHighlight","",WHITE)
   if page.note.SetWordWrap then page.note:SetWordWrap(true) end
+  page.routeItem=CreateFrame("Button",nil,page)
+  page.routeItem:SetPoint("TOPLEFT",page,"TOPLEFT",623,-72)
+  page.routeItem:SetSize(43,43)
+  page.routeItem.icon=page.routeItem:CreateTexture(nil,"ARTWORK")
+  page.routeItem.icon:SetAllPoints(page.routeItem)
+  page.routeItem:SetScript("OnEnter",function(btn)
+    local item=B:FindGearForStep(B.activeRouteStep)
+    if item then B:TooltipItem(btn,item) end
+  end)
+  page.routeItem:SetScript("OnLeave",dismissTip)
+  page.routeItem:Hide()
+  page.howButton=button(page,588,-112,90,23,"Details",function()
+    B:TooltipRoute(page.howButton,B.activeRouteStep)
+  end)
+  page.howButton:SetScript("OnEnter",function(btn)
+    B:TooltipRoute(btn,B.activeRouteStep)
+  end)
+  page.howButton:SetScript("OnLeave",dismissTip)
   page.listTitle=label(page,17,-144,350,23,"GameFontNormal",
     "OBJECTIFS DU SEGMENT",MUTED)
   page.toggleCompleted=button(page,505,-145,181,25,
@@ -720,9 +781,17 @@ function B:RefreshRoute()
     end
     local objective=selected.questId and
       self:QuestObjectiveSummary(selected.questId) or nil
+    local help=self:RouteHelp(selected)
     page.note:SetText(selected.text..
-      "\n"..(objective and ("En cours : "..objective) or
-        (selected.note or ""))..gear)
+      "\n"..(objective and ("Progression : "..objective..". ") or "")..
+      (help or selected.note or "")..gear)
+    local item=self:FindGearForStep(selected)
+    if item then
+      page.routeItem.icon:SetTexture(itemIcon(item.id))
+      page.routeItem:Show()
+    else
+      page.routeItem:Hide()
+    end
     page.activeAccent:SetVertexColor(shade[1],shade[2],shade[3],1)
     if selected.questId then
       page.done.txt:SetText("Suivi auto (journal)")
@@ -734,6 +803,7 @@ function B:RefreshRoute()
       page.done.txt:SetText("Marquer comme fait")
     end
   else
+    page.routeItem:Hide()
     page.zone:SetText("Aucun objectif actif dans cette tranche")
     page.activeKind:SetText("APERCU")
     page.activeKind:SetTextColor(MUTED[1],MUTED[2],MUTED[3])
