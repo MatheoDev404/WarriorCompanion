@@ -8,7 +8,7 @@ modules=[line for line in lines if not line.startswith("#")]
 assert modules==["Data.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","DetailedGuide.lua","DetailedData30_40.lua","Compass.lua","CombatData.lua","UI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","MinimapButton.lua","Core.lua"], modules
 assert "## Interface: 16001" in toc
 assert "## SavedVariables: WCBuildDB" in toc
-assert "## Version: 0.4.0-test" in toc
+assert "## Version: 0.4.1-test" in toc
 assert set(modules)=={p.name for p in root.glob("*.lua")}
 assert not list(root.glob("*.ttf")), "La police systeme WoW suffit, ne pas distribuer de police"
 ui=(root/"UI.lua").read_text(encoding="utf-8")
@@ -43,6 +43,10 @@ compass=(root/"Compass.lua").read_text(encoding="utf-8")
 assert "GetWorldPosFromMapPos" in compass
 assert "GetPlayerFacing" in compass
 assert "issecretvalue" in compass
+assert 'arrow:SetSize(68,68)' in compass, "Fleche principale 68 px"
+assert 'f:EnableMouse(false)' in compass, "Clics transmis hors poignee"
+assert 'f.dragHandle=drag' in compass, "HUD deplacable"
+assert 'rect(f,' not in compass, "Le HUD ne doit pas avoir de fond opaque"
 session=(root/"Session.lua").read_text(encoding="utf-8")
 assert 'issecretvalue' in session and 'function B:SafeNumber' in session
-print("OK: Build Planner 0.4.0-test, manifest 14 modules, events valides et interface")
+print("OK: Build Planner 0.4.1-test, manifest 14 modules, events valides et interface")
