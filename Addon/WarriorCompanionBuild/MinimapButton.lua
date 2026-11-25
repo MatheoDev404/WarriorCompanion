@@ -1,11 +1,27 @@
 local addon,B=...
 -- Bouton autonome autour de la minimap, sans LibDBIcon externe.
 local floor,cos,sin,pi=math.floor,math.cos,math.sin,math.pi
-local RADIUS=79
+-- Meme regle de placement que GearQuest : centre de l'icone sur le
+-- pourtour reel de la minimap, y compris si un addon la redimensionne.
+local function minimapRadius()
+  local width,height=nil,nil
+  if Minimap and type(Minimap.GetWidth)=="function" then
+    local ok,value=pcall(Minimap.GetWidth,Minimap)
+    width=ok and B.SafeNumber and B:SafeNumber(value) or nil
+  end
+  if Minimap and type(Minimap.GetHeight)=="function" then
+    local ok,value=pcall(Minimap.GetHeight,Minimap)
+    height=ok and B.SafeNumber and B:SafeNumber(value) or nil
+  end
+  if not width or width<=0 then width=140 end
+  if not height or height<=0 then height=width end
+  return math.min(width,height)/2+5
+end
 local function angleCoordinates(angle)
   local radians=angle*pi/180
-  return floor(cos(radians)*RADIUS+0.5),
-    floor(sin(radians)*RADIUS+0.5)
+  local radius=minimapRadius()
+  return floor(cos(radians)*radius+0.5),
+    floor(sin(radians)*radius+0.5)
 end
 function B:UpdateMinimapButton()
   local button=self.minimapButton
@@ -39,37 +55,21 @@ function B:CreateMinimapButton()
       type(CreateFrame)~="function" then
     return nil
   end
-  -- Apparence standard LibDBIcon/Questie : fond rond, icone 20px recadree,
-  -- liseré dore natif. Aucune texture carrée 32px en NormalTexture.
+  -- Presentation native identique aux boutons de GearQuest/LibDBIcon.
+  -- Ne pas appliquer de masque de portrait a une texture d'icone brute.
   local b=CreateFrame("Button","WarriorCompanionBuildMinimap",Minimap)
   b:SetSize(31,31)
-  b:SetFrameStrata("MEDIUM")
-  if type(b.SetFrameLevel)=="function" then b:SetFrameLevel(8) end
+  b:SetFrameStrata("HIGH")
+  if type(b.SetFrameLevel)=="function" then b:SetFrameLevel(20) end
   if type(b.SetHighlightTexture)=="function" then
     b:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
   end
-  local background=b:CreateTexture(nil,"BACKGROUND")
-  background:SetTexture("Interface\\Minimap\\UI-Minimap-Background")
-  background:SetSize(20,20)
-  background:SetPoint("TOPLEFT",b,"TOPLEFT",7,-5)
-  b.background=background
-  local icon=b:CreateTexture(nil,"ARTWORK")
-  icon:SetTexture("Interface\\Icons\\Ability_Warrior_BattleShout")
+  local icon=b:CreateTexture(nil,"BACKGROUND")
+  icon:SetTexture("Interface\\Icons\\Ability_Warrior_BerserkerRage")
   icon:SetSize(20,20)
-  icon:SetPoint("TOPLEFT",b,"TOPLEFT",7,-5)
+  icon:SetPoint("CENTER",b,"CENTER",0,1)
   if type(icon.SetTexCoord)=="function" then
-    icon:SetTexCoord(0.05,0.95,0.05,0.95)
-  end
-  -- Masque rond sur les versions qui l'autorisent ; sinon une icone
-  -- recadree de 20px reste contenue dans la bordure ronde Blizzard.
-  local masked=false
-  if type(icon.SetMask)=="function" then
-    masked=pcall(icon.SetMask,icon,
-      "Interface\\CharacterFrame\\TempPortraitAlphaMask")
-  end
-  if not masked and type(SetPortraitToTexture)=="function" then
-    pcall(SetPortraitToTexture,icon,
-      "Interface\\Icons\\Ability_Warrior_BattleShout")
+    icon:SetTexCoord(.06,.94,.06,.94)
   end
   b.icon=icon
   local border=b:CreateTexture(nil,"OVERLAY")
@@ -130,6 +130,13 @@ function B:CreateMinimapButton()
   end)
   self.minimapButton=b
   self:UpdateMinimapButton()
+  -- Les addons de carte peuvent modifier la taille de la minimap apres
+  -- l'initialisation. Recalculer alors le rayon de l'icone.
+  if type(Minimap.HookScript)=="function" then
+    pcall(Minimap.HookScript,Minimap,"OnSizeChanged",function()
+      B:UpdateMinimapButton()
+    end)
+  end
   return b
 end
 function B:SetMinimapVisible(show)
