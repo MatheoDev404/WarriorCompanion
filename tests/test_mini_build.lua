@@ -113,10 +113,27 @@ assert(B.minimapButton.clickButtons[2]=="RightButtonUp")
 B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
 assert(B.frame:IsShown() and B.db.displayMode=="full")
 B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
-assert(not B.frame:IsShown() and B.db.displayMode=="hidden")
+assert(B.frame:IsShown() and B.db.displayMode=="full",
+  "clic gauche repete : ne jamais fermer le grand guide")
 B.minimapButton.scripts.OnClick(B.minimapButton,"RightButton")
 assert(B.compactDashboard:IsShown() and not B.frame:IsShown() and
-  B.db.displayMode=="compact")
+  B.db.displayMode=="compact","clic droit : passer au mini-bilan")
+B.minimapButton.scripts.OnClick(B.minimapButton,"RightButton")
+assert(B.compactDashboard:IsShown() and not B.frame:IsShown() and
+  B.db.displayMode=="compact",
+  "clic droit repete : ne jamais masquer le mini-bilan")
+B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
+assert(B.frame:IsShown() and not B.compactDashboard:IsShown() and
+  B.restoreMiniOnClose==true,
+  "clic gauche depuis mini : grand guide avec retour mini")
+B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
+assert(B.frame:IsShown() and B.restoreMiniOnClose==true,
+  "second clic gauche ne doit pas perdre le retour au mini")
+B:CloseFull()
+assert(B.compactDashboard:IsShown() and not B.frame:IsShown(),
+  "Fermer grand guide restaure le mini apres ouverture via minimap")
+B.minimapButton.scripts.OnClick(B.minimapButton,"RightButton")
+assert(B.compactDashboard:IsShown(),"mini reste ouvert au clic droit")
 clock=161
 xp=75
 money=241976
@@ -166,6 +183,15 @@ assert(B.compactAdvice.text:find("Morts frequentes",1,true))
 B:ResetSession()
 assert(B.metrics.xpGained==0 and B.metrics.deaths==0 and
   B.metrics.moneyStart==money,"reinitialisation des statistiques")
+B:HideDashboard()
+assert(not B.frame:IsShown() and not B.compactDashboard:IsShown(),
+  "fermeture explicite masque les deux vues")
+B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
+assert(B.frame:IsShown(),"l'icone doit rouvrir le guide apres fermeture explicite")
+B:HideDashboard()
+B.minimapButton.scripts.OnClick(B.minimapButton,"RightButton")
+assert(B.compactDashboard:IsShown(),
+  "l'icone doit rouvrir le mini apres fermeture explicite")
 B:SetMinimapVisible(false)
 assert(not B.minimapButton:IsShown() and B.db.minimapVisible==false)
 B:SetMinimapVisible(true)
