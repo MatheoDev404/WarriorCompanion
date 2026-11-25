@@ -23,6 +23,7 @@ local function frame()
     function t:SetTexture(v) self.texture=v end
     function t:ClearAllPoints() self.point=nil end
     function t:SetPoint(...) self.point={...} end
+    function t:SetAllPoints(...) self.allPoints={...} end
     function t:SetSize(w,h) self.width=w self.height=h end
     function t:SetVertexColor(...) self.color={...} end
     function t:Hide() self.hidden=true end
@@ -145,9 +146,12 @@ assert(B.tabs.rotation and B.pages.rotation,"4eme onglet Rotation")
 assert(B.pages.talents.levelPoint.text:find("Coups",1,true),
   "point de talent gagne au niveau 34 indique")
 assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]==1,
-  "seul le talent gagne au niveau consulte est souligne")
-assert(B.pages.talents.nodes["Cruelty"].edges[1].color[4]==0,
-  "les points plus anciens ne sont pas tous soulignes")
+  "le talent gagne au niveau consulte garde sa surbrillance forte")
+assert(B.pages.talents.nodes["Cruelty"].edges[1].color[4]>0.9 and
+  B.pages.talents.nodes["Cruelty"].allocatedMarker.color[4]==1,
+  "talents precedemment investis marques d'ambre")
+assert(B.pages.talents.nodes["Booming Voice"].allocatedMarker.color[4]==0,
+  "talents non investis restent discrets")
 assert(B.pages.talents.nodes["Bloodthirst"])
 assert(#B.pages.talents.connections==2,"pre-requis visuels de l arbre Furie")
 B.pages.talents.nodes["Bloodthirst"].handlers.OnEnter()
@@ -158,19 +162,26 @@ B.pages.equipement.items[6802].handlers.OnEnter()
 assert(lastTooltipItem==6802,"infobulle vraie de l'objet dans le client")
 B.pages.equipement.items[6802].handlers.OnLeave()
 B.pages.equipement.items[6802].handlers.OnClick()
-assert(B.pages.equipement.previewName.text:find("Epee",1,true),
-  "nom de l'objet selectionne dans la fiche")
-assert(B.pages.equipement.previewIcon.texture==106802,
+assert(B.pages.equipement.previewName==nil and
+  B.pages.equipement.previewDescription==nil,
+  "le panneau de duplication de l'infobulle a disparu")
+assert(B.pages.equipement.items[6802].width==650,
+  "la liste occupe toute la largeur")
+assert(B.pages.equipement.items[6802].icon.texture==106802,
   "icone d'objet recuperee par son ID")
-assert(B.pages.equipement.previewDescription.text:find("donjon",1,true)
-  or B.pages.equipement.previewDescription.text:find("groupe",1,true)
-  or B.pages.equipement.previewDescription.text:find("GROUPE",1,true),
-  "conditions de groupe explicites")
+assert(B.pages.equipement.items[6802].detail.text:find("GROUPE",1,true),
+  "conditions de groupe explicites dans la ligne")
 assert(B.selectedItem==6802)
 B.pages.equipement.gotoButton.handlers.OnClick()
 assert(B.page=="parcours" and B.pages.parcours:IsShown())
 assert(B:OrderedRoute()[B.routeIndex].step.id=="quest-scarlet")
 assert(B.pages.parcours.zone.text:find("Monastere",1,true))
+assert(B.pages.parcours.routeItem:IsShown(),
+  "l'icone de recompense est visible pour cette quete")
+B.pages.parcours.routeItem.handlers.OnEnter(B.pages.parcours.routeItem)
+assert(lastTooltipItem==6802,"infobulle native de la recompense en parcours")
+B.pages.parcours.howButton.handlers.OnEnter(B.pages.parcours.howButton)
+B.pages.parcours.howButton.handlers.OnLeave()
 assert(B.pages.parcours.activeKind.text=="EQUIPEMENT",
   "les etapes d'equipement sont reconnaissables visuellement")
 assert(B.pages.parcours.rows[1].kind.text~=nil,
@@ -229,7 +240,8 @@ B:SetPreview(40)
 B:Refresh()
 assert(B.pages.talents.nodes["Bloodthirst"].edges[1].color[4]==1,
   "le talent de niveau 40 est en surbrillance")
-assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]==0)
+assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]>0.9,
+  "les rangs investis restent colores meme lorsqu'ils ne sont plus actifs")
 B:ShowPage("rotation")
 assert(B.pages.rotation:IsShown()
   and B.pages.rotation.rows.cycle[1].name.text=="Sanguinaire")
@@ -275,6 +287,8 @@ assert(B.pages.parcours.segmentLabel.text=="Segment 51-60" and
   "un segment non documente ne propose pas de quetes inventees")
 assert(B.pages.parcours.note.text:find("Apercu",1,true),
   "les chapitres 50-60 restent un apercu prudent")
+assert(not B.pages.parcours.routeItem:IsShown(),
+  "pas d'icone de recompense quand la tranche est non documentee")
 assert(not B:MarkRouteSelection(nil))
 
 B:ChangeScale(-0.08)
