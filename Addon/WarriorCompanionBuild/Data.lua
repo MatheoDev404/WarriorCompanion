@@ -173,6 +173,12 @@ B.gear={
   boss="Herode",routeId="dungeon-herod-shoulder",group=true,
   note="Mailles : bonus de Force et d'Endurance, choix solide au niveau 37. Butin aleatoire; priorite moindre si bonnes epaules deja equipees.",
   sourceUrl="https://foreverchanges.pro/item/7718/herods-shoulder"},
+ {id=10772,slot="Arme 1 main",name="Fendoir de Glouton",
+  minLevel=39,requiredLevel=37,dps=28.8,source="dungeon",
+  dungeon="Souilles de Tranchebauge",boss="Glouton",
+  routeId="dungeon-glutton-cleaver",group=true,
+  note="Hache a une main, 28,8 DPS sur Forever avec proc de saignement. Bonne alternative de main droite ou gauche; comparer aux Epee du vainqueur et Epee de malediction.",
+  sourceUrl="https://foreverchanges.pro/item/10772/gluttons-cleaver"},
 }
 -- Les etapes individuelles pilotes sont des actions verifiables ou des
 -- recommandations de hub, jamais des quetes inventees.
@@ -366,6 +372,10 @@ B.route={
   text="Fabriquer ou commander l\'Epee courte en mithril (Forge 180).",
   gearId=250607,optional=true,
   note="Recette 1252356, mithril et composants. L'objet est lie quand equipe, artisan possible."},
+ {id="dungeon-glutton-cleaver",level=39,zone="Souilles de Tranchebauge",
+  kind="dungeon",text="Option groupe : Fendoir de Glouton sur le boss Glouton.",
+  gearId=10772,optional=true,group=true,
+  note="Glouton, dans les Souilles de Tranchebauge. A regrouper avec la quete Horde #3341 deja conseillee. Butin aleatoire, ne pas venir uniquement pour ce drop."},
  {id="quest-bring-end",level=39,zone="Fossoyeuse / Souilles de Tranchebauge",kind="quest",
   text="Option groupe : Bring the End, recompense Vanquisher's Sword.",
   questId=3341,gearId=10823,optional=true,group=true,
@@ -383,6 +393,7 @@ B.gearDescriptions={
  [10823]="Epee une main, recompense de la quete #3341 aux Souilles de Tranchebauge. Quete Horde niveau 37+ en groupe.",
  [7719]="Casque en mailles du boss Herode au Monastere ecarlate (Armurerie), Force et critique; niveau 37 requis.",
  [7718]="Epaules en mailles du boss Herode au Monastere ecarlate (Armurerie), Force et Endurance; niveau 37 requis.",
+ [10772]="Hache a une main du boss Glouton aux Souilles de Tranchebauge, niveau 37 requis, 28,8 DPS sur Forever et saignement. Donjon facultatif.",
 }
 
 B.references={
