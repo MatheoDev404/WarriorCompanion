@@ -91,6 +91,23 @@ B:ReadQuestLog()
 assert(B:QuestCompletion(5561)==true and
   B:QuestCompletion(99999)==false,
   "fallback GetAllCompletedQuestIDs sans flag individuel")
+-- Valeurs protegees par le client Forever : type() reste number.
+issecretvalue=function(v) return type(v)=="number" and v==777 end
+C_QuestLog.GetAllCompletedQuestIDs=nil
+C_QuestLog.IsQuestFlaggedCompleted=function() return 777 end
+assert(B:QuestCompletion(1105)==nil,
+  "une quete secret ne doit pas etre supposee rendue")
+C_QuestLog.GetNumQuestLogEntries=function() return 1 end
+C_QuestLog.GetInfo=function() return {
+  questID=777,isHeader=false,isComplete=777
+} end
+local snapshot=B:ReadQuestLog()
+assert(snapshot and next(snapshot)==nil,
+  "une ligne secrete du journal doit etre ignoree")
+C_QuestLog.GetNumQuestLogEntries=function() return 777 end
+assert(B:ReadQuestLog()==nil,
+  "une taille de journal protegee ne doit pas etre comparee")
+issecretvalue=nil
 -- API degradee : ne jamais conclure a la completion ou a l'acceptation.
 C_QuestLog=nil
 B.questLog=nil
