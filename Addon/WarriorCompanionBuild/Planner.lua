@@ -343,6 +343,10 @@ function B:ItemEligible(item,level)
   if item.source=="craft" then
     return true,"Forge "..item.skill.." : recette et materiaux a verifier"
   end
+  if item.source=="dungeon" then
+    return true,"Donjon en groupe : butin aleatoire du boss "..
+      (item.boss or "non renseigne")
+  end
   return false,"Source refusee"
 end
 -- Les segments sont explicites et non superposes (30-40 est inclusif).
