@@ -60,6 +60,19 @@ local function slash(msg)
     B:OpenFullDashboard()
     if B.db then B.db.detailedMode=true end
     B:ShowPage("parcours")
+  elseif msg=="mode xp" or msg=="mode securite" or
+      msg=="mode sécurité" then
+    B:AdaptiveSetMode(msg=="mode xp" and "xp" or "safe")
+    if B.frame and B.frame:IsShown() and B.page=="parcours" then
+      B:RefreshRoute()
+    end
+    message("Mode de parcours : "..(B:AdaptiveMode()=="xp" and
+      "XP rapide" or "Sécurité"))
+  elseif msg=="reprendre" then
+    B:AdaptiveResume()
+    B:OpenFullDashboard()
+    if B.db then B.db.detailedMode=true end
+    B:ShowPage("parcours")
   elseif msg=="guideaudit" then
     local audit=B:DetailedAudit()
     message("Guide 30-40 : "..audit.steps.." etapes, "..
@@ -76,7 +89,8 @@ local function slash(msg)
   elseif msg=="help" then
     message("/wcb : ouvrir/fermer | mini | full | hide | talents | equipement | parcours | rotation | reel")
     message("/wcb reset | autostart on/off | alerts on/off | minimap on/off")
-    message("/wcb guide | guideaudit | compass on/off")
+    message("/wcb guide | reprendre | mode xp | mode securite")
+    message("/wcb guideaudit | compass on/off")
   else
     B:ToggleDashboard()
   end
@@ -103,6 +117,7 @@ events:SetScript("OnEvent",function(_,event,arg1)
   if event=="ADDON_LOADED" then
     if arg1~=addon then return end
     B:InitState()
+    if B.AdaptiveInit then B:AdaptiveInit() end
     if type(B.db.autoOpen)~="boolean" then B.db.autoOpen=false end
     if type(B.db.showAlerts)~="boolean" then B.db.showAlerts=true end
     if type(B.db.minimapVisible)~="boolean" then
@@ -131,6 +146,7 @@ events:SetScript("OnEvent",function(_,event,arg1)
   elseif event=="PLAYER_LEVEL_UP" then
     B:OnSessionEvent(event,arg1)
     B:UpdateLevel()
+    if B.AdaptiveInvalidate then B:AdaptiveInvalidate("level") end
     if B.frame then B:Refresh() end
     if B.UpdateCompass then B:UpdateCompass() end
   elseif event=="PLAYER_XP_UPDATE" or event=="PLAYER_DEAD" or
@@ -139,13 +155,15 @@ events:SetScript("OnEvent",function(_,event,arg1)
   elseif event=="QUEST_LOG_UPDATE" or event=="QUEST_ACCEPTED" or
       event=="QUEST_REMOVED" or event=="QUEST_TURNED_IN" then
     if B.ReadQuestLog then B:ReadQuestLog() end
+    if B.AdaptiveInvalidate then B:AdaptiveInvalidate("quest") end
     if B.frame and B.frame:IsShown() and B.page=="parcours" then
       B:RefreshRoute()
     end
     if B.UpdateCompass then B:UpdateCompass() end
   elseif event=="ZONE_CHANGED_NEW_AREA" then
+    if B.AdaptiveInvalidate then B:AdaptiveInvalidate("zone")
+    else B.routeSelectedId=nil end
     if B.frame and B.frame:IsShown() and B.page=="parcours" then
-      B.routeSelectedId=nil
       B:RefreshRoute()
     end
     if B.UpdateCompass then B:UpdateCompass() end
