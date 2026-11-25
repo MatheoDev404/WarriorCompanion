@@ -1,5 +1,16 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.5.0-test — 25 novembre 2026
+
+- **Étape B : sélection adaptative 30–40**. Nouveau moteur `AdaptiveRoute.lua` chargé après les 302 étapes, sans modifier le catalogue de quêtes source. Évaluation des actions réalisables selon le journal (acceptation, objectifs, rendu), des prérequis connus et du niveau.
+- **Modes Sécurité / XP rapide** : Sécurité par défaut exclut les paliers supérieurs au niveau réel ; XP rapide tolère un palier d'avance et privilégie davantage la proximité. Il s'agit de critères de *palier du guide*, pas d'un calcul vérifié de niveaux d'ennemis ou d'XP/heure.
+- **Optimisation locale par hubs** : regroupement des étapes de la même carte et par proximité des coordonnées locales, avec maintien préférentiel du dernier hub et de l'ordre des étapes comme départage. Pas de trajet chiffré entre régions.
+- **Reprise automatique après déviation** : journal de quêtes, changement de zone ou niveau déclenchent la réévaluation ; séparation entre choix manuels épinglés et proposition automatique. Le bouton **Reprendre** et la commande `/wcb reprendre` reprennent une route adaptée.
+- **Options facultatives et filtrées** : Armes, Armure, Métiers, Donjons. Les recommandations du pilote synthétique se placent auprès des sections du guide détaillé par niveau et région. Les donjons et options de groupe restent consultables mais jamais imposés par le moteur XP solo ; les détours sans coordonnées n'en inventent pas.
+- **Interface et tests** : nouveau contrôle de mode et quatre filtres dans Parcours, suivi des préférences dans `WCBuildDB` ; tests Lua 5.1 et 5.4 sur les actions non prêtes, les prérequis, les modes, le regroupement spatial, les épingles et la reprise. Tests des 302 étapes et boussole conservés.
+- **À vérifier en jeu** : pertinence des choix, coût réel des trajets, conditions exactes des chaînes, interactions avec les quêtes particulières de WoW Forever.
+
+
 ## 0.4.1-test — 25 novembre 2026
 
 - **HUD de boussole transparent** : panneau anthracite et bande supérieure supprimés ; aucune texture de fond ne couvre le monde.
