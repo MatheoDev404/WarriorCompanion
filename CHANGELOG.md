@@ -1,5 +1,13 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.3.7-test — 25 novembre 2026
+
+- **Minimap = lanceur, jamais interrupteur** : clic gauche ouvre le guide complet ; clic droit ouvre le mini-bilan. Cliquer à nouveau sur la vue déjà ouverte ne la ferme pas, la conserve à l'écran.
+- **Bascule de vues** : cliquer à droite depuis le guide passe au mini, cliquer à gauche depuis le mini ouvre le guide. Le bouton Fermer du guide revient au mini lorsque le guide a été ouvert depuis celui-ci.
+- **Fermeture volontaire** : bouton Fermer de la grande fenêtre ou commande `/wcb hide` pour masquer les deux vues. Les anciennes commandes gardent leur comportement explicite.
+- **Régression testée** : clics répétés gauche/droit, changement de vue, restauration du mini, fermeture explicite et réouverture. Aucun changement des talents, des équipements, de la route ou des métriques de session.
+
+
 ## 0.3.6-test — 25 novembre 2026
 
 - **Minimap** : placement de l'icône à la distance `min(largeur, hauteur) / 2 + 5` du centre, comme GearQuest/LibDBIcon ; recalcul automatique si la minimap change de dimensions, icône de guerrier centrée sans masque de portrait déformant.
