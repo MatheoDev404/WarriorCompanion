@@ -65,7 +65,14 @@ function B:CreateMinimapButton()
     b:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
   end
   local icon=b:CreateTexture(nil,"BACKGROUND")
-  icon:SetTexture("Interface\\Icons\\Ability_Warrior_BerserkerRage")
+  -- Lire l'icone de Cri de guerre directement dans le client si possible.
+  -- Eviter un nom de fichier d'icone non confirme sur Forever.
+  local artwork="Interface\\Icons\\Ability_Warrior_BattleShout"
+  if type(C_Spell)=="table" and type(C_Spell.GetSpellTexture)=="function" then
+    local ok,result=pcall(C_Spell.GetSpellTexture,6673)
+    if ok and result then artwork=result end
+  end
+  icon:SetTexture(artwork)
   icon:SetSize(20,20)
   icon:SetPoint("CENTER",b,"CENTER",0,1)
   if type(icon.SetTexCoord)=="function" then
