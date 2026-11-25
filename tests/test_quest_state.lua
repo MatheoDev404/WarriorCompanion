@@ -95,6 +95,7 @@ assert(B:QuestCompletion(5561)==true and
 issecretvalue=function(v) return type(v)=="number" and v==777 end
 C_QuestLog.GetAllCompletedQuestIDs=nil
 C_QuestLog.IsQuestFlaggedCompleted=function() return 777 end
+B:ReadQuestLog() -- vider l'ancien cache de completions avant le test degrade
 assert(B:QuestCompletion(1105)==nil,
   "une quete secret ne doit pas etre supposee rendue")
 C_QuestLog.GetNumQuestLogEntries=function() return 1 end
