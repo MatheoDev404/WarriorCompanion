@@ -782,9 +782,15 @@ function B:RefreshRoute()
     local objective=selected.questId and
       self:QuestObjectiveSummary(selected.questId) or nil
     local help=self:RouteHelp(selected)
-    page.note:SetText(selected.text..
-      "\n"..(objective and ("Progression : "..objective..". ") or "")..
-      (help or selected.note or "")..gear)
+    local instructions=(objective and ("Progression : "..objective..". ") or "")..
+      (help or selected.note or "")
+    -- La carte ne doit pas recouvrir les objectifs du segment.
+    -- L'infobulle Details contient la methode COMPLETE.
+    if #instructions>125 then
+      instructions=instructions:sub(1,122):gsub("[\\128-\\191]+$","")..
+        "... (Details)"
+    end
+    page.note:SetText(selected.text.."\n"..instructions)
     local item=self:FindGearForStep(selected)
     if item then
       page.routeItem.icon:SetTexture(itemIcon(item.id))
