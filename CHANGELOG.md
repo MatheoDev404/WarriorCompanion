@@ -1,5 +1,15 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.3.6-test — 25 novembre 2026
+
+- **Minimap** : placement de l'icône à la distance `min(largeur, hauteur) / 2 + 5` du centre, comme GearQuest/LibDBIcon ; recalcul automatique si la minimap change de dimensions, icône de guerrier centrée sans masque de portrait déformant.
+- **Talents** : icônes sans points estompées, rangs investis avec fond ambré, contour doré et témoin discret ; point conseillé du niveau prévisualisé surligné plus fortement. Trois arbres restent côte à côte.
+- **Équipement** : suppression de la fiche redondante à droite. Liste plein format avec cinq lignes et tooltips Blizzard au survol. Ajout de deux options de boss au niveau 37, Casque de berserker rageur (#7719) et Epaulière d'Herode (#7718), tous deux sur Hérode au Monastère écarlate - Armurerie. Pas de rang GearQuest prétendu ; l'utilité reste à comparer à l'objet porté.
+- **Parcours** : infobulle native de l'objet/recompense au survol de son icône ; bouton Détails pour les étapes, quêtes et objectifs en cours, fabrication et boss. Précisions sur où apprendre ou vérifier les plans de Forge, avec prudence sur les sources non certifiées.
+- **Mini-bilan** : palette anthracite et accents bronze alignés sur le guide complet, sans changer sa taille, ses cinq informations ou ses options.
+- **Non-régression** : tests Lua 5.1/5.4 et validation des nouvelles sources de butin, des liaisons au parcours, des états de talents, des tooltips et du placement adaptatif.
+
+
 ## 0.3.5-test — 24 novembre 2026
 
 - **Correction du clic droit sur l'icône de minimap** : les nombres secrets de WoW Forever ne sont plus comparés dans `Session.lua` ; lecture protégée par `issecretvalue` et repli sécurisé. L'affichage compact montre `--` quand la donnée est inaccessible (temps, monnaie, objectifs de session).
