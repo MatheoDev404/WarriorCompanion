@@ -787,8 +787,8 @@ function B:RefreshRoute()
     -- La carte ne doit pas recouvrir les objectifs du segment.
     -- L'infobulle Details contient la methode COMPLETE.
     if #instructions>125 then
-      instructions=instructions:sub(1,122):gsub("[\\128-\\191]+$","")..
-        "... (Details)"
+      local cut=instructions:sub(1,122)
+      instructions=(cut:match("^(.*)%s+") or cut).."... (Details)"
     end
     page.note:SetText(selected.text.."\n"..instructions)
     local item=self:FindGearForStep(selected)
