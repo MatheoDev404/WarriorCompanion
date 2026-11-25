@@ -171,6 +171,9 @@ function B:Profile()
 end
 function B:ShowCompact()
   if not self.compactDashboard then self:CreateCompactDashboard() end
+  -- Un passage explicite vers le mini annule la restauration d'un
+  -- precedent agrandissement : aucune fermeture fantome du guide.
+  self.restoreMiniOnClose=false
   if self.frame then self.frame:Hide() end
   self.compactDashboard:Show()
   if self.db then self.db.displayMode="compact" end
@@ -178,6 +181,12 @@ function B:ShowCompact()
 end
 function B:OpenFullDashboard()
   if not self.frame then self:CreateUI() end
+  -- Idempotence : un second clic sur l'icone ne remplace pas
+  -- l'information "ouvert depuis le mini" et ne ferme rien.
+  if self.frame:IsShown() then
+    self:Refresh()
+    return
+  end
   self.restoreMiniOnClose=self.compactDashboard and
     self.compactDashboard:IsShown() or false
   if self.compactDashboard then self.compactDashboard:Hide() end
