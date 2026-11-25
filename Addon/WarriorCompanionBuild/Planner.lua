@@ -1,7 +1,24 @@
 local addon,B=...
 local min,max,huge=math.min,math.max,math.huge
+local function nonSecret(v)
+  if type(issecretvalue)=="function" then
+    local ok,secret=pcall(issecretvalue,v)
+    if not ok or secret then return nil end
+  end
+  return v
+end
+local function questNumber(v)
+  v=nonSecret(v)
+  if type(v)~="number" then return nil end
+  local ok,valid=pcall(function()
+    return v==v and v>=0 and v<100000000
+  end)
+  if not ok or not valid then return nil end
+  return v
+end
 local function numberLevel(v)
-  return type(v)=="number" and v==math.floor(v) and v>=1 and v<=60
+  v=questNumber(v)
+  return v~=nil and v==math.floor(v) and v>=1 and v<=60
 end
 function B:ObservedLevel()
   if type(UnitLevel)=="function" then
@@ -388,42 +405,49 @@ function B:ReadQuestLog()
     self.questLog=nil
     return nil
   end
-  local n=questSafe(api.GetNumQuestLogEntries)
-  if type(n)~="number" or n<0 or n>1000 then
+  local n=questNumber(questSafe(api.GetNumQuestLogEntries))
+  if not n or n>1000 then
     self.questLog=nil
     return nil
   end
   local states={}
   for i=1,n do
     local info=questSafe(api.GetInfo,i)
-    if type(info)=="table" and not info.isHeader and
-       type(info.questID)=="number" then
-      local finished=info.readyForTurnIn==true or info.isComplete==true
+    local id=type(info)=="table" and questNumber(info.questID) or nil
+    local header=type(info)=="table" and nonSecret(info.isHeader) or nil
+    if id and header~=true then
+      local ready=nonSecret(info.readyForTurnIn)
+      local complete=nonSecret(info.isComplete)
+      local finished=ready==true or complete==true
       if not finished then
-        finished=questSafe(api.IsComplete,info.questID)==true
+        finished=nonSecret(questSafe(api.IsComplete,id))==true
       end
-      states[info.questID]=finished and "READY" or "ACTIVE"
+      states[id]=finished and "READY" or "ACTIVE"
     end
   end
   self.questLog=states
   -- Secours Forever : certaines versions exposent la liste des quetes
   -- rendues sans exposer IsQuestFlaggedCompleted.
   local completed=questSafe(api.GetAllCompletedQuestIDs)
-  if type(completed)=="table" then
-    self.completedQuestSet={}
-    for _,id in ipairs(completed) do
-      if type(id)=="number" then self.completedQuestSet[id]=true end
-    end
-  else
-    self.completedQuestSet=nil
+  self.completedQuestSet=nil
+  if type(completed)=="table" and nonSecret(completed) then
+    local set={}
+    local ok=pcall(function()
+      for _,value in ipairs(completed) do
+        local id=questNumber(value)
+        if id then set[id]=true end
+      end
+    end)
+    if ok then self.completedQuestSet=set end
   end
   return states
 end
 function B:QuestCompletion(questId)
-  if type(questId)~="number" then return nil end
+  questId=questNumber(questId)
+  if not questId then return nil end
   local api=C_QuestLog
   if type(api)~="table" then return nil end
-  local completed=questSafe(api.IsQuestFlaggedCompleted,questId)
+  local completed=nonSecret(questSafe(api.IsQuestFlaggedCompleted,questId))
   if completed==true then return true end
   if self.completedQuestSet then
     return self.completedQuestSet[questId]==true
@@ -432,7 +456,8 @@ function B:QuestCompletion(questId)
   return nil
 end
 function B:QuestLiveState(questId)
-  if type(questId)~="number" then return nil end
+  questId=questNumber(questId)
+  if not questId then return nil end
   if self:QuestCompletion(questId)==true then return "DONE" end
   local book=self.questLog
   if not book then book=self:ReadQuestLog() end
@@ -440,11 +465,14 @@ function B:QuestLiveState(questId)
   local api=C_QuestLog
   if type(api)=="table" and type(api.GetLogIndexForQuestID)=="function" and
       type(api.GetInfo)=="function" then
-    local index=questSafe(api.GetLogIndexForQuestID,questId)
-    if type(index)=="number" and index>0 then
+    local index=questNumber(questSafe(api.GetLogIndexForQuestID,questId))
+    if index and index>0 then
       local info=questSafe(api.GetInfo,index)
-      if type(info)=="table" and info.questID==questId then
-        return (info.isComplete==true or info.readyForTurnIn==true) and
+      local id=type(info)=="table" and questNumber(info.questID) or nil
+      if id==questId then
+        local ready=nonSecret(info.readyForTurnIn)
+        local completed=nonSecret(info.isComplete)
+        return (completed==true or ready==true) and
           "READY" or "ACTIVE"
       end
     end
@@ -460,9 +488,12 @@ function B:QuestObjectiveSummary(questId)
   local objectives=questSafe(api.GetQuestObjectives,questId)
   if type(objectives)~="table" then return nil end
   for _,objective in ipairs(objectives) do
-    if type(objective)=="table" and objective.finished~=true and
-        type(objective.text)=="string" and objective.text~="" then
-      return objective.text
+    local finished=type(objective)=="table" and
+      nonSecret(objective.finished) or nil
+    local content=type(objective)=="table" and
+      nonSecret(objective.text) or nil
+    if finished~=true and type(content)=="string" and content~="" then
+      return content
     end
   end
   return nil
