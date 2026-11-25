@@ -10,7 +10,7 @@ C_Map={
       GetXY=function(self) return self.x,self.y end}
   end,
 }
-local finished={},active={}
+local finished,active={},{} 
 C_QuestLog={
   IsQuestFlaggedCompleted=function(id) return finished[id] or false end,
   GetNumQuestLogEntries=function() return 0,0 end,
@@ -76,9 +76,11 @@ assert(not B:AdaptiveEligibility(objective,B:AdaptiveStepState(objective)),
 assert(not B:AdaptiveEligibility(turnin,B:AdaptiveStepState(turnin)),
   "pas de rendu recommandé sans objectifs terminés")
 local curatedPrereq=nil
-for _,entry in ipairs(B:AdaptiveEntries(true)) do
-  if entry.step.detour and entry.step.questId==1435 then
-    curatedPrereq=entry.step
+for _,step in ipairs(B.route) do
+  if step.questId==1435 then
+    curatedPrereq={id="detour:prereq-test",detour=true,guide=true,
+      category="armor",questId=1435,sourceStep=step,level=35}
+    break
   end
 end
 assert(curatedPrereq and
