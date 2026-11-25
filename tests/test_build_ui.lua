@@ -221,6 +221,7 @@ gearPanel.handlers.OnMouseWheel(gearPanel,-1)
 assert(gearPanel.gearOffset==1,"defilement vertical d'une ligne")
 gearPanel.handlers.OnMouseWheel(gearPanel,-1)
 gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
 local sawFuture=false
 for _,item in ipairs(gearPanel.displayed) do
   if item.minLevel>39 then sawFuture=true end
