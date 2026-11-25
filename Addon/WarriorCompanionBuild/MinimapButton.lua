@@ -88,9 +88,11 @@ function B:CreateMinimapButton()
     b:RegisterForClicks("LeftButtonUp","RightButtonUp")
   end
   if type(b.RegisterForDrag)=="function" then b:RegisterForDrag("LeftButton") end
+  -- L'icone est un lanceur, pas un interrupteur : cliquer plusieurs
+  -- fois sur une vue deja ouverte ne doit jamais la fermer.
   b:SetScript("OnClick",function(_,mouse)
-    if mouse=="RightButton" then B:ToggleCompact()
-    else B:ToggleDashboard() end
+    if mouse=="RightButton" then B:ShowCompact()
+    else B:OpenFullDashboard() end
   end)
   b:SetScript("OnEnter",function(frame)
     local tip=GameTooltip
