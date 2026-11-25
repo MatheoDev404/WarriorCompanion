@@ -343,6 +343,14 @@ function B:TooltipRoute(btn,step)
   tip:SetOwner(btn,"ANCHOR_RIGHT")
   if type(tip.ClearLines)=="function" then tip:ClearLines() end
   if type(tip.AddLine)~="function" then return end
+  if step.guide then
+    local details=self:GuideStepHelp(step) or step.text
+    for line in details:gmatch("[^\n]+") do
+      tip:AddLine(line,0.89,0.90,0.91,true)
+    end
+    if type(tip.Show)=="function" then tip:Show() end
+    return
+  end
   tip:AddLine(step.text or "Etape de parcours",1,0.76,0.32,true)
   tip:AddLine(step.zone or "Zone non renseignee",0.74,0.82,0.95)
   if step.questId then
@@ -370,6 +378,13 @@ end
 -- Marqueurs explicites : distinguent XP, amelioration facultative et donjon.
 local function routeBadge(step)
   if not step then return "APERCU",MUTED end
+  if step.guide then
+    if step.group then return "GROUPE",RED end
+    if step.action=="accept" then return "ACCEPTER",GREEN end
+    if step.action=="complete" then return "OBJECTIF",{0.55,0.78,0.98,1} end
+    if step.action=="turnin" then return "RENDRE",GOLD end
+    return step.travel and "TRAJET" or "ETAPE",{0.61,0.77,0.96,1}
+  end
   if step.kind=="dungeon" then return "DONJON",{0.83,0.50,0.93,1} end
   if step.gearId then return "EQUIPEMENT",{0.87,0.67,0.97,1} end
   if step.group then return "GROUPE",RED end
@@ -439,7 +454,11 @@ function B:CreateRoutePage(page)
   for i=1,5 do
     local row=button(page,16,-174-(i-1)*27,656,25,"",function()
       local entry=B.routeVisible and B.routeVisible[(B.routeScroll or 0)+i]
-      if entry then B.routeSelectedId=entry.step.id B:RefreshRoute() end
+      if entry then
+        B.routeSelectedId=entry.step.id
+        if entry.step.guide then B:GuideSelect(entry.step) end
+        B:RefreshRoute()
+      end
     end)
     row.marker=rect(row,0,0,3,25,GOLD)
     row.num=label(row,7,-2,36,22,"GameFontHighlightSmall","",GOLD)
@@ -475,16 +494,26 @@ function B:CreateRoutePage(page)
       B:RefreshRoute()
     end)
   end
-  page.nextAvailable=button(page,16,-317,184,27,"Objectif conseille",function()
+  page.switchGuide=button(page,16,-317,152,27,"Guide detaille",function()
+    if B.db then B.db.detailedMode=not (B.db.detailedMode~=false) end
     B.routeSelectedId=nil
     B.routeScroll=0
     B:RefreshRoute()
   end)
-  page.scrollHint=label(page,208,-317,266,27,
+  page.nextAvailable=button(page,173,-317,125,27,"Conseille",function()
+    B.routeSelectedId=nil
+    if B.db then B.db.guideSelectedId=nil end
+    B.routeScroll=0
+    B:RefreshRoute()
+  end)
+  page.scrollHint=label(page,302,-317,178,27,
     "GameFontHighlightSmall","",MUTED)
   page.done=button(page,492,-317,194,27,"Marquer comme fait",function()
     local selected=B.activeRouteStep
-    if selected then B:MarkRouteSelection(selected) end
+    if selected then
+      if selected.guide then B:GuideMarkStep(selected)
+      else B:MarkRouteSelection(selected) end
+    end
     B:RefreshRoute()
   end)
 end
@@ -729,15 +758,24 @@ function B:RefreshRoute()
   self.chapterMode=false
   local segmentIndex=self:CurrentRouteSegment()
   local segment=self.levelSegments[segmentIndex]
-  local entries=self:RouteSegmentEntries(segmentIndex,self.showCompleted)
-  local all=self:RouteSegmentEntries(segmentIndex,true)
+  local detailed=segmentIndex==4 and self.DetailedEntries and
+    self.db and self.db.detailedMode~=false
+  local entries=detailed and self:DetailedEntries(self.showCompleted) or
+    self:RouteSegmentEntries(segmentIndex,self.showCompleted)
+  local all=detailed and self:DetailedEntries(true) or
+    self:RouteSegmentEntries(segmentIndex,true)
   self.routeVisible=entries
   local doneCount=0
   for _,entry in ipairs(all) do
-    if self:IsStepDone(entry.step) then doneCount=doneCount+1 end
+    if (detailed and self:GuideStepDone(entry.step)) or
+      (not detailed and self:IsStepDone(entry.step)) then
+      doneCount=doneCount+1
+    end
   end
-  page.segmentLabel:SetText("Segment "..segment[3])
-  page.count:SetText((#all-doneCount).." restants / "..#all.." objectifs")
+  page.segmentLabel:SetText("Segment "..segment[3]..
+    (detailed and " · guide" or ""))
+  page.count:SetText((#all-doneCount).." restants / "..#all.." etapes")
+  page.switchGuide.txt:SetText(detailed and "Vue synthese" or "Guide detaille")
   page.toggleCompleted.txt:SetText(self.showCompleted and
     "Masquer les terminees" or "Afficher les terminees")
   local selected=nil
@@ -750,8 +788,10 @@ function B:RefreshRoute()
     end
   end
   if not selected then
-    selected=self:FirstSuggestedStep(entries)
+    selected=detailed and self:GuideSuggestedStep(entries) or
+      self:FirstSuggestedStep(entries)
     self.routeSelectedId=selected and selected.id or nil
+    if detailed and selected then self:GuideSelect(selected) end
   end
   self.activeRouteStep=selected
   if selected and self.routeForced then
@@ -764,9 +804,11 @@ function B:RefreshRoute()
     self.routeForced=false
   end
   if selected then
-    local state=self:StepState(selected)
+    local state=detailed and self:GuideStepState(selected) or
+      self:StepState(selected)
     local tag,shade=routeBadge(selected)
-    page.zone:SetText("Niv. "..selected.level.." | "..
+    page.zone:SetText((detailed and ("Etape "..selected.guideIndex) or
+      ("Niv. "..selected.level)).." | "..
       selected.zone.." ["..state.."]")
     page.activeKind:SetText(tag)
     page.activeKind:SetTextColor(shade[1],shade[2],shade[3])
@@ -781,7 +823,7 @@ function B:RefreshRoute()
     end
     local objective=selected.questId and
       self:QuestObjectiveSummary(selected.questId) or nil
-    local help=self:RouteHelp(selected)
+    local help=detailed and selected.text or self:RouteHelp(selected)
     local instructions=(objective and ("Progression : "..objective..". ") or "")..
       (help or selected.note or "")
     -- La carte ne doit pas recouvrir les objectifs du segment.
@@ -790,7 +832,8 @@ function B:RefreshRoute()
       local cut=instructions:sub(1,122)
       instructions=(cut:match("^(.*)%s+") or cut).."... (Details)"
     end
-    page.note:SetText(selected.text.."\n"..instructions)
+    page.note:SetText((detailed and self:GuideText(selected) or
+      selected.text).."\n"..instructions)
     local item=self:FindGearForStep(selected)
     if item then
       page.routeItem.icon:SetTexture(itemIcon(item.id))
@@ -799,7 +842,10 @@ function B:RefreshRoute()
       page.routeItem:Hide()
     end
     page.activeAccent:SetVertexColor(shade[1],shade[2],shade[3],1)
-    if selected.questId then
+    if detailed then
+      page.done.txt:SetText(selected.questId and "Ignorer (manuel)" or
+        "Etape effectuee")
+    elseif selected.questId then
       page.done.txt:SetText("Suivi auto (journal)")
     elseif selected.group or selected.level>(self.realLevel or 1) then
       page.done.txt:SetText("Plus tard / option")
@@ -836,6 +882,10 @@ function B:RefreshRoute()
     page.activeAccent:SetVertexColor(MUTED[1],MUTED[2],MUTED[3],1)
     page.done.txt:SetText("Aucun objectif")
   end
+  if self.SetCompassTarget then
+    self:SetCompassTarget(detailed and selected and
+      self:GuideTarget(selected) or nil)
+  end
   local count=#entries
   local maxOffset=math.max(0,count-5)
   self.routeScroll=math.max(0,math.min(self.routeScroll or 0,maxOffset))
@@ -847,12 +897,14 @@ function B:RefreshRoute()
       row:Show()
       local step=entry.step
       local tag,shade=routeBadge(step)
-      row.num:SetText(tostring(step.level))
+      row.num:SetText(tostring(detailed and step.guideIndex or step.level))
       row.kind:SetText(tag)
       row.kind:SetTextColor(shade[1],shade[2],shade[3])
       row.marker:SetVertexColor(shade[1],shade[2],shade[3],1)
-      row.name:SetText(routeText(step.text,65))
-      row.state:SetText(self:StepState(step))
+      row.name:SetText(routeText(detailed and self:GuideText(step) or
+        step.text,65))
+      row.state:SetText(detailed and self:GuideStepState(step) or
+        self:StepState(step))
       local active=selected and selected.id==step.id
       local color=active and {0.28,0.31,0.34,1} or CARD
       row.bg:SetVertexColor(color[1],color[2],color[3],color[4])
