@@ -1,5 +1,15 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.4.1-test — 25 novembre 2026
+
+- **HUD de boussole transparent** : panneau anthracite et bande supérieure supprimés ; aucune texture de fond ne couvre le monde.
+- **Flèche agrandie** : de 34 à **68 pixels**, couleur or/bronze ; silhouette noire décalée et halo très léger pour rester lisible sans cadre. Les trois couches tournent ensemble vers la destination.
+- **Texte réduit et lisible** : distance dorée et nom court de l'objectif, tous deux avec ombre sans rectangle opaque.
+- **Interactions discrètes** : le cadre transparent ne capte plus les clics ; seule la zone de la flèche reste une poignée de déplacement. Position de la boussole sauvegardée inchangée.
+- **Aucune régression voulue** : calcul de distance, protection des valeurs secrètes, reprise des étapes, arrivée et commandes `/wcb compass on/off` sont conservés ; tests Lua 5.1/5.4 étendus aux nouvelles propriétés graphiques et au déplacement.
+- **Validation restante** : rendu visuel du HUD dans le client WoW Forever et lisibilité pendant le combat.
+
+
 ## 0.4.0-test — 25 novembre 2026
 
 - **Phase A — Guide de niveau 30–40** : réintégration des 302 étapes historiques OpenXP/RestedXP en 14 sections, au lieu de remplacer définitivement le pilote synthétique. Les 285 coordonnées et 217 actions associées à des quêtes sont conservées, avec fichier de licence CC BY-NC-SA 4.0 et attributions.
