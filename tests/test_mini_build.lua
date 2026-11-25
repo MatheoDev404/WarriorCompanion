@@ -91,7 +91,7 @@ assert(B.minimapButton.normalTexture==nil,
   "aucune icone carree en texture de bouton")
 assert(B.minimapButton.icon and B.minimapButton.icon.width==20
     and B.minimapButton.icon.height==20 and
-    B.minimapButton.icon.texture:find("BerserkerRage",1,true),
+    B.minimapButton.icon.texture:find("BattleShout",1,true),
   "icone de guerrier centree de 20px")
 assert(B.minimapButton.icon.point[1]=="CENTER" and
   B.minimapButton.border and B.minimapButton.border.width==53,
