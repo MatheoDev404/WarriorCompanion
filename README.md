@@ -12,7 +12,7 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 
 ### Onglets
 1. **Talents** : talents investis ambrés et non investis estompés, 3 arbres Armes/Furie/Protection affichés côte à côte, icônes et infobulles, **point du niveau consulté surligné en or**, plan Fury pure ou hybride 13/38, prévisualisation libre.
-2. **Équipement** : quêtes, forge et butins de donjons sélectionnés, **liste pleine largeur à la molette / glissière** (cinq objets visibles ; objets du niveau d'abord, futurs ensuite), icônes/infobulles natives, source du boss et bouton **Voir dans Parcours**. L'estimation n'est pas un calcul de DPS.
+2. **Équipement** : quêtes, forge et butins de donjons sélectionnés (Hérode : casque/épaulières ; Glouton : hache 1M), **liste pleine largeur à la molette / glissière** (cinq objets visibles ; objets du niveau d'abord, futurs ensuite), icônes/infobulles natives, source du boss et bouton **Voir dans Parcours**. L'estimation n'est pas un calcul de DPS.
 3. **Parcours** : icône de récompense avec tooltip au survol, bouton **Détails** et information d'acquisition de recettes, tranches de niveaux (30–40 inclusif), **liste complète à défilement**, suivi du journal (acceptée, en cours, prête à rendre, rendue), filtre des quêtes déjà terminées et repères par type ; parcours solo prioritaire avec étapes facultatives séparées. Les autres tranches restent incomplètes.
 4. **Rotation** : mode **monocible / multicible**, enchaînement d'ouverture, buffs à maintenir, boucle, réactions, gros CD offensifs/défensifs ; Fracasser armure sur cible résistante, rangs à apprendre chez le maître et grimoire par familles, jamais d'autocast.
 
