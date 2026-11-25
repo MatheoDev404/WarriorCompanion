@@ -47,9 +47,11 @@ for _,g in ipairs(B.gear) do
   end
   assert(found,"objet sans quete ou forge dans le parcours")
 end
-assert(questSource==4 and craftSource==3 and dungeonSource==2)
+assert(questSource==4 and craftSource==3 and dungeonSource==3)
 assert(B:FindGearForStep({gearId=7719}).boss=="Herode")
 assert(B:FindGearForStep({gearId=7718}).source=="dungeon")
+assert(B:FindGearForStep({gearId=10772}).boss=="Glouton")
+assert(B:FindGearForStep({gearId=10772}).dps==28.8)
 assert(B:RouteHelp({gearId=7719}):find("Butin aleatoire",1,true),
   "aucun butin de boss garanti")
 assert(B:RouteHelp({gearId=250607}):find("251459",1,true),
@@ -83,7 +85,12 @@ assert(#B:GearListAt(20)==0,"aucun objet invente au niveau 20")
 local future=B:GearListAt(39,"future")
 assert(#future==2 and future[1].id==271802 and future[2].id==17705,
   "les objets du niveau 43/45 restent consultables dans un panneau separe")
-assert(relevant[1].id==250607,"Dague de Forge 180 visee au niveau 39")
+assert(relevant[1].id==10772,"Le Fendoir de Glouton est une option 1M forte au niveau 39")
+local foundMithril=false
+for _,item in ipairs(relevant) do
+  if item.id==250607 then foundMithril=true end
+end
+assert(foundMithril,"la dague de Forge reste une alternative")
 assert(B:ItemEligible(B:FindGearForStep({gearId=7719}),37))
 assert(not B:ItemEligible(B:FindGearForStep({gearId=7719}),35),
   "butin du boss non accessible au niveau 35")
