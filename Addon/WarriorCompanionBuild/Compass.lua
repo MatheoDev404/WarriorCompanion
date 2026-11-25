@@ -95,17 +95,6 @@ function B:CompassDirection(target)
   return {angle=relative,distance=distance,method=method,
     reached=distance<=18}
 end
-local function rect(parent,w,h,r,g,b,a)
-  local t=parent:CreateTexture(nil,"BACKGROUND")
-  t:SetAllPoints(parent)
-  if type(t.SetColorTexture)=="function" then
-    t:SetColorTexture(r,g,b,a or 1)
-  else
-    t:SetTexture("Interface\\Buttons\\WHITE8X8")
-    t:SetVertexColor(r,g,b,a or 1)
-  end
-  return t
-end
 local function label(parent,width,offsetY,size,color)
   local f=parent:CreateFontString(nil,"OVERLAY",size or "GameFontHighlightSmall")
   f:SetPoint("TOP",parent,"TOP",0,offsetY)
@@ -114,51 +103,80 @@ local function label(parent,width,offsetY,size,color)
   if color and type(f.SetTextColor)=="function" then
     f:SetTextColor(color[1],color[2],color[3])
   end
+  -- Ombre du texte pour le contraste en plein jeu, sans panneau opaque.
+  if type(f.SetShadowColor)=="function" then
+    f:SetShadowColor(0,0,0,0.95)
+  end
+  if type(f.SetShadowOffset)=="function" then
+    f:SetShadowOffset(1,-1)
+  end
   return f
 end
 function B:CreateCompass()
   if self.compassFrame then return self.compassFrame end
   if type(CreateFrame)~="function" or not UIParent then return nil end
   local f=CreateFrame("Frame","WarriorCompanionBuildCompass",UIParent)
-  f:SetSize(206,92)
+  f:SetSize(180,112)
   local p=self.db and self.db.compassPoint
   local x=(type(p)=="table" and num(p.x)) or 0
   local y=(type(p)=="table" and num(p.y)) or 160
   f:SetPoint("CENTER",UIParent,"CENTER",x,y)
   f:SetFrameStrata("MEDIUM")
   f:SetMovable(true)
-  f:EnableMouse(true)
-  if type(f.RegisterForDrag)=="function" then f:RegisterForDrag("LeftButton") end
-  f:SetScript("OnDragStart",function(selfFrame)
-    if type(selfFrame.StartMoving)=="function" then selfFrame:StartMoving() end
+  -- Une surface transparente ne doit pas capturer les clics de jeu :
+  -- seule la flèche peut être saisie pour déplacer le HUD.
+  f:EnableMouse(false)
+
+  local drag=CreateFrame("Button",nil,f)
+  drag:SetSize(76,72)
+  drag:SetPoint("TOP",f,"TOP",0,0)
+  if type(drag.EnableMouse)=="function" then drag:EnableMouse(true) end
+  if type(drag.RegisterForDrag)=="function" then
+    drag:RegisterForDrag("LeftButton")
+  end
+  drag:SetScript("OnDragStart",function()
+    if type(f.StartMoving)=="function" then f:StartMoving() end
   end)
-  f:SetScript("OnDragStop",function(selfFrame)
-    if type(selfFrame.StopMovingOrSizing)=="function" then
-      selfFrame:StopMovingOrSizing()
-    end
-    if not B.db or type(selfFrame.GetCenter)~="function" or
+  drag:SetScript("OnDragStop",function()
+    if type(f.StopMovingOrSizing)=="function" then f:StopMovingOrSizing() end
+    if not B.db or type(f.GetCenter)~="function" or
         type(UIParent.GetCenter)~="function" then return end
-    local x1,y1=call(selfFrame.GetCenter,selfFrame)
+    local x1,y1=call(f.GetCenter,f)
     local x2,y2=call(UIParent.GetCenter,UIParent)
     x1,y1,x2,y2=num(x1),num(y1),num(x2),num(y2)
     if x1 and y1 and x2 and y2 then
       B.db.compassPoint={x=x1-x2,y=y1-y2}
     end
   end)
-  rect(f,206,92,0.09,0.11,0.14,0.96)
-  local top=f:CreateTexture(nil,"BACKGROUND")
-  top:SetTexture("Interface\\Buttons\\WHITE8X8")
-  top:SetPoint("TOPLEFT",f,"TOPLEFT",0,0)
-  top:SetSize(206,3)
-  top:SetVertexColor(0.92,0.66,0.28,1)
-  local arrow=f:CreateTexture(nil,"ARTWORK")
-  arrow:SetSize(34,34)
-  arrow:SetPoint("TOP",f,"TOP",0,-6)
-  arrow:SetTexture("Interface\\Minimap\\MinimapArrow")
-  arrow:SetVertexColor(0.98,0.77,0.36,1)
+  f.dragHandle=drag
+
+  -- HUD 100 % transparent : uniquement la flèche et deux textes.
+  -- Trois silhouettes superposées, pour un contour moderne et lisible.
+  local arrowPath="Interface\\Minimap\\MinimapArrow"
+  local glow=f:CreateTexture(nil,"ARTWORK")
+  glow:SetTexture(arrowPath)
+  glow:SetSize(76,76)
+  glow:SetPoint("TOP",f,"TOP",0,1)
+  glow:SetVertexColor(0.97,0.53,0.17,0.20)
+  if type(glow.SetBlendMode)=="function" then glow:SetBlendMode("ADD") end
+  f.arrowGlow=glow
+
+  local shadow=f:CreateTexture(nil,"ARTWORK")
+  shadow:SetTexture(arrowPath)
+  shadow:SetSize(72,72)
+  shadow:SetPoint("TOP",f,"TOP",1,-3)
+  shadow:SetVertexColor(0.02,0.03,0.05,0.75)
+  f.arrowShadow=shadow
+
+  local arrow=f:CreateTexture(nil,"OVERLAY")
+  arrow:SetTexture(arrowPath)
+  arrow:SetSize(68,68)
+  arrow:SetPoint("TOP",f,"TOP",0,-2)
+  arrow:SetVertexColor(1,0.80,0.32,1)
   f.arrow=arrow
-  f.distance=label(f,190,-46,"GameFontNormal",{0.97,0.76,0.35})
-  f.description=label(f,197,-68,"GameFontHighlightSmall",{0.8,0.85,0.89})
+
+  f.distance=label(f,178,-76,"GameFontNormal",{1,0.82,0.38})
+  f.description=label(f,178,-96,"GameFontHighlightSmall",{0.88,0.91,0.96})
   self.compassFrame=f
   local tick=0
   f:SetScript("OnUpdate",function(_,delta)
@@ -193,11 +211,18 @@ function B:UpdateCompass()
   local result=self:CompassDirection(self.compassTarget)
   if not result or not result.angle then
     f.arrow:Hide()
+    f.arrowShadow:Hide()
+    f.arrowGlow:Hide()
     f.distance:SetText(result and result.reason or "Pas de destination")
   else
     f.arrow:Show()
-    if type(f.arrow.SetRotation)=="function" then
-      f.arrow:SetRotation(-result.angle)
+    f.arrowShadow:Show()
+    f.arrowGlow:Show()
+    -- Toutes les couches suivent exactement la même rotation.
+    for _,layer in ipairs({f.arrowGlow,f.arrowShadow,f.arrow}) do
+      if type(layer.SetRotation)=="function" then
+        layer:SetRotation(-result.angle)
+      end
     end
     f.distance:SetText(result.reached and "Destination atteinte" or
       ("~"..floor(result.distance+0.5).." m (ligne droite)"))
@@ -216,6 +241,6 @@ function B:UpdateCompass()
   local name=self.compassTarget and self.compassTarget.label or
     "Guide 30-40"
   if type(name)~="string" then name="Guide 30-40" end
-  if #name>34 then name=name:sub(1,31).."..." end
+  if #name>31 then name=name:sub(1,28).."..." end
   f.description:SetText(name)
 end
