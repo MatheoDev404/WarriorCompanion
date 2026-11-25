@@ -788,10 +788,16 @@ function B:RefreshRoute()
     end
   end
   if not selected then
+    local prior=self.routeSelectedId
     selected=detailed and self:GuideSuggestedStep(entries) or
       self:FirstSuggestedStep(entries)
     self.routeSelectedId=selected and selected.id or nil
-    if detailed and selected then self:GuideSelect(selected) end
+    if detailed and selected then
+      self:GuideSelect(selected)
+      -- Lors d'une reprise ou d'une auto-validation, montrer la nouvelle
+      -- ligne recommandée sans déplacer le scroll pendant une lecture.
+      if prior~=selected.id then self.routeForced=true end
+    end
   end
   self.activeRouteStep=selected
   if selected and self.routeForced then
