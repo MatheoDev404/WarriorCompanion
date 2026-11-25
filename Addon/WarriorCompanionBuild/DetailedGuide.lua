@@ -73,10 +73,12 @@ function B:RegisterGuidePack(pack)
       type(pack.maxLevel)~="number" or #pack.steps==0 then return false end
   local index=#self.guidePacks+1
   self.guidePacks[index]=pack
+  local mapHits={}
   for k,src in ipairs(pack.steps) do
     local id="guide30:"..pack.id..":"..k
     local raw=src.text or ""
     local map=zoneMaps[src.zone or ""]
+    if map then mapHits[map]=(mapHits[map] or 0)+1 end
     local validXY=numeric(src.x) and numeric(src.y) and
       src.x>=0 and src.x<=100 and src.y>=0 and src.y<=100
     local action=src.action
@@ -96,6 +98,10 @@ function B:RegisterGuidePack(pack)
     step.optional=step.group
     step.text=readable(raw)
     self.guideSteps[#self.guideSteps+1]=step
+  end
+  local largest=0
+  for map,n in pairs(mapHits) do
+    if n>largest then largest=n pack.majorMap=map end
   end
   return true
 end
@@ -151,7 +157,14 @@ local function stateOf(self,step)
   if step.group then return "OPTION GROUPE" end
   return step.travel and "DÉPLACEMENT" or "ÉTAPE À SUIVRE"
 end
-function B:GuideStepState(step) return stateOf(self,step) end
+function B:GuideStepState(step)
+  local state=stateOf(self,step)
+  if step.questId and state=="À ACCEPTER" and
+      self:GuidePrerequisites(step)==false then
+    return "PRÉREQUIS MANQUANT"
+  end
+  return state
+end
 function B:GuideStepDone(step)
   local s=self:GuideStepState(step)
   return s=="FAIT (MANUEL)" or s=="IGNORÉE" or s=="QUÊTE RENDUE" or
@@ -189,14 +202,9 @@ local function matchPack(pack,level,map,guideSteps)
   if level<pack.minLevel then distance=pack.minLevel-level
   elseif level>pack.maxLevel then distance=level-pack.maxLevel end
   local score=distance*90
-  local zoneHit=false
-  for _,step in ipairs(guideSteps) do
-    if step.packID==pack.id and step.mapID==map and map then
-      zoneHit=true
-      break
-    end
-  end
-  if zoneHit then score=score-110 end
+  -- Un simple detour dans la zone du personnage ne suffit pas : seul
+  -- le hub majoritaire de la section change la priorite.
+  if map and pack.majorMap==map then score=score-110 end
   return score
 end
 function B:GuideSuggestedStep(entries)
@@ -233,14 +241,16 @@ function B:GuideSuggestedStep(entries)
   end
   if packIndex then
     for _,entry in ipairs(entries) do
-      if entry.step.pack==packIndex and not entry.step.group then
+      if entry.step.pack==packIndex and not entry.step.group and
+          entry.state~="PRÉREQUIS MANQUANT" then
         return entry.step
       end
     end
   end
   -- Section épuisée : prendre la section non terminée la plus proche.
   for _,entry in ipairs(entries) do
-    if not entry.step.group and entry.step.level<=lv+1 then
+    if not entry.step.group and entry.step.level<=lv+1 and
+        entry.state~="PRÉREQUIS MANQUANT" then
       return entry.step
     end
   end
