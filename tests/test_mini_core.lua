@@ -73,11 +73,30 @@ end
 function B:Refresh() self.refreshed=(self.refreshed or 0)+1 end
 function B:RefreshGear() end
 function B:RefreshRotation() end
-function B:RefreshRoute() end
+function B:RefreshRoute()
+  self.routeRefreshed=(self.routeRefreshed or 0)+1
+end
 function B:ReadQuestLog() end
+function B:AdaptiveInit()
+  self.db.routeMode="safe"
+  self.adaptiveInitialized=true
+end
+function B:AdaptiveMode() return self.db.routeMode end
+function B:AdaptiveSetMode(mode)
+  self.db.routeMode=mode
+  return true
+end
+function B:AdaptiveResume()
+  self.resumes=(self.resumes or 0)+1
+end
+function B:AdaptiveInvalidate(reason)
+  self.invalidations=self.invalidations or {}
+  self.invalidations[#self.invalidations+1]=reason
+end
 function B:ReturnToReal() end
 function B:ShowPage(key)
   self.selectedPage=key
+  self.page=key
 end
 function B:SetMinimapVisible(value)
   self.db.minimapVisible=value
@@ -93,7 +112,8 @@ fire(eventFrame,"ADDON_LOADED","OtherAddon")
 assert(B.db==nil,"ignorer chargement d'autres addons")
 fire(eventFrame,"ADDON_LOADED","WarriorCompanionBuild")
 assert(B.db.autoOpen==false and B.db.displayMode=="hidden" and
-  B.db.minimapVisible==true and B.db.showAlerts==true)
+  B.db.minimapVisible==true and B.db.showAlerts==true and
+  B.adaptiveInitialized and B.db.routeMode=="safe")
 fire(eventFrame,"PLAYER_ENTERING_WORLD")
 assert(B.iconCreated==1 and B.started==1 and B.uiCreated==1 and
   B.compactCreated==1,"initialisation de tous les modules")
@@ -129,6 +149,23 @@ slash("reset")
 assert(B.resets==1)
 slash("parcours")
 assert(B.selectedPage=="parcours" and B.frame:IsShown())
+slash("mode xp")
+assert(B.db.routeMode=="xp" and B.routeRefreshed>0,
+  "la commande XP rapide replanifie le Parcours")
+slash("mode securite")
+assert(B.db.routeMode=="safe","la commande Sécurité persiste")
+slash("reprendre")
+assert(B.resumes==1 and B.selectedPage=="parcours",
+  "reprendre ouvre la carte adaptative")
+fire(eventFrame,"QUEST_LOG_UPDATE")
+assert(B.invalidations[#B.invalidations]=="quest" and B.routeRefreshed>1,
+  "le journal recalcul les objectifs")
+fire(eventFrame,"ZONE_CHANGED_NEW_AREA")
+assert(B.invalidations[#B.invalidations]=="zone",
+  "une déviation déclenche une nouvelle proposition")
+fire(eventFrame,"PLAYER_LEVEL_UP",36)
+assert(B.invalidations[#B.invalidations]=="level",
+  "le nouveau niveau invalide la recommandation ancienne")
 fire(eventFrame,"PLAYER_ENTERING_WORLD")
 assert(B.started==1 and B.iconCreated==1,
   "le changement de zone ne recree pas les fenetres ni la session")
