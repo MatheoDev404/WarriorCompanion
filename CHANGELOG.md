@@ -1,5 +1,15 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.4.0-test — 25 novembre 2026
+
+- **Phase A — Guide de niveau 30–40** : réintégration des 302 étapes historiques OpenXP/RestedXP en 14 sections, au lieu de remplacer définitivement le pilote synthétique. Les 285 coordonnées et 217 actions associées à des quêtes sont conservées, avec fichier de licence CC BY-NC-SA 4.0 et attributions.
+- **Reprise adaptative** : moteur séparé classant les étapes selon l'acceptation/les objectifs/le rendu réel des quêtes (`C_QuestLog`), le niveau et la zone courante. Prérequis connus vérifiés, autres marqués incertains. Choix prioritaire des quêtes en cours, reprise dans la section du hub majoritaire, sauvegarde de l'étape choisie et corrections manuelles réversibles.
+- **Onglet Parcours** : bouton Guide détaillé / Vue synthèse, navigation sur toute la liste des 302 étapes, centrage automatique de l'étape recommandée et infobulle présentant le détail connu. Conservation du lien « Voir dans Parcours » pour les récompenses du pilote.
+- **Boussole** : flèche directionnelle autonome, distance en ligne droite, zone et instance vérifiées, fallback local, position mémorisée, `/wcb compass on/off`. Les valeurs secrètes Forever sont filtrées, et l'absence de destination donne un message plutôt qu'une distance inventée. Une simple étape de déplacement peut se valider à l'arrivée, pas un objectif de combat.
+- **Audit source** : 108 identifiants de quêtes distincts recoupés avec l'export Forever de `prezus/ForeverGuide`; 285 points géographiques vérifiés syntaxiquement dans 14 zones (mapIDs). Les deux IDs spécifiques Forever 98070 et 93225 sont documentés dans les bases publiques.
+- **Tests** : Lua 5.1/5.4 sur le guide, les statuts du journal, la boussole, les valeurs protégées, la carte locale/étrangère et la bascule dans l'UI, audit Python des coordonnées et IDs. **Validation dans le client réel à poursuivre** : géographie, traductions, PNJ et chaînes de prérequis.
+
+
 ## 0.3.7-test — 25 novembre 2026
 
 - **Minimap = lanceur, jamais interrupteur** : clic gauche ouvre le guide complet ; clic droit ouvre le mini-bilan. Cliquer à nouveau sur la vue déjà ouverte ne la ferme pas, la conserve à l'écran.
