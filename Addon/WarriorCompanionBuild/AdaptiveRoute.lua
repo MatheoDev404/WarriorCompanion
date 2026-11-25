@@ -99,9 +99,9 @@ function B:AdaptiveOptionCategory(source)
   local item=self:FindGearForStep(source)
   if source.kind=="dungeon" or source.group then return "dungeons" end
   if item and isWeapon(item) then return "weapons" end
+  if item then return "armor" end
   if source.kind=="craft" or
       (source.id=="desolace-cookbook") then return "professions" end
-  if item then return "armor" end
   return nil
 end
 local function bestPack(self,step,map)
