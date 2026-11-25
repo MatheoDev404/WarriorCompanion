@@ -106,6 +106,7 @@ assert(loadfile("Addon/WarriorCompanionBuild/Spellbook.lua"))("WarriorCompanionB
 assert(loadfile("Addon/WarriorCompanionBuild/Planner.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/DetailedGuide.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/DetailedData30_40.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/AdaptiveRoute.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/CombatData.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/UI.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Rotation.lua"))("WarriorCompanionBuild",B)
@@ -212,9 +213,28 @@ assert(B.pages.parcours.segmentLabel.text=="Segment 30-40")
 B.pages.parcours.switchGuide.handlers.OnClick()
 assert(B.db.detailedMode and B.pages.parcours.segmentLabel.text:find("guide",1,true),
   "l'onglet active le guide detaille")
-assert(#B.routeVisible==302 and
-  B.pages.parcours.count.text:find("302",1,true),
-  "les 302 etapes deviennent defilables dans le guide")
+assert(#B.routeVisible>=302,
+  "les 302 etapes sont conservées, avec détours facultatifs")
+assert(B.pages.parcours.modeButton and
+  B.pages.parcours.optionButtons.weapons and
+  B.pages.parcours.optionButtons.professions and
+  B.pages.parcours.optionButtons.dungeons,
+  "les modes et les filtres restent accessibles dans l'onglet")
+B.pages.parcours.modeButton.handlers.OnClick()
+assert(B.db.routeMode=="xp" and
+  B.pages.parcours.modeButton.txt.text=="XP rapide",
+  "choix XP rapide mémorisé")
+B.pages.parcours.modeButton.handlers.OnClick()
+assert(B.db.routeMode=="safe",
+  "retour au mode Sécurité")
+local beforeDetour=#B.routeVisible
+B.pages.parcours.optionButtons.dungeons.handlers.OnClick()
+assert(B.db.routeOptions.dungeons==true and
+  #B.routeVisible>beforeDetour,
+  "les détours de donjons s'ajoutent sans supprimer les 302 étapes")
+B.pages.parcours.optionButtons.dungeons.handlers.OnClick()
+assert(B.db.routeOptions.dungeons==false,
+  "masquer les donjons est réversible")
 assert(B.activeRouteStep and B.activeRouteStep.guide,
   "le moteur propose une etape du guide au niveau reel")
 assert(B.routeScroll>0,"l'etape recommandee est repositionnee dans la liste")
