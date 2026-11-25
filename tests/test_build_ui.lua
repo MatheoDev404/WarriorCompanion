@@ -104,6 +104,8 @@ assert(loadfile("Addon/WarriorCompanionBuild/Data.lua"))("WarriorCompanionBuild"
 assert(loadfile("Addon/WarriorCompanionBuild/TalentTrees.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Spellbook.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Planner.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/DetailedGuide.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/DetailedData30_40.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/CombatData.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/UI.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Rotation.lua"))("WarriorCompanionBuild",B)
@@ -207,6 +209,19 @@ B.pages.parcours.nextSegment.handlers.OnClick()
 assert(B.pages.parcours.segmentLabel.text=="Segment 41-50")
 B.pages.parcours.prevSegment.handlers.OnClick()
 assert(B.pages.parcours.segmentLabel.text=="Segment 30-40")
+B.pages.parcours.switchGuide.handlers.OnClick()
+assert(B.db.detailedMode and B.pages.parcours.segmentLabel.text:find("guide",1,true),
+  "l'onglet active le guide detaille")
+assert(#B.routeVisible==302 and
+  B.pages.parcours.count.text:find("302",1,true),
+  "les 302 etapes deviennent defilables dans le guide")
+assert(B.activeRouteStep and B.activeRouteStep.guide,
+  "le moteur propose une etape du guide au niveau reel")
+assert(B.routeScroll>0,"l'etape recommandee est repositionnee dans la liste")
+B.pages.parcours.switchGuide.handlers.OnClick()
+assert(B.db.detailedMode==false and
+  B.pages.parcours.segmentLabel.text=="Segment 30-40",
+  "la vue synthese reste disponible")
 B:SetPreview(39)
 B:ShowPage("equipement")
 local gearPanel=B.pages.equipement
