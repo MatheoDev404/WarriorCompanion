@@ -264,8 +264,11 @@ function B:GuideMarkStep(step)
   if not step or not step.guide or not self.db then return false end
   if type(self.db.guideManual)~="table" then self.db.guideManual={} end
   local old=self.db.guideManual[step.id]
-  self.db.guideManual[step.id]=old and nil or
-    (step.questId and "skip" or "done")
+  if old then
+    self.db.guideManual[step.id]=nil
+  else
+    self.db.guideManual[step.id]=step.questId and "skip" or "done"
+  end
   self.routeSelectedId=nil
   self.db.guideSelectedId=nil
   return true
