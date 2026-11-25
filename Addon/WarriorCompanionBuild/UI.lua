@@ -241,75 +241,67 @@ function B:TooltipItem(btn,item)
 end
 function B:CreateGearPage(page)
   panel(page,0,0,700,347)
-  label(page,16,-10,650,23,"GameFontNormalLarge",
+  label(page,16,-10,654,23,"GameFontNormalLarge",
     "Equipement par paliers",WHITE)
-  label(page,16,-34,660,19,"GameFontHighlightSmall",
-    "Recompenses de quetes ou objets fabriques uniquement.",MUTED)
+  label(page,16,-34,654,19,"GameFontHighlightSmall",
+    "Quetes, Forge et butins de boss utiles au Guerrier Furie ; survol : fiche complete.",MUTED)
   page.items={}
   page.gearOffset=0
   page.displayed={}
-  -- Defilement vertical a la molette (pas de changement de palier par bouton).
-  local function scrollGear(_,delta)
-    if type(delta)~="number" then return end
+  local visibleRows=5
+  local function orderedGear()
     local list=B:GearListAt(B.viewLevel)
     for _,item in ipairs(B:GearListAt(B.viewLevel,"future")) do
       list[#list+1]=item
     end
-    local maximum=math.max(0,#list-4)
+    return list
+  end
+  local function scrollGear(_,delta)
+    if type(delta)~="number" then return end
+    local list=orderedGear()
+    local maximum=math.max(0,#list-visibleRows)
     page.gearOffset=math.max(0,math.min(maximum,
       (page.gearOffset or 0)-(delta>0 and 1 or -1)))
     B:RefreshGear()
   end
   if type(page.EnableMouseWheel)=="function" then page:EnableMouseWheel(true) end
   page:SetScript("OnMouseWheel",scrollGear)
-  for i,item in ipairs(self.gear) do
-    local y=-61-(i-1)*62
-    local row=button(page,16,y,411,56,"",function()
+  for _,item in ipairs(self.gear) do
+    local row=button(page,16,-61,650,47,"",function()
       B.selectedItem=item.id
-      B:Refresh()
+      B:RefreshGear()
     end)
     row.icon=row:CreateTexture(nil,"ARTWORK")
-    row.icon:SetPoint("TOPLEFT",row,"TOPLEFT",10,-8)
-    row.icon:SetSize(40,40)
+    row.icon:SetPoint("TOPLEFT",row,"TOPLEFT",8,-7)
+    row.icon:SetSize(34,34)
     row.icon:SetTexture(itemIcon(item.id))
-    row.name=label(row,60,-5,342,23,"GameFontNormal","",WHITE)
-    row.detail=label(row,60,-29,342,20,"GameFontHighlightSmall","",MUTED)
+    row.name=label(row,49,-4,588,21,"GameFontNormal","",WHITE)
+    row.detail=label(row,49,-25,588,18,"GameFontHighlightSmall","",MUTED)
     if type(row.EnableMouseWheel)=="function" then row:EnableMouseWheel(true) end
     row:SetScript("OnMouseWheel",scrollGear)
     row:SetScript("OnEnter",function()
-      row.bg:SetVertexColor(0.24,0.29,0.34,1)
+      row.bg:SetVertexColor(0.25,0.29,0.34,1)
       B:TooltipItem(row,item)
     end)
     row:SetScript("OnLeave",function()
       dismissTip()
       B:RefreshGear()
     end)
+    row:Hide()
     page.items[item.id]=row
   end
-  panel(page,439,-61,244,238)
-  page.previewIcon=page:CreateTexture(nil,"ARTWORK")
-  page.previewIcon:SetPoint("TOPLEFT",page,"TOPLEFT",455,-78)
-  page.previewIcon:SetSize(42,42)
-  page.previewName=label(page,505,-76,165,44,"GameFontNormal","",WHITE)
-  page.previewLevel=label(page,455,-130,211,21,"GameFontHighlightSmall","",GOLD)
-  page.previewSource=label(page,455,-153,213,30,"GameFontHighlightSmall","",MUTED)
-  page.previewDescription=label(page,455,-187,209,110,
-    "GameFontHighlightSmall","",WHITE)
-  if page.previewDescription.SetWordWrap then
-    page.previewDescription:SetWordWrap(true)
-  end
-  page.gearStatus=label(page,18,-318,288,27,"GameFontHighlightSmall","",GOLD)
-  page.scrollHint=label(page,306,-318,193,21,
+  page.gearStatus=label(page,18,-315,288,27,
+    "GameFontHighlightSmall","",GOLD)
+  page.scrollHint=label(page,313,-315,190,24,
     "GameFontHighlightSmall","Molette : faire defiler",MUTED)
-  page.scrollTrack=rect(page,430,-62,5,244,{0.26,0.29,0.32,1})
-  page.scrollThumb=rect(page,430,-62,5,70,GOLD)
-  -- Le curseur peut aussi etre glisse si le client propose l'API Slider.
+  page.scrollTrack=rect(page,675,-61,5,240,{0.26,0.29,0.32,1})
+  page.scrollThumb=rect(page,675,-61,5,70,GOLD)
   local slider=CreateFrame("Slider",nil,page)
   if type(slider.SetOrientation)=="function" and
       type(slider.SetMinMaxValues)=="function" and
       type(slider.SetThumbTexture)=="function" then
-    slider:SetPoint("TOPLEFT",page,"TOPLEFT",425,-62)
-    slider:SetSize(14,244)
+    slider:SetPoint("TOPLEFT",page,"TOPLEFT",671,-61)
+    slider:SetSize(13,240)
     slider:SetOrientation("VERTICAL")
     slider:SetMinMaxValues(0,0)
     if type(slider.SetValueStep)=="function" then slider:SetValueStep(1) end
@@ -327,7 +319,7 @@ function B:CreateGearPage(page)
       B:RefreshGear()
     end)
   end
-  page.gotoButton=button(page,502,-312,181,31,"Voir dans Parcours",function()
+  page.gotoButton=button(page,502,-310,181,31,"Voir dans Parcours",function()
     if B.selectedItem and B:GoToGear(B.selectedItem) then
       B:ShowPage("parcours")
     end
@@ -583,28 +575,25 @@ function B:RefreshGear()
     ordered[#ordered+1]=item
   end
   local count=#ordered
-  page.gearOffset=math.max(0,math.min(page.gearOffset or 0,
-    math.max(0,count-4)))
+  local visibleRows=5
+  local maxOffset=math.max(0,count-visibleRows)
+  page.gearOffset=math.max(0,math.min(page.gearOffset or 0,maxOffset))
   local start=page.gearOffset+1
   local shown={}
   page.displayed={}
-  for pos=1,4 do
+  for pos=1,visibleRows do
     local item=ordered[start+pos-1]
-    if item then
-      shown[item.id]=pos
-      page.displayed[pos]=item
-    end
+    if item then shown[item.id]=pos page.displayed[pos]=item end
   end
   if not self.selectedItem or not shown[self.selectedItem] then
     self.selectedItem=page.displayed[1] and page.displayed[1].id or nil
   end
-  local current=nil
   for _,item in ipairs(self.gear) do
     local row=page.items[item.id]
     local pos=shown[item.id]
     if pos then
       row:ClearAllPoints()
-      row:SetPoint("TOPLEFT",page,"TOPLEFT",16,-61-(pos-1)*62)
+      row:SetPoint("TOPLEFT",page,"TOPLEFT",16,-61-(pos-1)*49)
       row:Show()
       row.icon:SetTexture(itemIcon(item.id))
       row.name:SetText(itemName(item))
@@ -612,11 +601,13 @@ function B:RefreshGear()
       local levelLabel=item.requiredLevel and
         ("Niv. requis "..item.requiredLevel) or
         ("Quete min. "..item.minLevel)
+      local source=item.source=="dungeon" and
+        ("Donjon : "..(item.boss or "boss")) or
+        (item.source=="quest" and "Quete" or "Forge")
       row.detail:SetText((not eligible and "PLUS TARD  |  " or "")..
-        item.slot.."  |  "..levelLabel.."  |  "..
-        (item.source=="quest" and "Quete" or "Forge")..
+        item.slot.."  |  "..levelLabel.."  |  "..source..
         (item.dps and ("  |  "..string.format("%.1f",item.dps).." DPS") or "")..
-        (item.group and " (GROUPE)" or ""))
+        (item.group and "  [GROUPE]" or ""))
       local selected=self.selectedItem==item.id
       local color=selected and {0.28,0.30,0.32,1} or
         (eligible and CARD or {0.14,0.16,0.18,1})
@@ -629,57 +620,40 @@ function B:RefreshGear()
     else
       row:Hide()
     end
-    if self.selectedItem==item.id then current=item end
   end
-  if current then
-    local eligible,reason=self:ItemEligible(current,level)
-    page.previewIcon:SetTexture(itemIcon(current.id))
-    page.previewName:SetText(itemName(current))
-    page.previewLevel:SetText(current.requiredLevel and
-      ("Niveau requis : "..current.requiredLevel) or
-      ("Acces quete des le niv. "..current.minLevel))
-    local source=current.source=="quest" and
-      ("Quete #"..current.questId..(current.group and " | Groupe" or ""))
-      or ("Forge "..current.skill.." | Recette #"..current.recipe)
-    page.previewSource:SetText(source)
-    page.previewDescription:SetText((self.gearDescriptions[current.id] or
-      current.note or "Fiche indisponible.")..
-      (current.dps and ("\nDPS de base : "..string.format("%.1f",current.dps)..
-        " (sans stats/talents)") or "")..
-      "\n\n"..self:GearRelevance(current,level).."\n"..reason)
-    page.gearStatus:SetText(eligible and
-      "Cible potentielle : comparer les statistiques en jeu."
-      or ("Non accessible : "..reason))
+  if not self.selectedItem then
+    page.gearStatus:SetText("Aucun objet valide pour ce palier.")
+  else
+    local chosen=nil
+    for _,item in ipairs(self.gear) do
+      if item.id==self.selectedItem then chosen=item break end
+    end
+    if chosen and chosen.source=="dungeon" then
+      page.gearStatus:SetText("Butin de boss facultatif, non garanti.")
+    elseif chosen and chosen.source=="craft" then
+      page.gearStatus:SetText("Forge : recette et materiaux dans Parcours.")
+    else
+      page.gearStatus:SetText("Quete : voir les objectifs dans Parcours.")
+    end
   end
-  if not current then
-    page.previewIcon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
-    page.previewName:SetText("Aucune cible documentee")
-    page.previewLevel:SetText("Niveau "..level)
-    page.previewSource:SetText("")
-    page.previewDescription:SetText(
-      "Aucune recompense de quete ou de forge validee dans ce palier."..
-      " Les futurs objets sont consultables a part.")
-    page.gearStatus:SetText("Pas de recommandation fiable a ce niveau.")
-  end
+  page.scrollHint:SetText("Molette | "..(count==0 and "0/0" or
+    (start.."-"..math.min(count,start+visibleRows-1).."/"..count))..
+    " | "..availableCount.." actuels")
   if page.scrollBar then
     page.updatingScroll=true
-    page.scrollBar:SetMinMaxValues(0,math.max(0,count-4))
+    page.scrollBar:SetMinMaxValues(0,maxOffset)
     page.scrollBar:SetValue(page.gearOffset)
     page.updatingScroll=false
   end
-  page.scrollHint:SetText("Molette  |  "..(count==0 and "0/0" or
-    (start.."-"..math.min(count,start+3).."/"..count))..
-    "  |  "..availableCount.." actuels")
-  local height=244
-  local thumb= count>0 and math.max(22,math.floor(
-    height*math.min(4,count)/count)) or height
+  local height=240
+  local thumb=count>0 and math.max(22,math.floor(
+    height*math.min(visibleRows,count)/count)) or height
   page.scrollThumb:SetSize(5,thumb)
   if type(page.scrollThumb.ClearAllPoints)=="function" then
     page.scrollThumb:ClearAllPoints()
   end
-  local maximum=math.max(1,count-4)
-  page.scrollThumb:SetPoint("TOPLEFT",page,"TOPLEFT",430,
-    -62-math.floor((height-thumb)*(page.gearOffset/maximum)))
+  page.scrollThumb:SetPoint("TOPLEFT",page,"TOPLEFT",675,
+    -61-math.floor((height-thumb)*(page.gearOffset/math.max(1,maxOffset))))
 end
 local function routeText(text,maxLen)
   if type(text)~="string" then return "" end
