@@ -121,18 +121,20 @@ B.chapters={
  {49,54,"Cratere d'Un'Goro / Gorge des Vents brulants","Chapitre a documenter."},
  {55,60,"Gangrebois / Berceau-de-l'Hiver / Maleterres","Chapitre a documenter."},
 }
--- source="quest" ou "craft" EXCLUSIVEMENT.
+-- source="quest", "craft" ou "dungeon" (butin de boss precis).
 -- Une quete offrant une arme est referencee par routeId, dans B.route.
 -- Aucune etiquette "disponible" sans tester le niveau et les contraintes.
 B.gear={
  {id=3844,slot="Torse",name="Haubert en fer emeraude",
   minLevel=31,requiredLevel=31,source="craft",profession="Forge",skill=155,recipe=3508,
   routeId="craft-hauberk",group=false,
+  recipeHow="Appris chez un maitre de Forge expert si le rang requis est atteint; verifier le grimoire de Forge.",
   note="Armure de mailles; fabrication personnelle ou artisan tiers si objet non lie.",
   sourceUrl="https://www.wowhead.com/forever/item=3844"},
  {id=3843,slot="Jambes",name="Jambieres en ecailles dorees",
   minLevel=29,requiredLevel=29,source="craft",profession="Forge",skill=145,recipe=3507,
   routeId="craft-leggings",group=false,
+  recipeHow="Plan de Forge a obtenir (source exacte a verifier en jeu / HV). Ne pas supposer qu'il est vendu par le maitre.",
   note="Plan et composants a confirmer; alternative artisanale a envisager.",
   sourceUrl="https://www.wowhead.com/forever/item=3843"},
  {id=6802,slot="Arme 1 main",name="Epee de malediction",
@@ -145,7 +147,8 @@ B.gear={
   sourceUrl="https://www.wowhead.com/forever/quest=7064"},
  {id=250607,slot="Arme 1 main",name="Epee courte en mithril",
   minLevel=36,requiredLevel=36,dps=22.94,source="craft",profession="Forge",skill=180,
-  recipe=1252356,routeId="craft-mithril-shortsword",group=false,
+  recipe=1252356,recipeItemId=251459,routeId="craft-mithril-shortsword",group=false,
+  recipeHow="Apprendre avec « Plans : Epee courte en mithril » (#251459), Forge 180; disponibilite et vendeur a confirmer en jeu.",
   note="Dague main droite ou gauche, +14 PA. Forge 180, recette a trouver.",
   sourceUrl="https://senseos.gg/wiki/wow-forever/items/250607/mithril-shortsword/"},
  {id=271802,slot="Arme 1 main",name="Masse des vertus trahies",
@@ -157,6 +160,19 @@ B.gear={
   minLevel=37,dps=30.0,source="quest",questId=3341,routeId="quest-bring-end",
   group=true,note="Quete Horde de Souilles de Tranchebauge, niveau minimum 37. Groupe facultatif.",
   sourceUrl="https://endgametools.com/en/wow-forever/items/10823"},
+ -- Herode : deux pieces fortes pour Furie niveau 37, sans abandonner
+ -- la specialisation double maniement (Ravageuse est une hache 2 mains).
+ -- Ces butins sont des options de donjon, jamais une etape XP obligatoire.
+ {id=7719,slot="Tete",name="Casque de berserker rageur",
+  minLevel=37,requiredLevel=37,source="dungeon",dungeon="Monastere ecarlate - Armurerie",
+  boss="Herode",routeId="dungeon-herod-helm",group=true,
+  note="Mailles : bonus de Force et de critique interessants pour Furie. Butin aleatoire du boss; comparer au casque porte.",
+  sourceUrl="https://foreverchanges.pro/item/7719/raging-berserkers-helm"},
+ {id=7718,slot="Epaules",name="Epauliere d'Herode",
+  minLevel=37,requiredLevel=37,source="dungeon",dungeon="Monastere ecarlate - Armurerie",
+  boss="Herode",routeId="dungeon-herod-shoulder",group=true,
+  note="Mailles : bonus de Force et d'Endurance, choix solide au niveau 37. Butin aleatoire; priorite moindre si bonnes epaules deja equipees.",
+  sourceUrl="https://foreverchanges.pro/item/7718/herods-shoulder"},
 }
 -- Les etapes individuelles pilotes sont des actions verifiables ou des
 -- recommandations de hub, jamais des quetes inventees.
@@ -190,6 +206,14 @@ B.route={
   text="Option : Le venin acide des Salines, collecter le venin des scorpides.",
   questId=1104,optional=true,chainUnverified=true,
   note="Quete de la chaine la Livraison aux gnomes : verifier la precedente avant de venir."},
+ {id="dungeon-herod-helm",level=37,zone="Monastere ecarlate / Armurerie",
+  kind="dungeon",text="Option donjon : vaincre Herode pour le Casque de berserker rageur.",
+  gearId=7719,optional=true,group=true,
+  note="Butin du boss Herode (Armurerie). Preparatifs de groupe, acces via la Bibliotheque / cle ecarlate si necessaire. Pas obligatoire pour XP solo."},
+ {id="dungeon-herod-shoulder",level=37,zone="Monastere ecarlate / Armurerie",
+  kind="dungeon",text="Option donjon : Epauliere d'Herode sur Herode.",
+  gearId=7718,optional=true,group=true,
+  note="Butin alternatif du meme boss et meme trajet; un seul passage si le groupe y va pour la quete #1048. Pas une garantie de drop."},
  {id="quest-scarlet",level=33,zone="Fossoyeuse / Monastere ecarlate",
   kind="quest",text="Option groupe : Au monastere ecarlate (Epee de malediction).",
   questId=1048,gearId=6802,optional=true,group=true,
@@ -352,6 +376,8 @@ B.gearDescriptions={
  [250607]="Dague une main Forge 180. Niveau requis 36, +14 puissance d'attaque. Composants couteux a verifier.",
  [271802]="Masse lvl35 (28,6 DPS) recompensee par Khan Jehn 93128, suite d'une LONGUE chaine Gelkis Honore vers les niveaux 42-43. La quete 1374 est DIFFERENTE.",
  [10823]="Epee une main, recompense de la quete #3341 aux Souilles de Tranchebauge. Quete Horde niveau 37+ en groupe.",
+ [7719]="Casque en mailles du boss Herode au Monastere ecarlate (Armurerie), Force et critique; niveau 37 requis.",
+ [7718]="Epaules en mailles du boss Herode au Monastere ecarlate (Armurerie), Force et Endurance; niveau 37 requis.",
 }
 
 B.references={
@@ -363,4 +389,6 @@ B.references={
  "https://www.wowhead.com/forever/item=3844",
  "https://www.wowhead.com/forever/item=3843",
  "https://zephras.com/data/",
+ "https://foreverchanges.pro/fr/dungeons/scarlet-monastery-armory",
+ "https://github.com/Henrik8210/gear-quest-forever",
 }
