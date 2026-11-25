@@ -56,7 +56,7 @@ C_Map={
 }
 function UnitPosition() return 90,80,0,1 end
 function GetPlayerFacing() return 0 end
-local B={db={compassEnabled=true}}
+local B={db={compassEnabled=true},guideSteps={{id="a",guide=true}}}
 local marked=0
 function B:GuideStepDone(step) return marked>0 end
 function B:GuideMarkStep(step) marked=marked+1 end
