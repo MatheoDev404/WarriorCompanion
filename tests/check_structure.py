@@ -27,7 +27,7 @@ minimap=(root/"MinimapButton.lua").read_text(encoding="utf-8")
 assert 'RightButton' in minimap and 'LeftButton' in minimap
 assert 'MiniMap-TrackingBorder' in minimap
 assert 'GetWidth' in minimap and 'GetHeight' in minimap
-assert 'BerserkerRage' in minimap
+assert 'BattleShout' in minimap
 assert 'OnSizeChanged' in minimap
 assert 'GetRadius' not in minimap
 session=(root/"Session.lua").read_text(encoding="utf-8")
