@@ -27,7 +27,7 @@ local function call(fn,...)
   return a,b,c,d
 end
 local function vectorXY(v)
-  if type(v)~="table" and type(v)~="userdata" then return nil end
+  if v==nil then return nil end
   local ok,x,y=pcall(function()
     if type(v.GetXY)=="function" then return v:GetXY() end
     return v.x,v.y
