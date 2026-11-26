@@ -39,3 +39,17 @@ jobs:
         run: lua${{ matrix.lua }} tests/test_mini_build.lua
       - name: Verify minimap startup and slash commands
         run: lua${{ matrix.lua }} tests/test_mini_core.lua
+      - name: Verify production addon dependencies
+        run: python3 scripts/package_addon.py --check
+      - name: Package minimal installable addon
+        if: matrix.lua == '5.1'
+        run: python3 scripts/package_addon.py --output dist/WarriorCompanionBuild.zip
+      - name: Publish installable addon artifact
+        if: matrix.lua == '5.1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: WarriorCompanionBuild-installable
+          path: dist/WarriorCompanionBuild.zip
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: error
