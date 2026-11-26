@@ -2,7 +2,7 @@
 ## Title: Warrior Companion | Build Planner (Test)
 ## Notes: Guerrier Furie - guide par segments et quetes suivies
 ## Author: Warrior Companion
-## Version: 0.6.0-test
+## Version: 0.6.1-test
 ## SavedVariables: WCBuildDB
 Data.lua
 ProfessionData.lua
@@ -21,5 +21,6 @@ ProfessionUI.lua
 Rotation.lua
 Session.lua
 CompactDashboard.lua
+Settings.lua
 MinimapButton.lua
 Core.lua
