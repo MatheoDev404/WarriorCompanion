@@ -5,10 +5,10 @@ assert root.is_dir(), "Le dossier du nouvel addon est absent"
 toc=(root/"WarriorCompanionBuild.toc").read_text(encoding="utf-8")
 lines=[line.strip() for line in toc.splitlines() if line.strip()]
 modules=[line for line in lines if not line.startswith("#")]
-assert modules==["Data.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","DetailedGuide.lua","DetailedData30_40.lua","AdaptiveRoute.lua","Compass.lua","CombatData.lua","UI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","MinimapButton.lua","Core.lua"], modules
+assert modules==["Data.lua","ProfessionData.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","ProfessionRuntime.lua","ProfessionPlanner.lua","DetailedGuide.lua","DetailedData30_40.lua","AdaptiveRoute.lua","Compass.lua","CombatData.lua","UI.lua","ProfessionUI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","MinimapButton.lua","Core.lua"], modules
 assert "## Interface: 16001" in toc
 assert "## SavedVariables: WCBuildDB" in toc
-assert "## Version: 0.5.0-test" in toc
+assert "## Version: 0.6.0-test" in toc
 assert set(modules)=={p.name for p in root.glob("*.lua")}
 assert not list(root.glob("*.ttf")), "La police systeme WoW suffit, ne pas distribuer de police"
 ui=(root/"UI.lua").read_text(encoding="utf-8")
@@ -44,6 +44,17 @@ assert "function B:AdaptiveSuggestedStep" in adaptive
 assert "function B:AdaptiveEntries" in adaptive
 assert "function B:AdaptiveSetMode" in adaptive
 assert "function B:AdaptiveResume" in adaptive
+data=(root/"ProfessionData.lua").read_text(encoding="utf-8")
+assert "B.professionGuides" in data and "B.miningBands" in data
+assert "B.smithingBands" in data and "B.smelting" in data
+runtime=(root/"ProfessionRuntime.lua").read_text(encoding="utf-8")
+assert "GetProfessionInfo" in runtime and "C_TradeSkillUI" in runtime
+assert "ReadProfessionBank" in runtime and "ReadProfessionRecipes" in runtime
+planner=(root/"ProfessionPlanner.lua").read_text(encoding="utf-8")
+assert "ProfessionSupplyPlan" in planner
+assert "ProfessionComboEntries" in planner
+profui=(root/"ProfessionUI.lua").read_text(encoding="utf-8")
+assert "page.guideSelector" in profui and "page.guideMenu" in profui
 compass=(root/"Compass.lua").read_text(encoding="utf-8")
 assert "GetWorldPosFromMapPos" in compass
 assert "GetPlayerFacing" in compass
@@ -54,4 +65,4 @@ assert 'f.dragHandle=drag' in compass, "HUD deplacable"
 assert 'rect(f,' not in compass, "Le HUD ne doit pas avoir de fond opaque"
 session=(root/"Session.lua").read_text(encoding="utf-8")
 assert 'issecretvalue' in session and 'function B:SafeNumber' in session
-print("OK: Build Planner 0.4.1-test, manifest 15 modules, events valides et interface")
+print("OK: Build Planner 0.4.1-test, manifest 19 modules, events valides et interface")
