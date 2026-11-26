@@ -101,14 +101,18 @@ GameTooltip={
 }
 local B={}
 assert(loadfile("Addon/WarriorCompanionBuild/Data.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/ProfessionData.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/TalentTrees.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Spellbook.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Planner.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/ProfessionRuntime.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/ProfessionPlanner.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/DetailedGuide.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/DetailedData30_40.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/AdaptiveRoute.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/CombatData.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/UI.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/ProfessionUI.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Rotation.lua"))("WarriorCompanionBuild",B)
 B:InitState()
 assert(B:ValidateContent())
