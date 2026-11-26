@@ -99,6 +99,10 @@ function B:ProfessionStockBreakdown(materials)
   if m.inBank and m.inBank>0 then line=line.." [banque]" end
   lines[#lines+1]=line
  end
+ if self.db and self.db.professionBank and
+    self.db.professionBank.stale==true then
+  lines[#lines+1]="Banque non actualisee (exclue du calcul)"
+ end
  return table.concat(lines," ; ")
 end
 -- Calcul récursif unique avec stock partage : les barres non possedees
@@ -216,6 +220,14 @@ function B:ProfessionSmithingEntries(key)
     " ; "..self:ProfessionStockBreakdown(mats)..
     ". Les gains jaunes/verts ne sont pas garantis."
   if band.note then detail=detail.." "..band.note end
+  if band.kind=="armor" or band.kind=="weapon" then
+   local equipped=self:ProfessionIsEquipped(band.item)
+   if equipped==true then
+    detail=detail.." Equipement deja porte : eviter un doublon pour l'usage personnel."
+   elseif equipped==false then
+    detail=detail.." Comparer au materiel actuellement porte avant de le garder."
+   end
+  end
   if active and not learned then
    status="RECETTE A VERIFIER"
    detail=detail.." Ouvrir la Forge pour confirmer la recette connue."
@@ -275,6 +287,14 @@ function B:ProfessionComboEntries()
  local details="Forge "..smith.."/"..stage.to.." : "..
    stage.name.." (premier lot "..batch.."x). "..
    self:ProfessionStockBreakdown(mats)
+ if stage.kind=="armor" or stage.kind=="weapon" then
+  local equipped=self:ProfessionIsEquipped(stage.item)
+  if equipped==true then
+   details=details.." Deja porte : fabriquer seulement pour progresser en Forge."
+  elseif equipped==false then
+   details=details.." Comparer l'objet a l'equipement porte au survol."
+  end
+ end
  if not learned then
   out[#out+1]=entry("combo:recipe","recipe",
     "Verifier que le plan "..stage.name.." est appris","A VERIFIER",
