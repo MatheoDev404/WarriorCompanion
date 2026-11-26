@@ -8,7 +8,7 @@ modules=[line for line in lines if not line.startswith("#")]
 assert modules==["Data.lua","ProfessionData.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","ProfessionRuntime.lua","ProfessionPlanner.lua","DetailedGuide.lua","DetailedData30_40.lua","AdaptiveRoute.lua","Compass.lua","CombatData.lua","UI.lua","ProfessionUI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","Settings.lua","MinimapButton.lua","Core.lua"], modules
 assert "## Interface: 16001" in toc
 assert "## SavedVariables: WCBuildDB" in toc
-assert "## Version: 0.6.3-test" in toc
+assert "## Version: 0.6.4-test" in toc
 assert set(modules)=={p.name for p in root.glob("*.lua")}
 assert not list(root.glob("*.ttf")), "La police systeme WoW suffit, ne pas distribuer de police"
 assert not list(root.glob("*.tga")) and not list(root.glob("*.png")), "Textures obsolètes non souhaitées"
@@ -86,4 +86,4 @@ assert "c.compass=kit.button" in settings and "c.reset=kit.button" in settings
 assert "Réglages" in ui and "compactSettings" in compact
 session=(root/"Session.lua").read_text(encoding="utf-8")
 assert 'issecretvalue' in session and 'function B:SafeNumber' in session
-print("OK: Build Planner 0.6.3-test, manifest 20 modules, events valides et interface")
+print("OK: Build Planner 0.6.4-test, manifest 20 modules, events valides et interface")

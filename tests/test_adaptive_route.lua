@@ -105,7 +105,7 @@ B.QuestCompletion=function(_,id) return done[id] or false end
 local inProgress={id="doing",guide=true,questId=700,action="complete",
  level=35,pack=1,packMax=36,mapID=1443,x=80,y=80,guideIndex=4}
 local nearer={id="new",guide=true,questId=701,action="accept",
- level=35,pack=1,packMax=36,mapID=1443,x=50,y=50,guideIndex=5}
+ level=35,pack=1,packMax=36,mapID=1443,x=62,y=62,guideIndex=5}
 local function asEntries(steps)
   local result={}
   for i,step in ipairs(steps) do
@@ -115,7 +115,45 @@ local function asEntries(steps)
 end
 local candidates=asEntries({inProgress,nearer})
 assert(B:AdaptiveSuggestedStep(candidates).id=="doing",
-  "quête active prioritaire avant une nouvelle quête plus proche")
+  "quête active prioritaire avant une nouvelle quête hors du hub")
+-- Nouvelle règle de regroupement : ne pas quitter un hub alors qu'une
+-- quête du même chapitre est à prendre à quelques points de carte.
+nearer.x,nearer.y=52,50
+assert(B:AdaptiveSuggestedStep(asEntries({inProgress,nearer})).id=="new",
+  "récupérer une quête du même hub avant le trajet vers les objectifs")
+nearer.pack=2
+assert(B:AdaptiveSuggestedStep(asEntries({inProgress,nearer})).id=="doing",
+  "pas de regroupement entre chapitres différents")
+nearer.pack=1
+nearer.mapID=1441
+assert(B:AdaptiveSuggestedStep(asEntries({inProgress,nearer})).id=="doing",
+  "pas de distance ni de regroupement entre cartes")
+nearer.mapID=1443
+characterX,characterY=nil,nil
+assert(B:AdaptiveSuggestedStep(asEntries({inProgress,nearer})).id=="doing",
+  "position illisible : conserver la priorité du journal")
+characterX,characterY=.5,.5
+inProgress.x,inProgress.y=54,54
+assert(B:AdaptiveSuggestedStep(asEntries({inProgress,nearer})).id=="doing",
+  "ne pas interrompre les objectifs déjà proches")
+inProgress.x,inProgress.y=80,80
+local blocked=asEntries({inProgress,nearer})
+blocked[2].state="PRÉREQUIS MANQUANT"
+assert(B:AdaptiveSuggestedStep(blocked).id=="doing",
+  "ne pas grouper une quête bloquée")
+local readyAtHub={id="ready",guide=true,questId=500,action="turnin",
+  level=35,pack=1,packMax=36,mapID=1443,x=51,y=51,guideIndex=10}
+live[500]="READY"
+assert(B:AdaptiveSuggestedStep(asEntries({inProgress,nearer,readyAtHub})).id=="ready",
+  "rendu prioritaire sur le regroupement local")
+live[500]=nil
+B:AdaptiveChoose(inProgress,true)
+assert(B:AdaptiveSuggestedStep(asEntries({inProgress,nearer})).id=="doing",
+  "le regroupement ne remplace jamais un choix manuel")
+B:AdaptiveInvalidate("preference")
+B.db.guidePinned=false
+B.db.guideSelectedId=nil
+B.routeSelectedId=nil
 live[700]="READY"
 assert(B:AdaptiveStepDone(inProgress),
   "les objectifs finis disparaissent sans marquer la quête rendue")
@@ -148,6 +186,30 @@ assert(B:AdaptiveEligibility(future,"ÉTAPE À SUIVRE"),
 B:AdaptiveSetMode("safe")
 assert(not B:AdaptiveEligibility(future,"ÉTAPE À SUIVRE"),
   "Sécurité n'impose pas de palier au-dessus du niveau réel")
+-- Le filtre se base sur la fin du chapitre, pas sur le niveau
+-- minimal du chapitre ni sur une estimation du niveau d'un mob.
+local obsolete={id="obsolete",guide=true,level=30,packMax=31,
+  pack=1,mapID=1443,x=50,y=50,questId=800,action="accept"}
+local recent={id="recent",guide=true,level=31,packMax=32,
+  pack=1,mapID=1441,questId=801,action="accept"}
+assert(not B:AdaptiveEligibility(obsolete,"À ACCEPTER"))
+assert(B:AdaptiveEligibility(recent,"À ACCEPTER"))
+assert(B:AdaptiveEligibility(obsolete,"EN COURS"))
+assert(B:AdaptiveEligibility(obsolete,"À RENDRE"))
+assert(B:AdaptiveSuggestedStep(asEntries({obsolete,recent})).id=="recent",
+  "un ancien chapitre local ne détourne pas la reprise")
+assert(B:AdaptiveSuggestedStep(asEntries({obsolete}))==nil,
+  "ne pas inventer d'objectif lorsque seuls les anciens chapitres restent")
+B:AdaptiveChoose(obsolete,true)
+assert(B:AdaptiveSuggestedStep(asEntries({obsolete,recent})).id=="obsolete",
+  "ancien chapitre toujours consultable à la demande")
+B.db.guidePinned=false
+B.db.guideSelectedId=nil
+B.routeSelectedId=nil
+assert(B:AdaptiveSetMode("xp"))
+assert(not B:AdaptiveEligibility(obsolete,"À ACCEPTER"),
+  "XP rapide ne relance pas non plus les anciens chapitres")
+B:AdaptiveSetMode("safe")
 assert(B:AdaptiveSetMode("invalid")==false)
 assert(B:AdaptiveSetOption("dungeons",false))
 assert(B:AdaptiveOptionEnabled("dungeons")==false and

@@ -3,6 +3,11 @@ local _,B=...
 -- Heuristiques de choix, PAS un calcul de trajet ni une estimation garantie
 -- de l'XP/h. Les paliers du guide ne sont pas des niveaux de monstres.
 local abs,huge,min,max=math.abs,math.huge,math.min,math.max
+-- Seuils heuristiques en points de carte (pas des mètres), et non
+-- niveaux de monstres : aucune distance inter-zone n'est déduite.
+local OLD_PACK_GAP=3
+local HUB_RADIUS=5
+local COMBAT_TRIP_RADIUS=10
 local categoryOrder={"weapons","armor","professions","dungeons"}
 local labels={weapons="Armes",armor="Armure",
   professions="Metiers",dungeons="Donjons"}
@@ -260,6 +265,12 @@ function B:AdaptiveEligibility(step,state)
     if state=="PRÉREQUIS MANQUANT" then return false,"prérequis" end
   end
   local level=self.realLevel or 1
+  -- Reprendre à son niveau réel sans refaire les anciens chapitres.
+  -- Une quête déjà prise ou prête à rendre reste toujours éligible.
+  if (step.packMax or step.level)<level-OLD_PACK_GAP and
+      state~="EN COURS" and state~="À RENDRE" then
+    return false,"ancien palier"
+  end
   if step.level>level+1 and state~="EN COURS" and
       state~="À RENDRE" then return false,"palier supérieur" end
   if self:AdaptiveMode()=="safe" and step.level>level and
@@ -267,6 +278,12 @@ function B:AdaptiveEligibility(step,state)
     return false,"palier supérieur en sécurité"
   end
   return true
+end
+local function localDistance(step,ctx)
+  if not ctx.map or step.mapID~=ctx.map or not ctx.x or not ctx.y or
+      not step.x or not step.y then return nil end
+  local dx,dy=step.x-ctx.x,step.y-ctx.y
+  return math.sqrt(dx*dx+dy*dy)
 end
 function B:AdaptiveScore(step,state,ctx)
   local level,map=ctx.level,ctx.map
@@ -278,11 +295,8 @@ function B:AdaptiveScore(step,state,ctx)
   local place=step.mapID or (pack and pack.majorMap)
   if map and place==map then score=score-165
   elseif map and place and place~=map then score=score+80 end
-  if map and step.mapID==map and ctx.x and ctx.y and
-      step.x and step.y then
-    local dx,dy=step.x-ctx.x,step.y-ctx.y
-    score=score+math.sqrt(dx*dx+dy*dy)*1.7
-  end
+  local distance=localDistance(step,ctx)
+  if distance then score=score+distance*1.7 end
   if state=="À RENDRE" then score=score-700
   elseif state=="EN COURS" then score=score-530
   elseif state=="À ACCEPTER" then score=score-90 end
@@ -319,15 +333,35 @@ function B:AdaptiveSuggestedStep(entries)
   local map=self:GuideCurrentMap()
   local px,py=currentPosition(self,map)
   local ctx={level=self.realLevel or 1,map=map,x=px,y=py}
-  local best,bestScore=nil,huge
+  local best,bestState,bestScore=nil,nil,huge
+  local localAccepts={}
   for _,entry in ipairs(entries) do
     local step=entry.step
     local ok=self:AdaptiveEligibility(step,entry.state)
     if ok then
       local score=self:AdaptiveScore(step,entry.state,ctx)
       if score<bestScore then
-        best,bestScore=step,score
+        best,bestState,bestScore=step,entry.state,score
       end
+      if entry.state=="À ACCEPTER" then
+        local distance=localDistance(step,ctx)
+        if step.pack and distance and distance<=HUB_RADIUS then
+          local list=localAccepts[step.pack]
+          if not list or score<list.score then
+            localAccepts[step.pack]={step=step,score=score}
+          end
+        end
+      end
+    end
+  end
+  -- Avant de partir combattre, récupérer les quêtes restantes du
+  -- même chapitre à proximité immédiate. Ne jamais interrompre un
+  -- rendu, un choix manuel ou un combat déjà proche.
+  if best and bestState=="EN COURS" then
+    local distance=localDistance(best,ctx)
+    local pickup=localAccepts[best.pack]
+    if distance and distance>COMBAT_TRIP_RADIUS and pickup then
+      return pickup.step
     end
   end
   return best

@@ -5,6 +5,21 @@ addon. Les détails de chaque correctif restent consultables dans les commits
 de la branche `feature/build-planner` et dans la PR #29. L'historique Git
 conserve les anciennes versions de ce document.
 
+## 0.6.4-test — 26 novembre 2026 — regroupement et reprise
+
+- Le parcours détaillé ne recommande plus automatiquement les chapitres
+  dont la fin est à plus de trois niveaux derrière le niveau réel. Les quêtes
+  en cours ou prêtes à rendre, l'historique et la sélection manuelle restent
+  accessibles ; aucune progression n'est modifiée.
+- Avant de partir vers un objectif de combat distant, récupérer les quêtes
+  du même chapitre dans un rayon de 5 points de carte si l'objectif actif
+  est à plus de 10 points. Aucun regroupement entre cartes, en l'absence de
+  position lisible, sur prérequis bloqué ou au détriment du rendu prioritaire.
+- Les statuts des lignes visibles et de l'objectif sélectionné réutilisent
+  le résultat du calcul de parcours ; tests de non-régression supplémentaires.
+- Les 302 étapes sources, 20 modules, sauvegardes et licences restent intacts.
+  Seuils heuristiques à ajuster après essai sur le client réel.
+
 ## 0.6.3-test — 26 novembre 2026 — audit et nettoyage
 
 - Dépendances vérifiées depuis le `.toc` : **les 20 modules Lua, tous les

@@ -245,15 +245,25 @@ assert(#B.routeVisible>=302,
 -- Une seule construction du parcours pour l'affichage, quel que soit
 -- l'état des filtres. Le calcul du statut est réutilisé pour le tri.
 local originalAdaptiveEntries=B.AdaptiveEntries
-local adaptiveCalls=0
+local adaptiveCalls,stateCalls,entryCount=0,0,0
+local originalState=B.AdaptiveStepState
+B.AdaptiveStepState=function(self,...)
+  stateCalls=stateCalls+1
+  return originalState(self,...)
+end
 B.AdaptiveEntries=function(self,...)
   adaptiveCalls=adaptiveCalls+1
-  return originalAdaptiveEntries(self,...)
+  local entries=originalAdaptiveEntries(self,...)
+  entryCount=#entries
+  return entries
 end
 B:RefreshRoute()
 assert(adaptiveCalls==1,
   "l'affichage ne doit pas rescanner 302 quetes deux fois")
+assert(stateCalls==entryCount,
+  "le statut sélectionné et les lignes visibles utilisent le snapshot")
 B.AdaptiveEntries=originalAdaptiveEntries
+B.AdaptiveStepState=originalState
 assert(B.pages.parcours.modeButton and
   B.pages.parcours.optionButtons.weapons and
   B.pages.parcours.optionButtons.professions and

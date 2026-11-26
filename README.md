@@ -1,7 +1,7 @@
 # Warrior Companion | Build Planner
 
 Addon autonome de leveling **Guerrier Furie Horde** pour **WoW Forever 1.60.1**.
-Version de test **0.6.3-test** (nettoyage et optimisation du projet).
+Version de test **0.6.4-test** (regroupement de quêtes et reprise adaptative).
 La branche `feature/build-planner` est indépendante de l'ancien addon
 `WarriorCompanion` conservé dans `main`.
 
@@ -53,6 +53,11 @@ En secours : `/wcb help`, `/wcb guide`, `/wcb mini`,
   en jeu. Les autres tranches de leveling ne sont pas exhaustives.
 - Les modes Sécurité/XP rapide utilisent des **heuristiques de palier et de
   distance**, pas une mesure XP/heure ni le niveau exact de chaque ennemi.
+  Le guide écarte des suggestions automatiques les chapitres dont la fin
+  est à plus de 3 niveaux derrière le joueur (sauf quêtes actives ou à rendre).
+  Avant de quitter un hub, il propose les prises de quêtes proches du même
+  chapitre si les objectifs actifs sont éloignés. Seuils heuristiques exprimés
+  en points de carte, jamais en mètres. Les choix manuels restent disponibles.
 - Le guide Minage/Forge recalcule des lots courts avec le stock lisible,
   les recettes connues et les seuils de métier ; les plans rares et les
   zones de récolte restent des propositions à vérifier. Pas d'achats ni

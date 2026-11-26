@@ -881,9 +881,11 @@ function B:RefreshRoute()
     self.routeForced=false
   end
   if selected then
-    local state=adaptive and self:AdaptiveStepState(selected) or
-      (detailed and self:GuideStepState(selected)) or
-      self:StepState(selected)
+    local state
+    for _,entry in ipairs(entries) do
+      if entry.step.id==selected.id then state=entry.state break end
+    end
+    state=state or self:StepState(selected)
     local tag,shade=routeBadge(selected)
     page.zone:SetText((detailed and ("Etape "..selected.guideIndex) or
       ("Niv. "..selected.level)).." | "..
@@ -984,8 +986,7 @@ function B:RefreshRoute()
       row.name:SetText(routeText(
         adaptive and self:AdaptiveText(step) or
           (detailed and self:GuideText(step)) or step.text,65))
-      row.state:SetText(adaptive and self:AdaptiveStepState(step) or
-        (detailed and self:GuideStepState(step)) or self:StepState(step))
+      row.state:SetText(entry.state)
       local active=selected and selected.id==step.id
       local color=active and {0.28,0.31,0.34,1} or CARD
       row.bg:SetVertexColor(color[1],color[2],color[3],color[4])

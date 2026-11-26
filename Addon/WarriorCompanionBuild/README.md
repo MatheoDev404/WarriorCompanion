@@ -1,4 +1,4 @@
-# Warrior Companion Build — 0.6.3-test
+# Warrior Companion Build — 0.6.4-test
 
 **Addon autonome** pour WoW Forever 1.60.1 (`## Interface: 16001`).
 Installation : placer ce dossier `WarriorCompanionBuild` dans
