@@ -5,10 +5,10 @@ assert root.is_dir(), "Le dossier du nouvel addon est absent"
 toc=(root/"WarriorCompanionBuild.toc").read_text(encoding="utf-8")
 lines=[line.strip() for line in toc.splitlines() if line.strip()]
 modules=[line for line in lines if not line.startswith("#")]
-assert modules==["Data.lua","ProfessionData.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","ProfessionRuntime.lua","ProfessionPlanner.lua","DetailedGuide.lua","DetailedData30_40.lua","AdaptiveRoute.lua","Compass.lua","CombatData.lua","UI.lua","ProfessionUI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","MinimapButton.lua","Core.lua"], modules
+assert modules==["Data.lua","ProfessionData.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","ProfessionRuntime.lua","ProfessionPlanner.lua","DetailedGuide.lua","DetailedData30_40.lua","AdaptiveRoute.lua","Compass.lua","CombatData.lua","UI.lua","ProfessionUI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","Settings.lua","MinimapButton.lua","Core.lua"], modules
 assert "## Interface: 16001" in toc
 assert "## SavedVariables: WCBuildDB" in toc
-assert "## Version: 0.6.0-test" in toc
+assert "## Version: 0.6.1-test" in toc
 assert set(modules)=={p.name for p in root.glob("*.lua")}
 assert not list(root.glob("*.ttf")), "La police systeme WoW suffit, ne pas distribuer de police"
 ui=(root/"UI.lua").read_text(encoding="utf-8")
@@ -59,10 +59,20 @@ compass=(root/"Compass.lua").read_text(encoding="utf-8")
 assert "GetWorldPosFromMapPos" in compass
 assert "GetPlayerFacing" in compass
 assert "issecretvalue" in compass
-assert 'arrow:SetSize(68,68)' in compass, "Fleche principale 68 px"
+assert "function B:CompassDraw" in compass
+assert "arrowStroke(f,4,43" in compass
+assert "arrowGlow" not in compass and "arrowShadow" not in compass
+assert "MinimapArrow" not in compass, "Plus de texture pixellisee agrandie"
+assert "SetCompassScale" in compass
 assert 'f:EnableMouse(false)' in compass, "Clics transmis hors poignee"
 assert 'f.dragHandle=drag' in compass, "HUD deplacable"
 assert 'rect(f,' not in compass, "Le HUD ne doit pas avoir de fond opaque"
+settings=(root/"Settings.lua").read_text(encoding="utf-8")
+assert "function B:OpenSettings" in settings
+assert "c.miningSkill=field(" in settings and "c.smithSkill=field(" in settings
+assert "c.auto=kit.button" in settings and "c.minimap=kit.button" in settings
+assert "c.compass=kit.button" in settings and "c.reset=kit.button" in settings
+assert "Réglages" in ui and "compactSettings" in compact
 session=(root/"Session.lua").read_text(encoding="utf-8")
 assert 'issecretvalue' in session and 'function B:SafeNumber' in session
-print("OK: Build Planner 0.4.1-test, manifest 19 modules, events valides et interface")
+print("OK: Build Planner 0.6.1-test, manifest 20 modules, events valides et interface")
