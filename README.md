@@ -1,6 +1,6 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.5.0.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.6.0.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
 
 ## Installation
 
@@ -13,8 +13,18 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 ### Onglets
 1. **Talents** : talents investis ambrés et non investis estompés, 3 arbres Armes/Furie/Protection affichés côte à côte, icônes et infobulles, **point du niveau consulté surligné en or**, plan Fury pure ou hybride 13/38, prévisualisation libre.
 2. **Équipement** : quêtes, forge et butins de donjons sélectionnés (Hérode : casque/épaulières ; Glouton : hache 1M), **liste pleine largeur à la molette / glissière** (cinq objets visibles ; objets du niveau d'abord, futurs ensuite), icônes/infobulles natives, source du boss et bouton **Voir dans Parcours**. L'estimation n'est pas un calcul de DPS.
-3. **Parcours** : **vue Guide détaillé 30–40 (302 étapes dans 14 sections)**, enrichie avec les **détours facultatifs** par catégorie (Armes, Armure, Métiers, Donjons), les modes **Sécurité / XP rapide**, le regroupement par zone et la sélection dynamique selon le niveau et le journal. Bouton **Reprendre** pour recalculer après une déviation, et possibilité de sélectionner manuellement une étape. La vue synthétique précédente reste disponible pour les équipements et les quêtes particulières. Les autres tranches restent incomplètes.
+3. **Parcours** : **sélecteur de quatre guides (Leveling, Minage 1–300, Forge 1–300 et Minage + Forge 1–300)**. Le guide de leveling garde sa **vue Guide détaillé 30–40 (302 étapes dans 14 sections)**, enrichie avec les **détours facultatifs** par catégorie (Armes, Armure, Métiers, Donjons), les modes **Sécurité / XP rapide**, le regroupement par zone et la sélection dynamique selon le niveau et le journal. Bouton **Reprendre** pour recalculer après une déviation, et possibilité de sélectionner manuellement une étape. La vue synthétique précédente reste disponible pour les équipements et les quêtes particulières. Les autres tranches restent incomplètes.
 4. **Rotation** : mode **monocible / multicible**, enchaînement d'ouverture, buffs à maintenir, boucle, réactions, gros CD offensifs/défensifs ; Fracasser armure sur cible résistante, rangs à apprendre chez le maître et grimoire par familles, jamais d'autocast.
+
+### Nouveaux guides Minage et Forge 1–300 (0.6.0-test)
+
+- **Dans l’onglet Parcours**, ouvrir le menu « Guide : ... » pour changer entre **Leveling**, **Minage**, **Forge** et **Minage + Forge**. Chaque guide conserve sa sélection, son défilement et ses étapes validées manuellement.
+- **Suivi automatique** des compétences et plafonds (`GetProfessions / GetProfessionInfo`), des recettes connues (`C_TradeSkillUI` quand la fenêtre de métier est ouverte), des matériaux en sacs et de la banque uniquement quand ses données sont accessibles. Les recettes et emplacements illisibles sont signalés ; les données de banque non rafraîchies ne sont pas soustraites des besoins.
+- **Guide Minage** : filons et seuils 1–300, zones recommandées pour la Horde selon le niveau du personnage ; possibilité de fonte en fonction des stocks et des recettes connues. Aucune position exacte de filon inventée.
+- **Guide Forge** : paliers 1–300 et recettes cibles sourcées Forever ; petits lots de cinq créations maximum, estimation prudente des gains non garantis, vérification des plans et composants en jeu, distinction des créations d’équipement et des consommables.
+- **Guide combiné** : premier objectif de Minage 169 → 175 et Forge 127 → 129 (puis paliers suivants) dans le scénario de départ. Le calcul déduit les barres et minerais réellement recensés, propose la fonte des barres manquantes si la recette est accessible, et évite de planifier un stock 1–300 inutile. Les achats ne sont jamais automatiques.
+- **Commandes** : `/wcb guide minage`, `/wcb guide forge`, `/wcb guide mixte`, `/wcb guide leveling`, `/wcb metier set minage N CAP`, `/wcb metier set forge N CAP`. Saisie manuelle réservée aux compétences non fournies par le client.
+- **Limites** : certaines recettes rares, les spécialités, les circuits exacts de filons et les PNJ/coordonnées détaillés doivent encore être vérifiés. Les autres métiers (Cuisine, Pêche, Secourisme) pourront être ajoutés au registre sans remplacer l’architecture.
 
 ### Nouvelle boussole et guide détaillé 30–40
 
