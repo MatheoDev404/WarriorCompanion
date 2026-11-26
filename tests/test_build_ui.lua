@@ -339,4 +339,38 @@ assert(B.frame.scale==0.74)
 B:ReturnToReal()
 B:Refresh()
 assert(B.levelText.text:find("34",1,true))
-print("OK: 3 tree panels, hybrid points, learned rank-2 spells, buff state, gear and real mono/aoe loops")
+assert(B:SetProfessionManualSkill("mining",169,225))
+assert(B:SetProfessionManualSkill("smithing",127,225))
+B:ShowPage("parcours")
+local p=B.pages.parcours
+assert(p.guideSelector and p.guideMenu and p.guideOptions.combo,
+  "selecteur avec quatre parcours dans l'onglet existant")
+p.guideSelector.handlers.OnClick()
+assert(p.guideMenu:IsShown(),"menu deroulant ouvert au clic")
+p.guideOptions.mining.handlers.OnClick()
+assert(B:ActiveGuide()=="mining" and not p.guideMenu:IsShown(),
+  "guide Minage selectionne et menu referme")
+assert(not p.prevSegment:IsShown() and p.skillCaption.hidden==false,
+  "une barre metier remplace les boutons de tranche")
+assert(p.zone.text:find("Minage 169/225",1,true))
+local id=B.routeVisible[1].step.id
+p.rows[1].handlers.OnClick()
+assert(B.routeSelectedId==id,"choix manuel d'un objectif Minage")
+p.guideSelector.handlers.OnClick()
+p.guideOptions.combo.handlers.OnClick()
+assert(B:ActiveGuide()=="combo" and p.skillBar2.hidden==false and
+  p.zone.text:find("Forge 127/225",1,true),
+  "le guide combine affiche les deux metiers et la seconde barre")
+assert(#B.routeVisible>=2,"le guide combine propose des objectifs synchronises")
+p.guideSelector.handlers.OnClick()
+p.guideOptions.mining.handlers.OnClick()
+assert(B.routeSelectedId==id,
+  "le guide Minage reprend son objectif precedent apres changement de parcours")
+p.guideSelector.handlers.OnClick()
+p.guideOptions.leveling.handlers.OnClick()
+assert(B:ActiveGuide()=="leveling" and p.prevSegment:IsShown() and
+  p.skillCaption.hidden==true,
+  "le guide de leveling et les anciennes commandes restent accessibles")
+B:ShowPage("talents")
+assert(B.pages.talents:IsShown(),"les onglets Talents restent fonctionnels")
+print("OK: arbre, equipement, rotation, dropdown 4 guides et progression independente")
