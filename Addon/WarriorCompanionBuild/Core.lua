@@ -58,8 +58,29 @@ local function slash(msg)
     B:SetCompassEnabled(false)
   elseif msg=="guide" then
     B:OpenFullDashboard()
+    B:SetActiveGuide("leveling")
     if B.db then B.db.detailedMode=true end
     B:ShowPage("parcours")
+  elseif msg=="guide minage" or msg=="guide forge" or
+      msg=="guide mixte" or msg=="guide leveling" then
+    local id=msg=="guide minage" and "mining" or
+      msg=="guide forge" and "smithing" or
+      msg=="guide mixte" and "combo" or "leveling"
+    B:SetActiveGuide(id)
+    B:OpenFullDashboard()
+    B:ShowPage("parcours")
+  elseif msg:match("^metier set ") then
+    local name,value,cap=msg:match("^metier set ([%a]+) (%d+) (%d+)$")
+    local key=name=="minage" and "mining" or
+      name=="forge" and "smithing" or nil
+    if key and B:SetProfessionManualSkill(key,tonumber(value),tonumber(cap)) then
+      message("Competence manuelle enregistree : "..name.." "..value.."/"..cap)
+      if B.frame and B.frame:IsShown() and B.page=="parcours" then
+        B:RefreshRoute()
+      end
+    else
+      message("Saisie refusee (valeur du jeu prioritaire). Usage : /wcb metier set forge 127 225")
+    end
   elseif msg=="mode xp" or msg=="mode securite" or
       msg=="mode sécurité" then
     B:AdaptiveSetMode(msg=="mode xp" and "xp" or "safe")
@@ -89,7 +110,9 @@ local function slash(msg)
   elseif msg=="help" then
     message("/wcb : ouvrir/fermer | mini | full | hide | talents | equipement | parcours | rotation | reel")
     message("/wcb reset | autostart on/off | alerts on/off | minimap on/off")
-    message("/wcb guide | reprendre | mode xp | mode securite")
+    message("/wcb guide [minage|forge|mixte|leveling] | reprendre")
+    message("/wcb metier set minage N CAP | metier set forge N CAP")
+    message("/wcb mode xp | mode securite")
     message("/wcb guideaudit | compass on/off")
   else
     B:ToggleDashboard()
@@ -107,6 +130,16 @@ events:RegisterEvent("PLAYER_DEAD")
 events:RegisterEvent("PLAYER_MONEY")
 events:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 events:RegisterEvent("SPELLS_CHANGED")
+events:RegisterEvent("SKILL_LINES_CHANGED")
+events:RegisterEvent("TRADE_SKILL_SHOW")
+events:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
+events:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED")
+events:RegisterEvent("BAG_UPDATE_DELAYED")
+events:RegisterEvent("BANKFRAME_OPENED")
+events:RegisterEvent("BANKFRAME_CLOSED")
+events:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
+events:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
+events:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 events:RegisterEvent("QUEST_LOG_UPDATE")
 events:RegisterEvent("QUEST_ACCEPTED")
 events:RegisterEvent("QUEST_REMOVED")
@@ -117,6 +150,7 @@ events:SetScript("OnEvent",function(_,event,arg1)
   if event=="ADDON_LOADED" then
     if arg1~=addon then return end
     B:InitState()
+    if B.ProfessionsInit then B:ProfessionsInit() end
     if B.AdaptiveInit then B:AdaptiveInit() end
     if type(B.db.autoOpen)~="boolean" then B.db.autoOpen=false end
     if type(B.db.showAlerts)~="boolean" then B.db.showAlerts=true end
@@ -137,6 +171,9 @@ events:SetScript("OnEvent",function(_,event,arg1)
     B:StartSession()
     B:OnSessionEvent(event,arg1)
     if B.ReadQuestLog then B:ReadQuestLog() end
+    if B.RefreshProfessionObservations then
+      B:RefreshProfessionObservations(event)
+    end
     if not B.frame then B:CreateUI() end
     if not B.compactDashboard then B:CreateCompactDashboard() end
     B:CreateMinimapButton()
@@ -167,6 +204,22 @@ events:SetScript("OnEvent",function(_,event,arg1)
       B:RefreshRoute()
     end
     if B.UpdateCompass then B:UpdateCompass() end
+  elseif event=="SKILL_LINES_CHANGED" or
+      event=="TRADE_SKILL_SHOW" or
+      event=="TRADE_SKILL_LIST_UPDATE" or
+      event=="TRADE_SKILL_DATA_SOURCE_CHANGED" or
+      event=="BAG_UPDATE_DELAYED" or
+      event=="BANKFRAME_OPENED" or event=="BANKFRAME_CLOSED" or
+      event=="PLAYERBANKSLOTS_CHANGED" or
+      event=="PLAYERBANKBAGSLOTS_CHANGED" or
+      event=="PLAYER_EQUIPMENT_CHANGED" then
+    if B.RefreshProfessionObservations then
+      B:RefreshProfessionObservations(event)
+    end
+    if B.frame and B.frame:IsShown() and B.page=="parcours" and
+      B.ActiveGuide and B:ActiveGuide()~="leveling" then
+      B:RefreshRoute()
+    end
   elseif event=="GET_ITEM_INFO_RECEIVED" then
     if B.frame and B.frame:IsShown() then B:RefreshGear() end
   elseif event=="SPELLS_CHANGED" then
