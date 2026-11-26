@@ -27,6 +27,7 @@ local function frame()
     function t:SetSize(w,h) self.width=w self.height=h end
     function t:SetVertexColor(...) self.color={...} end
     function t:Hide() self.hidden=true end
+    function t:Show() self.hidden=false end
     return t
   end
   function f:CreateFontString()
@@ -39,6 +40,8 @@ local function frame()
     function t:SetTextColor(...) self.color={...} end
     function t:SetFont(path,size) self.fontPath=path self.fontSize=size end
     function t:SetWordWrap(value) self.wordWrap=value end
+    function t:Hide() self.hidden=true end
+    function t:Show() self.hidden=false end
     return t
   end
   return f
