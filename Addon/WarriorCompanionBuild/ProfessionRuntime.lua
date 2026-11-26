@@ -1,7 +1,7 @@
 local _,B=...
 -- Sources detectees sur Forever (C_TradeSkillUI et C_Container), avec
 -- repli manuel si le client ne fournit pas une valeur lisible.
-local floor,min,max=math.floor,math.min,math.max
+local floor=math.floor
 local function plain(v)
  if type(issecretvalue)=="function" then
   local ok,secret=pcall(issecretvalue,v)
@@ -50,9 +50,6 @@ function B:ProfessionsInit()
  end
  if type(self.db.professionSkills)~="table" then
   self.db.professionSkills={}
- end
- if type(self.db.professionManual)~="table" then
-  self.db.professionManual={}
  end
  if type(self.db.professionBank)~="table" then
   self.db.professionBank={items={},stale=true}
