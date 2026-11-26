@@ -1,6 +1,8 @@
-# Warrior Companion | Build Planner — 0.6.1-test
+# Warrior Companion | Build Planner — 0.6.2-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
+
+**Correctif 0.6.2-test :** sur certaines versions de Forever, `PLAYERBANKBAGSLOTS_CHANGED` provoque une erreur Lua lors de `RegisterEvent`. L'événement n'est plus enregistré ; les autres événements non reconnus ne bloquent plus le chargement. La banque ouverte est actualisée via `BANKFRAME_OPENED`, `BAG_UPDATE_DELAYED` et, s'il existe, `PLAYERBANKSLOTS_CHANGED`.
 
 ## Installation
 
