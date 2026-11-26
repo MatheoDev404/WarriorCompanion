@@ -181,6 +181,7 @@ function B:Profile()
   return self.db or {}
 end
 function B:ShowCompact()
+  if self.settingsFrame then self.settingsFrame:Hide() end
   if not self.compactDashboard then self:CreateCompactDashboard() end
   -- Un passage explicite vers le mini annule la restauration d'un
   -- precedent agrandissement : aucune fermeture fantome du guide.
@@ -207,12 +208,14 @@ function B:OpenFullDashboard()
   self:Refresh()
 end
 function B:CloseFull()
+  if self.settingsFrame then self.settingsFrame:Hide() end
   if self.frame then self.frame:Hide() end
   if self.restoreMiniOnClose then self:ShowCompact()
   elseif self.db then self.db.displayMode="hidden" end
   self.restoreMiniOnClose=false
 end
 function B:HideDashboard()
+  if self.settingsFrame then self.settingsFrame:Hide() end
   if self.frame then self.frame:Hide() end
   if self.compactDashboard then self.compactDashboard:Hide() end
   self.restoreMiniOnClose=false
