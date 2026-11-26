@@ -49,6 +49,14 @@ end
 UIParent=frame()
 function CreateFrame(kind)
   local result=frame()
+  if kind=="EditBox" then
+    function result:SetText(v) self.text=v end
+    function result:GetText() return self.text end
+    function result:SetAutoFocus(value) self.autoFocus=value end
+    function result:SetNumeric(value) self.numeric=value end
+    function result:SetMaxLetters(value) self.maxLetters=value end
+    function result:ClearFocus() self.focused=false end
+  end
   if kind=="Slider" then
     function result:SetOrientation(value) self.orientation=value end
     function result:SetMinMaxValues(low,high) self.low=low self.high=high end
@@ -117,7 +125,16 @@ assert(loadfile("Addon/WarriorCompanionBuild/CombatData.lua"))("WarriorCompanion
 assert(loadfile("Addon/WarriorCompanionBuild/UI.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/ProfessionUI.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/Rotation.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Compass.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Settings.lua"))("WarriorCompanionBuild",B)
 B:InitState()
+B.ResetSession=function(self) self.sessionResets=(self.sessionResets or 0)+1 end
+B.ShowCompact=function(self) self.compactOpened=true end
+B.HideDashboard=function(self) self.hiddenViaSettings=true end
+B.SetMinimapVisible=function(self,value)
+ self.db.minimapVisible=value
+end
+B.OpenFullDashboard=function(self) self.frame:Show() end
 assert(B:ValidateContent())
 assert(B:BuildSpellbookCache())
 assert(B:IsKnownSpell({name="Cri de guerre",spellId=6673})==true,
@@ -373,4 +390,60 @@ assert(B:ActiveGuide()=="leveling" and p.prevSegment:IsShown() and
   "le guide de leveling et les anciennes commandes restent accessibles")
 B:ShowPage("talents")
 assert(B.pages.talents:IsShown(),"les onglets Talents restent fonctionnels")
-print("OK: arbre, equipement, rotation, dropdown 4 guides et progression independente")
+-- Tous les reglages accessibles au clic depuis les fenetres, pas via /wcb.
+assert(B.settingsButton and B.settingsFrame and
+  not B.settingsFrame:IsShown(),"panneau de reglages ferme par defaut")
+B.settingsButton.handlers.OnClick()
+assert(B.settingsFrame:IsShown(),"bouton Reglages ouvre les options")
+local c=B.settingsControls
+assert(c.compass and c.scalePlus and c.scaleMinus and
+  c.minimap and c.auto and c.alert and c.mini and
+  c.resume and c.audit and c.reset and
+  c.miningSkill and c.smithSkill,
+  "les fonctions du guide, de la boussole et du bilan ont des boutons")
+c.compass.handlers.OnClick()
+assert(B.db.compassEnabled==false,"boussole desactivee depuis l'interface")
+c.compass.handlers.OnClick()
+assert(B.db.compassEnabled==true and B.compassFrame,
+ "boussole reactivee sans taper /wcb compass on")
+local oldScale=B.db.compassScale or 1
+c.scalePlus.handlers.OnClick()
+assert(B.db.compassScale>oldScale,"fleche agrandie depuis Reglages")
+c.scaleMinus.handlers.OnClick()
+assert(B.db.compassScale==oldScale,"zoom reversible")
+c.auto.handlers.OnClick()
+assert(B.db.autoOpen==true,"lancement automatique disponible au clic")
+c.alert.handlers.OnClick()
+assert(B.db.showAlerts==false,"alertes configurables au clic")
+c.minimap.handlers.OnClick()
+assert(B.db.minimapVisible==false,"icone masquable depuis Reglages")
+c.minimap.handlers.OnClick()
+assert(B.db.minimapVisible==true,"icone retablie depuis Reglages")
+c.xp.handlers.OnClick()
+assert(B.db.routeMode=="xp","mode XP accessible sans commande")
+c.safe.handlers.OnClick()
+assert(B.db.routeMode=="safe","mode securite accessible sans commande")
+c.audit.handlers.OnClick()
+assert(B.settingsStatus.text:find("302",1,true),
+ "audit du guide consultable dans la fenetre")
+c.reset.handlers.OnClick()
+assert(B.sessionResets==1,"remise a zero du bilan disponible au clic")
+c.miningSkill:SetText("169")
+c.miningCap:SetText("225")
+c.miningApply.handlers.OnClick()
+assert(B:ProfessionSkill("mining")==169,
+ "saisie manuelle des metiers accessible sans commande")
+c.smithSkill:SetText("127")
+c.smithCap:SetText("225")
+c.smithApply.handlers.OnClick()
+assert(B:ProfessionSkill("smithing")==127)
+c.mini.handlers.OnClick()
+assert(B.compactOpened==true,"bouton mini depuis les reglages")
+B:OpenSettings()
+c.hideAll.handlers.OnClick()
+assert(B.hiddenViaSettings==true,"masquer les fenetres au clic")
+B:OpenSettings()
+c.route.handlers.OnClick()
+assert(B.page=="parcours" and not B.settingsFrame:IsShown(),
+ "Parcours rouvre depuis les reglages")
+print("OK: 4 guides, tous les reglages au clic, fleche vectorielle, talents/equipement/rotation")
