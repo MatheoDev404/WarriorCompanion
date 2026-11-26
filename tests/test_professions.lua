@@ -122,6 +122,7 @@ assert(B:ProfessionSkill("smithing")==127)
 -- Recettes non lues : calcul statique référence, avec information explicite.
 C_TradeSkillUI=nil
 B.db.professionRecipes={}
+B:SetActiveGuide("smithing")
 local smith=B:ProfessionEntries("smithing",false)
 assert(smith[1].state=="RECETTE A VERIFIER",
  "ne pas pretendre qu'une recette de Forge est apprise")
