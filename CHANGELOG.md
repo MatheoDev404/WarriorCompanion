@@ -1,160 +1,89 @@
 # Changelog — Warrior Companion Build Planner
 
-## 0.6.2-test — 26 novembre 2026
+Les changements ci-dessous décrivent les **étapes fonctionnelles** du nouvel
+addon. Les détails de chaque correctif restent consultables dans les commits
+de la branche `feature/build-planner` et dans la PR #29. L'historique Git
+conserve les anciennes versions de ce document.
 
-- **Correctif bloquant WoW Forever** : ne plus enregistrer `PLAYERBANKBAGSLOTS_CHANGED`, absent du client 1.60.1 (erreur Lua sur `Frame:RegisterEvent` dès le démarrage).
-- **Compatibilité renforcée** : seules les deux notifications indispensables sont enregistrées strictement ; les événements facultatifs sont enregistrés avec `pcall`, et les inconnus sont ignorés sans empêcher le lancement de l'addon.
-- **Banque sans perte de suivi** : rafraîchissement des stocks à l'ouverture, sur `PLAYERBANKSLOTS_CHANGED` lorsque disponible, et via `BAG_UPDATE_DELAYED` lorsque la banque est ouverte ; les données sont périmées après sa fermeture.
-- **Tests de non-régression** : simulation d'un client rejetant plusieurs événements et contrôle de la mise à jour des stocks bancaires sans événement spécifique. Tests automatisés Lua 5.1/5.4 ; confirmation sur le vrai client encore requise.
+## 0.6.3-test — 26 novembre 2026 — audit et nettoyage
 
+- Dépendances vérifiées depuis le `.toc` : **les 20 modules Lua, tous les
+  outils développés, les sauvegardes et la licence historique sont conservés**.
+  Le code de l'ancien `WarriorCompanion` demeure dans `main`.
+- **Parcours optimisé** : une seule construction des 302 états de quêtes par
+  rendu, avec réutilisation des statuts pour filtrer et choisir le prochain
+  objectif. La logique des prérequis, de la sécurité et des étapes facultatives
+  est conservée.
+- **Métiers optimisés** : une seule construction des recettes/matériaux
+  pour chaque mise à jour visuelle ; les stocks restent protégés en cas
+  d'API illisible et la banque fermée n'est pas considérée disponible.
+- Suppression du doublon documentaire dans l'addon, des spécifications
+  d'architecture dépassées et des descriptions devenues incompatibles
+  avec l'interface actuelle.
+- **Paquet installable minimal** : `scripts/package_addon.py` produit un ZIP
+  contenant uniquement l'addon, son manifeste, ses modules, sa licence et
+  sa courte notice. La CI le publie en artefact après les tests.
+- Nouvelle architecture consolidée dans
+  `docs/ARCHITECTURE_ACTUELLE.md` et contrôles de non-régression enrichis.
+- **À valider** : fonctionnement réel sur WoW Forever 1.60.1, interactions
+  avec la minimap, glisser-déposer, API des métiers et flèche de direction.
 
-## 0.6.1-test — 26 novembre 2026
+## 0.6.2-test — 26 novembre 2026 — démarrage Forever
 
-- **Flèche modernisée et plus nette** : dessin procédural de trois traits rectangulaires (hampe et deux chevrons), sans rééchantillonnage de la texture MinimapArrow. Accent bronze, aucun halo ni contour superposé, fond entièrement transparent, distance/objectif discrets.
-- **HUD non intrusif** : masque toute la boussole lorsqu'aucun objectif n'est présent. Sa taille se règle de 75 à 135 %, position glissable mémorisée ; direction et distance inchangées.
-- **Réglages cliquables depuis l’addon** : bouton Réglages sous les quatre onglets, bouton OPT du mini-bilan et clic molette de la minimap. Les clics gauche/droit restent respectivement guide/mini.
-- **Options regroupées** : activer/masquer et recentrer la boussole, zoom, auto-ouverture, alertes, visibilité minimap, modes XP/Sécurité, reprise du guide, audit, remise à zéro de session, masquage des fenêtres et accès direct au Parcours.
-- **Saisie de secours des métiers** : entrées Minage et Forge (compétence/plafond) dans les réglages, lorsque le client ne livre pas ces données. La valeur lue en jeu prime toujours.
-- **Non-régression** : simulations Lua 5.1/5.4 étendues au clic sur la minimap, au mini-bilan, aux réglages, aux champs de compétences et à la nouvelle géométrie de la boussole. Le véritable rendu WoW Forever est encore à confirmer.
+- Retrait de l'événement inconnu `PLAYERBANKBAGSLOTS_CHANGED`, responsable
+  d'une erreur Lua lors de `RegisterEvent`.
+- Enregistrement protégé des événements facultatifs et maintien du
+  rafraîchissement du stock bancaire lors de l'ouverture et des événements
+  pris en charge.
+- Tests de refus d'événements et de fermeture/réouverture de la banque.
 
+## 0.6.1-test — 26 novembre 2026 — HUD et réglages
 
-## 0.6.0-test — 26 novembre 2026
+- Flèche géométrique en trois traits bronze sans panneau opaque ni halo,
+  zoom et position mémorisés, masquage complet sans cible.
+- Réglages cliquables depuis le grand guide, le mini-bilan (OPT) et
+  le clic molette de la minimap : modes, visibilité, alertes et saisie
+  manuelle de secours des métiers.
 
-- **Quatre guides dans Parcours** : menu déroulant Leveling 1–60, Minage 1–300, Forge 1–300 et Minage + Forge 1–300. Sauvegardes de progression, sélection et défilement séparées sans toucher aux trois autres onglets, à la boussole ni au mini-bilan.
-- **Architecture modulaire** : `ProfessionData.lua` (données Forever), `ProfessionRuntime.lua` (lecture du personnage, sacs, banque, recettes et équipement), `ProfessionPlanner.lua` (recommandations, compétence, craft et matériaux), `ProfessionUI.lua` (sélecteur et affichage).
-- **Minage** : filons/compétences 1–300, rangs et fontes classiques, zones alternatives choisies en tenant compte du niveau et de la carte. Pas de circuits exacts ou coordonnées non confirmés.
-- **Forge** : catalogue de progression 1–300 à étapes courtes (max. 5 crafts par lot). Prise en compte des recettes réellement connues de `C_TradeSkillUI`, ingrédients des schémas si disponibles, plans rares et gain de compétence non garanti. Comparaison basique avec les objets déjà portés.
-- **Minage + Forge** : calcul des besoins cumulés sans double déduction, stocks de sacs + banque accessible, fontes intermédiaires, besoins de minerais et composants non récoltables. Priorité utilisateur Minage 169 → 175 avant de partir miner le mithril ; repréparation après les gains de compétence.
-- **Données indisponibles** : état de banque ancien/illisible signalé ; absence de compétences, recettes ou stocks ne produit pas de zéros inventés. Saisie manuelle via `/wcb metier set` quand les données du client manquent.
-- **Tests** : nouveaux scénarios Lua 5.1/5.4 pour compétences 127/169, lecture des recettes, sacs, banque, barres/matériaux manquants, comparaison d’équipement, sélection et indépendance des guides. Tests existants de leveling, talents, rotations, mini-bilan et boussole conservés.
-- **Validation en jeu nécessaire** : données de Forever nouvelles/non documentées, sources de recettes, coordonnées des vendeurs/filons, spécialisation Forge et rentabilité réelle des circuits.
+## 0.6.0-test — 26 novembre 2026 — métiers
 
+- Quatre guides de l'onglet Parcours : Leveling, Minage 1–300,
+  Forge 1–300 et guide combiné Minage + Forge.
+- Lecture des compétences, recettes, sacs, banque et équipements
+  lorsque les API Forever sont disponibles.
+- Calcul par petits lots, fonte intermédiaire, suivi de matériaux
+  et données inconnues affichées comme telles.
 
-## 0.5.0-test — 25 novembre 2026
+## 0.5.0-test — 25 novembre 2026 — adaptation
 
-- **Étape B : sélection adaptative 30–40**. Nouveau moteur `AdaptiveRoute.lua` chargé après les 302 étapes, sans modifier le catalogue de quêtes source. Évaluation des actions réalisables selon le journal (acceptation, objectifs, rendu), des prérequis connus et du niveau.
-- **Modes Sécurité / XP rapide** : Sécurité par défaut exclut les paliers supérieurs au niveau réel ; XP rapide tolère un palier d'avance et privilégie davantage la proximité. Il s'agit de critères de *palier du guide*, pas d'un calcul vérifié de niveaux d'ennemis ou d'XP/heure.
-- **Optimisation locale par hubs** : regroupement des étapes de la même carte et par proximité des coordonnées locales, avec maintien préférentiel du dernier hub et de l'ordre des étapes comme départage. Pas de trajet chiffré entre régions.
-- **Reprise automatique après déviation** : journal de quêtes, changement de zone ou niveau déclenchent la réévaluation ; séparation entre choix manuels épinglés et proposition automatique. Le bouton **Reprendre** et la commande `/wcb reprendre` reprennent une route adaptée.
-- **Options facultatives et filtrées** : Armes, Armure, Métiers, Donjons. Les recommandations du pilote synthétique se placent auprès des sections du guide détaillé par niveau et région. Les donjons et options de groupe restent consultables mais jamais imposés par le moteur XP solo ; les détours sans coordonnées n'en inventent pas.
-- **Interface et tests** : nouveau contrôle de mode et quatre filtres dans Parcours, suivi des préférences dans `WCBuildDB` ; tests Lua 5.1 et 5.4 sur les actions non prêtes, les prérequis, les modes, le regroupement spatial, les épingles et la reprise. Tests des 302 étapes et boussole conservés.
-- **À vérifier en jeu** : pertinence des choix, coût réel des trajets, conditions exactes des chaînes, interactions avec les quêtes particulières de WoW Forever.
+- Modes Sécurité / XP rapide, regroupement des objectifs locaux,
+  reprise après déviation et épingles manuelles.
+- Détours facultatifs pour armes, armures, métiers et donjons ;
+  pas de groupe imposé au joueur solo.
 
+## 0.4.0–0.4.1-test — 25 novembre 2026 — guide et boussole
 
-## 0.4.1-test — 25 novembre 2026
+- Réintégration de **302 étapes historiques** du niveau 30–40,
+  **285 coordonnées** et **217 actions de quêtes**.
+- Conservation de la licence CC BY-NC-SA 4.0 du guide et suivi
+  prudent des quêtes, prérequis et états du journal.
+- Première boussole, puis HUD transparent.
 
-- **HUD de boussole transparent** : panneau anthracite et bande supérieure supprimés ; aucune texture de fond ne couvre le monde.
-- **Flèche agrandie** : de 34 à **68 pixels**, couleur or/bronze ; silhouette noire décalée et halo très léger pour rester lisible sans cadre. Les trois couches tournent ensemble vers la destination.
-- **Texte réduit et lisible** : distance dorée et nom court de l'objectif, tous deux avec ombre sans rectangle opaque.
-- **Interactions discrètes** : le cadre transparent ne capte plus les clics ; seule la zone de la flèche reste une poignée de déplacement. Position de la boussole sauvegardée inchangée.
-- **Aucune régression voulue** : calcul de distance, protection des valeurs secrètes, reprise des étapes, arrivée et commandes `/wcb compass on/off` sont conservés ; tests Lua 5.1/5.4 étendus aux nouvelles propriétés graphiques et au déplacement.
-- **Validation restante** : rendu visuel du HUD dans le client WoW Forever et lisibilité pendant le combat.
+## 0.3.0–0.3.7-test — 23–25 novembre 2026 — interfaces
 
+- Trois arbres de talents côte à côte ; simulation et rangs réellement appris.
+- Équipement par palier, infobulles natives, options de donjon et liens
+  vers Parcours.
+- Rotations mono/multi, buffs, priorités et temps de recharge.
+- Mini-bilan de session, icône de minimap et protection contre les
+  valeurs secrètes de Forever.
 
-## 0.4.0-test — 25 novembre 2026
+## 0.1.0–0.2.0-test — 23 novembre 2026 — fondations
 
-- **Phase A — Guide de niveau 30–40** : réintégration des 302 étapes historiques OpenXP/RestedXP en 14 sections, au lieu de remplacer définitivement le pilote synthétique. Les 285 coordonnées et 217 actions associées à des quêtes sont conservées, avec fichier de licence CC BY-NC-SA 4.0 et attributions.
-- **Reprise adaptative** : moteur séparé classant les étapes selon l'acceptation/les objectifs/le rendu réel des quêtes (`C_QuestLog`), le niveau et la zone courante. Prérequis connus vérifiés, autres marqués incertains. Choix prioritaire des quêtes en cours, reprise dans la section du hub majoritaire, sauvegarde de l'étape choisie et corrections manuelles réversibles.
-- **Onglet Parcours** : bouton Guide détaillé / Vue synthèse, navigation sur toute la liste des 302 étapes, centrage automatique de l'étape recommandée et infobulle présentant le détail connu. Conservation du lien « Voir dans Parcours » pour les récompenses du pilote.
-- **Boussole** : flèche directionnelle autonome, distance en ligne droite, zone et instance vérifiées, fallback local, position mémorisée, `/wcb compass on/off`. Les valeurs secrètes Forever sont filtrées, et l'absence de destination donne un message plutôt qu'une distance inventée. Une simple étape de déplacement peut se valider à l'arrivée, pas un objectif de combat.
-- **Audit source** : 108 identifiants de quêtes distincts recoupés avec l'export Forever de `prezus/ForeverGuide`; 285 points géographiques vérifiés syntaxiquement dans 14 zones (mapIDs). Les deux IDs spécifiques Forever 98070 et 93225 sont documentés dans les bases publiques.
-- **Tests** : Lua 5.1/5.4 sur le guide, les statuts du journal, la boussole, les valeurs protégées, la carte locale/étrangère et la bascule dans l'UI, audit Python des coordonnées et IDs. **Validation dans le client réel à poursuivre** : géographie, traductions, PNJ et chaînes de prérequis.
+- Nouveau `WarriorCompanionBuild` autonome, distinct du code historique.
+- Plan de talents et équipement, premiers tests Lua 5.1/5.4,
+  démarrage simple et sélection de niveau.
 
-
-## 0.3.7-test — 25 novembre 2026
-
-- **Minimap = lanceur, jamais interrupteur** : clic gauche ouvre le guide complet ; clic droit ouvre le mini-bilan. Cliquer à nouveau sur la vue déjà ouverte ne la ferme pas, la conserve à l'écran.
-- **Bascule de vues** : cliquer à droite depuis le guide passe au mini, cliquer à gauche depuis le mini ouvre le guide. Le bouton Fermer du guide revient au mini lorsque le guide a été ouvert depuis celui-ci.
-- **Fermeture volontaire** : bouton Fermer de la grande fenêtre ou commande `/wcb hide` pour masquer les deux vues. Les anciennes commandes gardent leur comportement explicite.
-- **Régression testée** : clics répétés gauche/droit, changement de vue, restauration du mini, fermeture explicite et réouverture. Aucun changement des talents, des équipements, de la route ou des métriques de session.
-
-
-## 0.3.6-test — 25 novembre 2026
-
-- **Minimap** : placement de l'icône à la distance `min(largeur, hauteur) / 2 + 5` du centre, comme GearQuest/LibDBIcon ; recalcul automatique si la minimap change de dimensions, icône de guerrier centrée sans masque de portrait déformant.
-- **Talents** : icônes sans points estompées, rangs investis avec fond ambré, contour doré et témoin discret ; point conseillé du niveau prévisualisé surligné plus fortement. Trois arbres restent côte à côte.
-- **Équipement** : suppression de la fiche redondante à droite. Liste plein format avec cinq lignes et tooltips Blizzard au survol. Ajout de deux options de boss au niveau 37, Casque de berserker rageur (#7719) et Epaulière d'Herode (#7718), tous deux sur Hérode au Monastère écarlate - Armurerie. Ajout également du Fendoir de Glouton (#10772), hache 1M sur Glouton dans les Souilles de Tranchebauge, donjon déjà visité pour la quête #3341. Pas de rang GearQuest prétendu ; l'utilité reste à comparer à l'objet porté.
-- **Parcours** : infobulle native de l'objet/recompense au survol de son icône ; bouton Détails pour les étapes, quêtes et objectifs en cours, fabrication et boss. Précisions sur où apprendre ou vérifier les plans de Forge, avec prudence sur les sources non certifiées.
-- **Mini-bilan** : palette anthracite et accents bronze alignés sur le guide complet, sans changer sa taille, ses cinq informations ou ses options.
-- **Non-régression** : tests Lua 5.1/5.4 et validation des nouvelles sources de butin, des liaisons au parcours, des états de talents, des tooltips et du placement adaptatif.
-
-
-## 0.3.5-test — 24 novembre 2026
-
-- **Correction du clic droit sur l'icône de minimap** : les nombres secrets de WoW Forever ne sont plus comparés dans `Session.lua` ; lecture protégée par `issecretvalue` et repli sécurisé. L'affichage compact montre `--` quand la donnée est inaccessible (temps, monnaie, objectifs de session).
-- **Protection supplémentaire** : même vérification des valeurs dans `CompactDashboard.lua` (horloge, solde, position sauvegardée, delta `OnUpdate`) et `MinimapButton.lua` (coordonnées du curseur, angle et échelle).
-- **Bouton rond** : habillage standard des addons utilisant LibDBIcon (31 px, fond `UI-Minimap-Background`, bordure dorée `MiniMap-TrackingBorder`, surbrillance ronde, icône de 20 px avec masque circulaire si l'API est disponible). Suppression de la grande icône carrée.
-- **Tests de non-régression** : nombres simulés comme secrets, comportement de l'XP, de la monnaie, de l'horloge, de la santé, du déplacement autour de la minimap ; contrôle des textures et dimensions du bouton.
-
-
-## 0.3.4-test — 24 novembre 2026
-
-- **Minimap** : icône guerrier visible par défaut, déplaçable autour de la minimap avec angle enregistré. Clic gauche pour ouvrir/fermer le guide ; clic droit pour basculer le mini-bilan ; commande `/wcb minimap on/off`.
-- **Mini-bilan 304 × 88 px restauré** depuis le `CompactDashboard.lua` d'origine : XP gagnée, durée de session, morts, solde en or/argent/cuivre avec code couleur, conseil, déplacement libre avec position sauvegardée et bouton `>>` pour développer le guide.
-- **Sessions** : suivi indépendant via `PLAYER_XP_UPDATE`, `PLAYER_LEVEL_UP`, `PLAYER_DEAD`, `PLAYER_MONEY` ; remise à zéro par `/wcb reset`. Aucune XP supposée en cas de données ambiguës.
-- **Comportement au login** : seule la minimap s'affiche par défaut, sans ouverture forcée de la grande application. `/wcb autostart on/off` restaure l'ouverture automatique dans le dernier mode sélectionné.
-- **Compatibilité** : mini / guide n'utilisent pas les mêmes fenêtres que l'ancien addon ; les versions peuvent coexister, mais on recommande de désactiver l'ancien addon lors des tests pour éviter les doublons de suivi de session.
-- **Tests** : mini-bilan, monnaie positive/négative, XP/temps/morts, commandes de modes, minimap, position, réinitialisation, autostart et validation syntaxique Lua 5.1/5.4.
-
-
-## 0.3.3-test — 24 novembre 2026
-
-- **Segments de niveaux** : 1–9, 10–19, 20–29, 30–40 inclusif, 41–50 et 51–60 ; navigation directe d'une tranche a l'autre. Les segments sans quetes verifiees restent des apercus, pas des quetes inventees.
-- **Journal de quetes Forever** : utilisation de `C_QuestLog.GetNumQuestLogEntries`, `GetInfo`, `IsComplete` et `IsQuestFlaggedCompleted` (ou `GetAllCompletedQuestIDs` en secours) pour identifier quetes en cours, pretes a rendre et rendues. Ne jamais confondre objectif termine et quete rendue.
-- **Liste complete a defilement vertical** : molette et glissiere; cinq lignes visibles en permanence sur la totalite des objectifs du segment; filtre « Afficher les terminees ». Les quetes deja rendues sont masquees par defaut.
-- **Recommandations prudentes** : quetes pretes a rendre, puis actives, puis objectifs solo proches du niveau. Regroupement explicite des hubs connus 30–40, sans imposer donjon ou longue chaine facultative. Aucun calcul mensonger de distance ni de DPS.
-- **Informations dynamiques** : texte du premier objectif en cours depuis `GetQuestObjectives` lorsqu'il est disponible, et rafraichissement sur les evenements de journal/acceptation/abandon/rendu.
-- **Interface** : statuts et reperes couleur quete XP, groupe, option, equipement, trajet, forge; progression de segment; saut depuis la fiche d'equipement vers l'etape correspondante. Footer de diagnostic superflu supprime.
-- **Tests** : cas de quete acceptee/en cours/prete a rendre/rendue, liste filtree, variantes d'API Forever, tranches 30–40 et 51–60, curseur et choix de l'objectif propose. Validation Lua 5.1/5.4 en CI.
-
-
-## 0.3.2-test — 23 novembre 2026
-
-- **Erreur de lancement corrigée** : suppression de l'enregistrement de `LEARNED_SPELL_IN_TAB`, événement inconnu de WoW Forever ; `SPELLS_CHANGED` reste écouté.
-- **Talents** : trois arbres affichés simultanément, avec grille complète, rangs, flèches de prérequis, surbrillance et infobulles, sans panneau explicatif latéral.
-- **Équipement** : liste ordonnée consultable à la molette et via glissière verticale compatible quand disponible ; objets atteignables d'abord, paliers futurs ensuite. Suppression de la pagination « Paliers suivants ».
-- **Parcours** : marqueurs visuels par type (quête XP, équipement, groupe, option, trajet, forge, maître), traduction des intitulés connus et ajouts de quêtes d'XP des Salines #1105 et #1175. Les intitulés non confirmés sont descriptifs, non présentés comme traductions officielles.
-- **Rotation** : Fracasser armure intégré au monocible pour les ennemis robustes, pas conseillé à chaque cible ; correction de l'ID Forever d'Ivresse de la victoire vers #402927. Le statut des sorts appris est masqué, les rangs documentés et accessibles chez le maître sont signalés pour Cri de guerre, Frappe héroïque et Fracasser armure. Lecture incomplète du grimoire = « à vérifier ».
-- **Tests** : simulation des trois arbres simultanés, du défilement vertical, des badges de route, de la reconnaissance des rangs et de l'absence d'événement inconnu. Compatibilité Lua 5.1/5.4 vérifiée en CI ; rendu final encore à essayer sur Forever.
-
-
-
-## 0.3.1-test — 23 novembre 2026
-
-- **Équipement par niveau** : la sélection principale exclut les objets dont le palier d'accès est futur ; pagination des cibles actuelles puis écran séparé pour les récompenses à venir. La fiche distingue niveau requis pour porter et palier conseillé pour obtenir.
-- **Grimoire** : reconnaissance des libellés français avec/sans accents et lecture de secours par les noms de sorts quand `GetSpellBookItemInfo` est absent, sans inventer « non appris ».
-- **Rotation** : boucle textuelle adaptée au palier, trois réactions visibles (Fulgurance, Ivresse de la victoire, Exécution). Rage sanguinaire mentionnée hors GCD ; Fulgurance reste une réaction sur GCD.
-- **Parcours** : The Islander #1718 puis The Affray #1719 (posture Berserker), Salt Flat Venom #1104 (chaîne à vérifier), Kodo Roundup #5561, Catch of the Day #5386 et arrêt de métier chez Wulan à Désolace. Ces ajouts ne constituent pas une route exhaustive 1–60.
-- **Tests de non-régression** : équipement accessible/futur, pages de navigation, sort de rang supérieur/accents, API incomplète, réactions et identifiants des nouvelles étapes.
-
-
-
-## 0.3.0-test — 23 novembre 2026
-
-- **Trois arbres consultables** Armes, Furie et Protection, même budget de 51 points, positions/icônes et prérequis versionnés, surbrillance du point alloué au niveau demandé. Variantes **Furie pure 0/51/0** et hybride expérimental **13/38/0**, sans changement de spé du personnage.
-- **Rotation plus utile** : buffs à maintenir (avec détection prudente de Cri de guerre si aura disponible), ouverture, boucle, réactions/procs, gros CD offensifs et défensifs. Choix mono/multicible ; Fulgurance est réactive mais **soumise au GCD**.
-- **Correction de l'état des sorts** : lecture du grimoire par famille et nom localisé, compatible avec rangs supérieurs. En cas d'API incomplète, afficher `Apprentissage à vérifier`, jamais un faux `Non appris`.
-- **Équipement** : sélection de 4 recommandations selon niveau, priorité armes, malus pour donjons et futures chaînes longues, navigation vers les autres paliers ; distinction niveau de port / niveau d'accès à une quête.
-- **Parcours étoffé** : chaînes Horde Désolace avec identifiants (Kolkar, Alliance Relations, Gelkis), prérequis connus ou statut explicitement incertain, et chaîne Forever facultative de la Vallée des Os vers les niveaux 42–43.
-- **Audit critique** : Bludgeon of Betrayed Virtues provient de `Khan Jehn 93128` (**Gelkis Honoré**, longue chaîne), **pas** de `Khan Jehn 1374`. Recommandation différée et reliée à la bonne quête.
-- **Correction Forge** : Golden Scale Leggings nécessite 145 pour apprendre le plan ; 170 indique la difficulté jaune, pas le minimum.
-- Tests Lua 5.1/5.4 sur les 3 arbres, les variantes, le grimoire de rang supérieur, les états d'aura, les quêtes et le lien objets → route. L'optimisation DPS reste non mesurée et le 1–60 hors pilote non validé.
-
-## 0.2.0-test — 23 novembre 2026
-
-- Police sans empattement `Fonts\\ARIALN.TTF` (police intégrée au client, style moderne proche Roboto).
-- Correction du problème de panneaux qui pouvaient masquer les textes : fonds rendus comme textures, sous les contrôles.
-- **Talents :** contour doré sur le point obtenu exactement au niveau prévisualisé ; rangs déjà acquis plus discrets, détails accessibles et infobulles par rang.
-- **Équipement :** icônes d'objets depuis l'API client, infobulles des vrais objets, détails de source, niveau et fabrication, lien direct avec l'étape du Parcours.
-- **Parcours :** grande carte d'étape active et liste de suivantes lisibles, à la manière de PexGuide. Les quêtes de donjon restent facultatives.
-- **Rotation :** quatrième onglet avec priorités indicatives monocible/multicible, icônes, conditions et infobulles ; pas de lancement automatique.
-- Boutons `+` et `-` conservés pour adapter la taille. Suppression des commandes de mode `compact` et `grand`.
-- L'ancien addon et ses tests sont conservés historiquement sur `main` mais retirés du contenu actif de la branche de développement.
-- Tests de syntaxe et de comportement Lua 5.1/5.4 mis à jour.
-
-## 0.1.0-test — 23 novembre 2026
-
-- Prototype autonome à trois onglets Talents, Équipement et Parcours, profil Furie 1–60 et pilote de niveaux 30–40.
-- Validation structurelle des 51 allocations, des seuils d'équipement et de la correspondance obligatoire équipement → quête/fabrication du parcours.
-
-L'ancien historique du tableau de bord Warrior Companion est disponible dans la branche `main` et dans l'historique Git.
+**Ce changelog n'est pas une preuve de validation in-game :** les
+propositions de quêtes, coordonnées et recettes doivent toujours être
+contrôlées sur le client Forever réel.
