@@ -81,7 +81,10 @@ B:CreateMinimapButton()
 assert(B.compactDashboard.width==304 and B.compactDashboard.height==88,
   "dimensions originales 304x88 du mini-bilan")
 assert(B.compactExpand and #B.compactStats==3 and
-  #B.compactMoneyParts==3 and B.compactAdvice)
+  #B.compactMoneyParts==3 and B.compactAdvice and B.compactSettings)
+B.compactSettings.scripts.OnClick()
+assert(B.settingsOpened==1,
+  "le mini-bilan donne acces aux reglages sans commande")
 assert(not B.frame:IsShown() and not B.compactDashboard:IsShown() and
   B.minimapButton:IsShown(),
   "connexion par defaut : icone seulement, pas de grande fenetre")
