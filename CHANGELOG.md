@@ -1,5 +1,13 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.6.2-test — 26 novembre 2026
+
+- **Correctif bloquant WoW Forever** : ne plus enregistrer `PLAYERBANKBAGSLOTS_CHANGED`, absent du client 1.60.1 (erreur Lua sur `Frame:RegisterEvent` dès le démarrage).
+- **Compatibilité renforcée** : seules les deux notifications indispensables sont enregistrées strictement ; les événements facultatifs sont enregistrés avec `pcall`, et les inconnus sont ignorés sans empêcher le lancement de l'addon.
+- **Banque sans perte de suivi** : rafraîchissement des stocks à l'ouverture, sur `PLAYERBANKSLOTS_CHANGED` lorsque disponible, et via `BAG_UPDATE_DELAYED` lorsque la banque est ouverte ; les données sont périmées après sa fermeture.
+- **Tests de non-régression** : simulation d'un client rejetant plusieurs événements et contrôle de la mise à jour des stocks bancaires sans événement spécifique. Tests automatisés Lua 5.1/5.4 ; confirmation sur le vrai client encore requise.
+
+
 ## 0.6.1-test — 26 novembre 2026
 
 - **Flèche modernisée et plus nette** : dessin procédural de trois traits rectangulaires (hampe et deux chevrons), sans rééchantillonnage de la texture MinimapArrow. Accent bronze, aucun halo ni contour superposé, fond entièrement transparent, distance/objectif discrets.
