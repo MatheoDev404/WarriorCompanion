@@ -1,30 +1,45 @@
-# Stratégie GitHub — Warrior Companion Build Planner
+# GitHub — développement Warrior Companion
 
-Approuvée en conception le 23 novembre 2026. Ne pas fusionner l'ancienne UI / l'ancienne PR #25 sans test en jeu.
+Mise à jour : 26 novembre 2026.
 
-## Règle de branches
+## Branches
 
-- `main` : code stable validé dans WoW Forever.
-- `feature/build-planner` : **branche d'intégration unique active pour le nouveau socle et la documentation**. La phase de conception ajoute des documents seulement et laisse l'ancien `Addon/` intact.
-- `feature/talents`, `feature/equipement`, `feature/parcours` : **créées uniquement si un travail parallèle et conséquent le justifie**. Une branche par grand module, jamais une branche par bouton/fix/niveau/version.
-- Maximum souhaité : **4 branches de travail ouvertes** ; sinon une seule branche `feature/build-planner` suffit.
-- Une PR par ensemble fonctionnel testable ; une correction sur le module va dans sa branche existante jusqu'à intégration.
-- Après validation, merger/squash et **supprimer la branche de travail**. Ne jamais laisser une longue série de branches `feat/x-v0.n` abandonnées. Tags `vX.Y.Z` pour les livraisons, **pas** des branches de version.
+- `main` : ancien addon `WarriorCompanion` et historique, **ne pas supprimer**.
+- `feature/build-planner` : branche unique d'intégration et de validation du
+  nouvel addon `WarriorCompanionBuild` (PR #29).
+- Éviter les branches par bouton ou par correctif ; conserver les commits
+  fonctionnels, et fusionner seulement après un test réel du client.
+- L'historique Git contient les anciennes spécifications et les versions
+  précédentes du changelog ; leur répétition dans le paquet n'est pas utile.
 
-## Inventaire préliminaire effectué
+## Toute modification doit passer par
 
-Le dépôt contient de nombreuses branches historiques `feat/*-v0.*`, `fix/*-v0.*`, `feature/guide-on-063` et la branche `refactor/cleanup-lean-guide`. La PR #25 est la seule PR encore ouverte au 23/11/2026 ; elle appartient à l'ancienne interface.
+1. **Pertinence** : sert-elle le leveling, les talents, équipements, rotations,
+   la navigation, les guides métiers ou les réglages réellement utilisés ?
+2. **Compatibilité** : ne pas inventer d'API ni d'événement WoW Forever 1.60.1 ;
+   les événements facultatifs sont enregistrés avec protection.
+3. **Licence** : `DetailedData30_40.lua` ne peut pas être distribué sans
+   `LICENSE-GUIDE.txt` (CC BY-NC-SA 4.0) et ses attributions.
+4. **Tests** : valider la structure, les 302 étapes et leur audit, les
+   métiers Minage/Forge, la boussole, les 4 onglets et la minimap sur
+   Lua 5.1 **et** 5.4. Un test ajouté ne doit pas supposer que le client
+   fournit systématiquement les APIs modernes.
+5. **Non-régression** : vérifier les modes de parcours, les réglages,
+   la reprise de quêtes, le chargement du TOC et l'absence de texture
+   ou de fichier legacy dans le paquet.
+6. **Test en jeu** : contrôler le rendu, les clics, les tooltip, les valeurs
+   secrètes et les événements du client Forever. Garder la version
+   `-test` jusqu'à cette confirmation.
 
-**Nettoyage non destructif d'abord :** comparer chaque ancienne branche à `main` ou ses PR fusionnées ; supprimer uniquement celles totalement intégrées, et préserver un tag ou une référence d'archive pour les travaux encore uniques. Aucune suppression automatique de branches dans cette phase ; ne pas annoncer que l'inventaire a été supprimé tant qu'il ne l'est pas.
+## Distribution compacte
 
-## Méthode de développement
+`scripts/package_addon.py` produit le ZIP autonome contenant seulement :
+- le `.toc` et les **modules Lua déclarés** ;
+- le README d'installation et la licence historique.
 
-1. **Recherche et données** : pour chaque règle/quête/objet/talent, enregistrer source, date, build client, ID et statut de confiance (confirmé jeu / confirmé deux sources / hypothèse).
-2. **Tests hors jeu** : compatibilité Lua 5.1/5.4 ; validation de 51 points ou points disponibles, prérequis talents, niveaux d'objets, métiers et chaînes de quête, absence de contenu de faction ennemie.
-3. **Revue de pertinence** : chaque changement doit servir Talents/Équipement/Parcours ; aucune métrique ou UI hors de ce périmètre.
-4. **Validation en jeu** : screenshots, erreurs Lua, tooltips, noms français et état réel, répétabilité aux levels 10/20/30/34/36/40/60.
-5. **Fusion seulement après accord de test**, release tag et changelog. Ne pas modifier l'ancien addon sous la nouvelle architecture avant validation du socle.
+Les tests, archives de recherche et données de conception restent dans le
+**dépôt Git**, pas dans `Interface/AddOns/`. La CI joint un artefact
+`WarriorCompanionBuild-installable` au résultat de test pour installer
+sans extraire manuellement le grand ZIP du dépôt.
 
-## Gestion des licences
-
-Les guides tiers **RestedXP / Journey** sont des références méthodologiques, pas une source de copie de données payantes. Ancien OpenXP dans le projet : conserver crédit et licence propres, vérifier les conditions avant extraction. Export des arbres de talent Zephras : CC BY 4.0 pour l'arrangement et attribution obligatoire ; noms, icônes et textes du jeu restent à Blizzard. Les fichiers de provenance doivent rester explicites.
+Voir [l'architecture actuelle](ARCHITECTURE_ACTUELLE.md).
