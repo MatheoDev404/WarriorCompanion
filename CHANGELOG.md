@@ -1,5 +1,17 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.6.0-test — 26 novembre 2026
+
+- **Quatre guides dans Parcours** : menu déroulant Leveling 1–60, Minage 1–300, Forge 1–300 et Minage + Forge 1–300. Sauvegardes de progression, sélection et défilement séparées sans toucher aux trois autres onglets, à la boussole ni au mini-bilan.
+- **Architecture modulaire** : `ProfessionData.lua` (données Forever), `ProfessionRuntime.lua` (lecture du personnage, sacs, banque, recettes et équipement), `ProfessionPlanner.lua` (recommandations, compétence, craft et matériaux), `ProfessionUI.lua` (sélecteur et affichage).
+- **Minage** : filons/compétences 1–300, rangs et fontes classiques, zones alternatives choisies en tenant compte du niveau et de la carte. Pas de circuits exacts ou coordonnées non confirmés.
+- **Forge** : catalogue de progression 1–300 à étapes courtes (max. 5 crafts par lot). Prise en compte des recettes réellement connues de `C_TradeSkillUI`, ingrédients des schémas si disponibles, plans rares et gain de compétence non garanti. Comparaison basique avec les objets déjà portés.
+- **Minage + Forge** : calcul des besoins cumulés sans double déduction, stocks de sacs + banque accessible, fontes intermédiaires, besoins de minerais et composants non récoltables. Priorité utilisateur Minage 169 → 175 avant de partir miner le mithril ; repréparation après les gains de compétence.
+- **Données indisponibles** : état de banque ancien/illisible signalé ; absence de compétences, recettes ou stocks ne produit pas de zéros inventés. Saisie manuelle via `/wcb metier set` quand les données du client manquent.
+- **Tests** : nouveaux scénarios Lua 5.1/5.4 pour compétences 127/169, lecture des recettes, sacs, banque, barres/matériaux manquants, comparaison d’équipement, sélection et indépendance des guides. Tests existants de leveling, talents, rotations, mini-bilan et boussole conservés.
+- **Validation en jeu nécessaire** : données de Forever nouvelles/non documentées, sources de recettes, coordonnées des vendeurs/filons, spécialisation Forge et rentabilité réelle des circuits.
+
+
 ## 0.5.0-test — 25 novembre 2026
 
 - **Étape B : sélection adaptative 30–40**. Nouveau moteur `AdaptiveRoute.lua` chargé après les 302 étapes, sans modifier le catalogue de quêtes source. Évaluation des actions réalisables selon le journal (acceptation, objectifs, rendu), des prérequis connus et du niveau.
