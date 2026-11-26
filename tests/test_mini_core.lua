@@ -1,8 +1,19 @@
 -- Demarrage et commandes /wcb sans client, en particulier absence d'auto-open.
 local registered={}
 local eventFrame={handlers={}}
+-- Le client Forever rejette certains noms d'événements.
+-- Ils doivent être ignorés sans casser l'initialisation complète.
+local unknownEvents={
+  PLAYERBANKSLOTS_CHANGED=true,
+  TRADE_SKILL_DATA_SOURCE_CHANGED=true,
+}
 function eventFrame:RegisterEvent(name)
   assert(name~="LEARNED_SPELL_IN_TAB","evenement inconnu Forever interdit")
+  assert(name~="PLAYERBANKBAGSLOTS_CHANGED",
+    "ne pas tenter d'enregistrer l'evenement signale en jeu")
+  if unknownEvents[name] then
+    error('Frame:RegisterEvent(): Attempt to register unknown event "'..name..'"')
+  end
   registered[name]=true
 end
 function eventFrame:SetScript(name,handler) self.handlers[name]=handler end
@@ -107,6 +118,13 @@ assert(loadfile("Addon/WarriorCompanionBuild/Core.lua"))("WarriorCompanionBuild"
 assert(registered.ADDON_LOADED and registered.PLAYER_ENTERING_WORLD and
   registered.PLAYER_XP_UPDATE and registered.PLAYER_DEAD and
   registered.PLAYER_MONEY,"events XP, mort, monnaie et lancement")
+assert(B.unsupportedEvents and
+  B.unsupportedEvents.PLAYERBANKSLOTS_CHANGED and
+  B.unsupportedEvents.TRADE_SKILL_DATA_SOURCE_CHANGED,
+  "un event optionnel inconnu est ignore sans interrompre le chargement")
+assert(registered.BANKFRAME_OPENED and registered.BANKFRAME_CLOSED and
+  registered.BAG_UPDATE_DELAYED,
+  "les événements de secours pour la banque restent actifs")
 local fire=eventFrame.handlers.OnEvent
 fire(eventFrame,"ADDON_LOADED","OtherAddon")
 assert(B.db==nil,"ignorer chargement d'autres addons")
