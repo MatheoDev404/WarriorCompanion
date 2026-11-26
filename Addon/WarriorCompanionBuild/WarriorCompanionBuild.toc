@@ -1,0 +1,26 @@
+## Interface: 16001
+## Title: Warrior Companion | Build Planner (Test)
+## Notes: Guerrier Furie - guide par segments et quetes suivies
+## Author: Warrior Companion
+## Version: 0.6.4-test
+## SavedVariables: WCBuildDB
+Data.lua
+ProfessionData.lua
+TalentTrees.lua
+Spellbook.lua
+Planner.lua
+ProfessionRuntime.lua
+ProfessionPlanner.lua
+DetailedGuide.lua
+DetailedData30_40.lua
+AdaptiveRoute.lua
+Compass.lua
+CombatData.lua
+UI.lua
+ProfessionUI.lua
+Rotation.lua
+Session.lua
+CompactDashboard.lua
+Settings.lua
+MinimapButton.lua
+Core.lua

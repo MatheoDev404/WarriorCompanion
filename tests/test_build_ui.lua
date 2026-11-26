@@ -1,0 +1,484 @@
+-- Simulations de la nouvelle interface WoW (sans client graphique).
+local function frame()
+  local f={shown=true,handlers={}}
+  function f:SetPoint(...) self.point={...} end
+  function f:ClearAllPoints() self.point=nil end
+  function f:SetSize(w,h) self.width=w self.height=h end
+  function f:SetScale(v) self.scale=v end
+  function f:SetFrameStrata(v) self.strata=v end
+  function f:SetMovable(v) end
+  function f:EnableMouse(v) end
+  function f:EnableMouseWheel(v) self.wheelEnabled=v end
+  function f:RegisterForDrag(v) end
+  function f:SetClampedToScreen(v) end
+  function f:StartMoving() end
+  function f:StopMovingOrSizing() end
+  function f:GetPoint() return "CENTER",UIParent,"CENTER",0,0 end
+  function f:SetScript(k,fn) self.handlers[k]=fn end
+  function f:Show() self.shown=true end
+  function f:Hide() self.shown=false end
+  function f:IsShown() return self.shown end
+  function f:CreateTexture()
+    local t={}
+    function t:SetTexture(v) self.texture=v end
+    function t:ClearAllPoints() self.point=nil end
+    function t:SetPoint(...) self.point={...} end
+    function t:SetAllPoints(...) self.allPoints={...} end
+    function t:SetSize(w,h) self.width=w self.height=h end
+    function t:SetVertexColor(...) self.color={...} end
+    function t:Hide() self.hidden=true end
+    function t:Show() self.hidden=false end
+    return t
+  end
+  function f:CreateFontString()
+    local t={}
+    function t:SetPoint(...) end
+    function t:SetSize(w,h) end
+    function t:SetWidth(w) self.width=w end
+    function t:SetShadowColor(...) self.shadowColor={...} end
+    function t:SetShadowOffset(...) self.shadowOffset={...} end
+    function t:SetJustifyH() end
+    function t:SetJustifyV() end
+    function t:SetText(v) self.text=v end
+    function t:SetTextColor(...) self.color={...} end
+    function t:SetFont(path,size) self.fontPath=path self.fontSize=size end
+    function t:SetWordWrap(value) self.wordWrap=value end
+    function t:Hide() self.hidden=true end
+    function t:Show() self.hidden=false end
+    return t
+  end
+  return f
+end
+UIParent=frame()
+function CreateFrame(kind)
+  local result=frame()
+  if kind=="EditBox" then
+    function result:SetText(v) self.text=v end
+    function result:GetText() return self.text end
+    function result:SetAutoFocus(value) self.autoFocus=value end
+    function result:SetNumeric(value) self.numeric=value end
+    function result:SetMaxLetters(value) self.maxLetters=value end
+    function result:ClearFocus() self.focused=false end
+  end
+  if kind=="Slider" then
+    function result:SetOrientation(value) self.orientation=value end
+    function result:SetMinMaxValues(low,high) self.low=low self.high=high end
+    function result:SetValueStep(step) self.step=step end
+    function result:SetThumbTexture(texture)
+      self.thumb={path=texture}
+      function self.thumb:SetVertexColor(...) self.color={...} end
+    end
+    function result:GetThumbTexture() return self.thumb end
+    function result:SetValue(value)
+      self.value=value
+      if self.handlers.OnValueChanged then
+        self.handlers.OnValueChanged(self,value)
+      end
+    end
+  end
+  return result
+end
+function UnitLevel() return 34 end
+local lastTooltipSpell, lastTooltipItem
+Enum={SpellBookSpellBank={Player=0}}
+C_Spell={GetSpellInfo=function(id)
+  local names={[6673]="Cri de guerre",[100]="Charge",
+    [23881]="Sanguinaire",[1680]="Tourbillon"}
+  return {name=names[id],spellID=id}
+end}
+-- Dans le vrai grimoire, le rang 2 de Cri de guerre est connu,
+-- meme si le rang 1 (6673) n'est pas signale par IsPlayerSpell.
+function IsPlayerSpell() return false end
+C_SpellBook={
+  GetNumSpellBookSkillLines=function()return 1 end,
+  GetSpellBookSkillLineInfo=function()return {
+    itemIndexOffset=0,numSpellBookItems=3
+  }end,
+  GetSpellBookItemInfo=function(slot)
+    return {spellID=slot==1 and 5242 or (slot==2 and 100 or 1160),itemType="SPELL"}
+  end,
+  GetSpellBookItemName=function(slot)
+    return slot==1 and "Cri de guerre" or
+      (slot==2 and "Charge" or "Cri démoralisant")
+  end,
+}
+C_UnitAuras={GetAuraDataByIndex=function(_,index)
+  if index==1 then return {name="Cri de guerre",spellId=5242} end
+  return nil
+end}
+C_Item={GetItemIconByID=function(id) return 100000+id end}
+GameTooltip={
+  SetOwner=function() end,
+  SetSpellByID=function(_,id) lastTooltipSpell=id end,
+  SetItemByID=function(_,id) lastTooltipItem=id end,
+  AddLine=function()end, Show=function()end, Hide=function()end,
+}
+local B={}
+assert(loadfile("Addon/WarriorCompanionBuild/Data.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/ProfessionData.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/TalentTrees.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Spellbook.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Planner.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/ProfessionRuntime.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/ProfessionPlanner.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/DetailedGuide.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/DetailedData30_40.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/AdaptiveRoute.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/CombatData.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/UI.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/ProfessionUI.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Rotation.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Compass.lua"))("WarriorCompanionBuild",B)
+assert(loadfile("Addon/WarriorCompanionBuild/Settings.lua"))("WarriorCompanionBuild",B)
+B:InitState()
+B.ResetSession=function(self) self.sessionResets=(self.sessionResets or 0)+1 end
+B.ShowCompact=function(self) self.compactOpened=true end
+B.HideDashboard=function(self) self.hiddenViaSettings=true end
+B.SetMinimapVisible=function(self,value)
+ self.db.minimapVisible=value
+end
+B.OpenFullDashboard=function(self) self.frame:Show() end
+assert(B:ValidateContent())
+assert(B:BuildSpellbookCache())
+assert(B:IsKnownSpell({name="Cri de guerre",spellId=6673})==true,
+  "le rang 2 appris est reconnu malgre le rang 1 inconnu")
+assert(B:IsKnownSpell({name="Cri demoralisant",spellId=1160})==true,
+  "les noms francais avec/sans accents doivent correspondre")
+local getInfo=C_SpellBook.GetSpellBookItemInfo
+C_SpellBook.GetSpellBookItemInfo=nil
+assert(B:BuildSpellbookCache(),"l'API grimoire sans ItemInfo reste lisible")
+assert(B:IsKnownSpell({name="Cri de guerre",spellId=6673})==true,
+  "une lecture par noms suffit si GetSpellBookItemInfo manque")
+C_SpellBook.GetSpellBookItemInfo=getInfo
+B:BuildSpellbookCache()
+assert(B:PlayerBuffStatus("Cri de guerre",6673)==true)
+B.realLevel=34
+assert(B:SpellStatus({name="Cri de guerre",spellId=6673,level=1}):find("rang 3",1,true),
+  "un rang plus eleve est signale sans declarer le sort non appris")
+assert(B:SpellStatus({name="Charge",spellId=100,level=4})=="",
+  "un sort appris sans amelioration cache son statut")
+B:CreateUI()
+assert(B.frame.width==760 and B.frame.scale==0.82)
+assert(B.page=="talents" and B.pages.talents:IsShown())
+assert(B.pages.talents.trees.Armes and B.pages.talents.trees.Furie
+  and B.pages.talents.trees.Protection,
+  "les trois arbres doivent etre accessibles")
+assert(B.pages.talents.trees.Armes.frame:IsShown() and
+  B.pages.talents.trees.Furie.frame:IsShown() and
+  B.pages.talents.trees.Protection.frame:IsShown(),
+  "les trois arbres s'affichent simultanement")
+assert(B.pages.talents.trees.Armes.nodes["Deep Wounds"] and
+  B.pages.talents.trees.Protection.nodes["Shield Slam"],
+  "tous les talents ont une icone et une infobulle")
+assert(B.pages.talents.desc==nil and B.pages.talents.treeTabs==nil,
+  "suppression du descriptif et des boutons de sous-arbres")
+assert(B.tabs.rotation and B.pages.rotation,"4eme onglet Rotation")
+assert(B.pages.talents.levelPoint.text:find("Coups",1,true),
+  "point de talent gagne au niveau 34 indique")
+assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]==1,
+  "le talent gagne au niveau consulte garde sa surbrillance forte")
+assert(B.pages.talents.nodes["Cruelty"].edges[1].color[4]>0.9 and
+  B.pages.talents.nodes["Cruelty"].allocatedMarker.color[4]==1,
+  "talents precedemment investis marques d'ambre")
+assert(B.pages.talents.nodes["Booming Voice"].allocatedMarker.color[4]==0,
+  "talents non investis restent discrets")
+assert(B.pages.talents.nodes["Bloodthirst"])
+assert(#B.pages.talents.connections==2,"pre-requis visuels de l arbre Furie")
+B.pages.talents.nodes["Bloodthirst"].handlers.OnEnter()
+assert(lastTooltipSpell==23881,"tooltip de talent depuis le spellID")
+B:ShowPage("equipement")
+assert(B.pages.equipement:IsShown() and not B.pages.talents:IsShown())
+B.pages.equipement.items[6802].handlers.OnEnter()
+assert(lastTooltipItem==6802,"infobulle vraie de l'objet dans le client")
+B.pages.equipement.items[6802].handlers.OnLeave()
+B.pages.equipement.items[6802].handlers.OnClick()
+assert(B.pages.equipement.previewName==nil and
+  B.pages.equipement.previewDescription==nil,
+  "le panneau de duplication de l'infobulle a disparu")
+assert(B.pages.equipement.items[6802].width==650,
+  "la liste occupe toute la largeur")
+assert(B.pages.equipement.items[6802].icon.texture==106802,
+  "icone d'objet recuperee par son ID")
+assert(B.pages.equipement.items[6802].detail.text:find("GROUPE",1,true),
+  "conditions de groupe explicites dans la ligne")
+assert(B.selectedItem==6802)
+B.pages.equipement.gotoButton.handlers.OnClick()
+assert(B.page=="parcours" and B.pages.parcours:IsShown())
+assert(B:OrderedRoute()[B.routeIndex].step.id=="quest-scarlet")
+assert(B.pages.parcours.zone.text:find("Monastere",1,true))
+assert(B.pages.parcours.routeItem:IsShown(),
+  "l'icone de recompense est visible pour cette quete")
+B.pages.parcours.routeItem.handlers.OnEnter(B.pages.parcours.routeItem)
+assert(lastTooltipItem==6802,"infobulle native de la recompense en parcours")
+B.pages.parcours.howButton.handlers.OnEnter(B.pages.parcours.howButton)
+B.pages.parcours.howButton.handlers.OnLeave()
+assert(B.pages.parcours.activeKind.text=="EQUIPEMENT",
+  "les etapes d'equipement sont reconnaissables visuellement")
+assert(B.pages.parcours.rows[1].kind.text~=nil,
+  "les etapes suivantes ont un marqueur par type")
+assert(B.pages.parcours.segmentLabel.text=="Segment 30-40" and
+  B.pages.parcours.wheelEnabled and B.pages.parcours.scrollBar,
+  "segment 30-40 complet et liste scrollable")
+assert(#B.routeVisible>5,"les objectifs depassent la fenetre visible")
+-- Le saut depuis l'equipement positionne logiquement la liste sur la cible.
+assert(B.routeScroll>0,"la recompense de donjon est visible apres saut")
+B.routeScroll=0
+B:RefreshRoute()
+B.pages.parcours.handlers.OnMouseWheel(B.pages.parcours,-1)
+assert(B.routeScroll==1,"la liste defile sans changer de segment")
+B.pages.parcours.scrollBar:SetValue(3)
+assert(B.routeScroll==3,"scroll vertical au curseur")
+B.pages.parcours.toggleCompleted.handlers.OnClick()
+assert(B.showCompleted and B.db.showCompleted,
+  "le mode montrer les quetes rendues est memorise")
+B.pages.parcours.toggleCompleted.handlers.OnClick()
+assert(not B.showCompleted)
+B.pages.parcours.nextSegment.handlers.OnClick()
+assert(B.pages.parcours.segmentLabel.text=="Segment 41-50")
+B.pages.parcours.prevSegment.handlers.OnClick()
+assert(B.pages.parcours.segmentLabel.text=="Segment 30-40")
+B.pages.parcours.switchGuide.handlers.OnClick()
+assert(B.db.detailedMode and B.pages.parcours.segmentLabel.text:find("guide",1,true),
+  "l'onglet active le guide detaille")
+assert(#B.routeVisible>=302,
+  "les 302 etapes sont conservées, avec détours facultatifs")
+-- Une seule construction du parcours pour l'affichage, quel que soit
+-- l'état des filtres. Le calcul du statut est réutilisé pour le tri.
+local originalAdaptiveEntries=B.AdaptiveEntries
+local adaptiveCalls,stateCalls,entryCount=0,0,0
+local originalState=B.AdaptiveStepState
+B.AdaptiveStepState=function(self,...)
+  stateCalls=stateCalls+1
+  return originalState(self,...)
+end
+B.AdaptiveEntries=function(self,...)
+  adaptiveCalls=adaptiveCalls+1
+  local entries=originalAdaptiveEntries(self,...)
+  entryCount=#entries
+  return entries
+end
+B:RefreshRoute()
+assert(adaptiveCalls==1,
+  "l'affichage ne doit pas rescanner 302 quetes deux fois")
+assert(stateCalls==entryCount,
+  "le statut sélectionné et les lignes visibles utilisent le snapshot")
+B.AdaptiveEntries=originalAdaptiveEntries
+B.AdaptiveStepState=originalState
+assert(B.pages.parcours.modeButton and
+  B.pages.parcours.optionButtons.weapons and
+  B.pages.parcours.optionButtons.professions and
+  B.pages.parcours.optionButtons.dungeons,
+  "les modes et les filtres restent accessibles dans l'onglet")
+B.pages.parcours.modeButton.handlers.OnClick()
+assert(B.db.routeMode=="xp" and
+  B.pages.parcours.modeButton.txt.text=="XP rapide",
+  "choix XP rapide mémorisé")
+B.pages.parcours.modeButton.handlers.OnClick()
+assert(B.db.routeMode=="safe",
+  "retour au mode Sécurité")
+local beforeDetour=#B.routeVisible
+B.pages.parcours.optionButtons.dungeons.handlers.OnClick()
+assert(B.db.routeOptions.dungeons==true and
+  #B.routeVisible>beforeDetour,
+  "les détours de donjons s'ajoutent sans supprimer les 302 étapes")
+B.pages.parcours.optionButtons.dungeons.handlers.OnClick()
+assert(B.db.routeOptions.dungeons==false,
+  "masquer les donjons est réversible")
+assert(B.activeRouteStep and B.activeRouteStep.guide,
+  "le moteur propose une etape du guide au niveau reel")
+assert(B.routeScroll>0,"l'etape recommandee est repositionnee dans la liste")
+B.pages.parcours.switchGuide.handlers.OnClick()
+assert(B.db.detailedMode==false and
+  B.pages.parcours.segmentLabel.text=="Segment 30-40",
+  "la vue synthese reste disponible")
+B:SetPreview(39)
+B:ShowPage("equipement")
+local gearPanel=B.pages.equipement
+assert(gearPanel.moreButton==nil and gearPanel.wheelEnabled and
+  gearPanel.scrollBar and gearPanel.scrollBar.orientation=="VERTICAL",
+  "la molette et le curseur vertical remplacent la pagination")
+assert(gearPanel.gearOffset==0)
+for _,item in ipairs(gearPanel.displayed) do
+  assert(item.minLevel<=39,"les premieres cibles correspondent au niveau")
+end
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+assert(gearPanel.gearOffset==1,"defilement vertical d'une ligne")
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+local sawFuture=false
+for _,item in ipairs(gearPanel.displayed) do
+  if item.minLevel>39 then sawFuture=true end
+end
+assert(sawFuture,"les paliers futurs apparaissent a la fin de la liste")
+assert(gearPanel.scrollBar.value==gearPanel.gearOffset)
+gearPanel.scrollBar:SetValue(1)
+assert(gearPanel.gearOffset==1,"le curseur glissable deplace la liste")
+gearPanel.handlers.OnMouseWheel(gearPanel,-1)
+assert(gearPanel.gearOffset==2,"la molette repart du curseur")
+gearPanel.handlers.OnMouseWheel(gearPanel,1)
+assert(gearPanel.gearOffset==1,"defilement vers le haut")
+B:SetPreview(34)
+B:ShowPage("talents")
+assert(B.pages.talents.nextLabel.text:find("Rafale",1,true))
+B:SetPreview(40)
+B:Refresh()
+assert(B.pages.talents.nodes["Bloodthirst"].edges[1].color[4]==1,
+  "le talent de niveau 40 est en surbrillance")
+assert(B.pages.talents.nodes["Reckless Swings"].edges[1].color[4]>0.9,
+  "les rangs investis restent colores meme lorsqu'ils ne sont plus actifs")
+B:ShowPage("rotation")
+assert(B.pages.rotation:IsShown()
+  and B.pages.rotation.rows.cycle[1].name.text=="Sanguinaire")
+assert(B.pages.rotation.rows.maintain[1].note.text:find("Buff actif",1,true),
+  "Cri de guerre deja actif est detecte avec le rang du grimoire")
+assert(not B.pages.rotation.rows.maintain[1].note.text:find("Non appris",1,true))
+B.pages.rotation.rows.cycle[1].handlers.OnEnter()
+assert(lastTooltipSpell==23881,"infobulle du sort de la rotation")
+B.pages.rotation.rows.cycle[1].handlers.OnLeave()
+assert(B.pages.rotation.rows.cycle[4]:IsShown() and
+  B.pages.rotation.rows.cycle[3].name.text=="Fracasser armure",
+  "la rotation monocible contient Fracasser armure")
+assert(B.pages.rotation.rows.reactive[2].entry.spellId==402927,
+  "identifiant Forever de l'Ivresse de la victoire")
+assert(B.pages.rotation.rows.defense[2]:IsShown(),
+  "le deuxieme cooldown defensif est visible")
+assert(B.pages.rotation.rows.reactive[3]:IsShown(),
+  "Fulgurance, Ivresse et Execution visibles en meme temps")
+assert(B.pages.rotation.rotationSummary.text:find("Sanguinaire",1,true),
+  "la boucle niveau 40 apparait independamment des procs")
+B.pages.rotation.modeButtons.multi.handlers.OnClick()
+assert(B.rotationMode=="multi" and
+ B.pages.rotation.rows.cycle[1].name.text=="Tourbillon")
+B.pages.rotation.modeButtons.mono.handlers.OnClick()
+assert(B.rotationMode=="mono")
+B:ShowPage("talents")
+B.pages.talents.variantButton.handlers.OnClick()
+assert(B.planVariant=="hybrid" and B:PlanAt(60).pointsByTree.Armes==13,
+  "variante hybride accessible et plan partage entre 3 arbres")
+B:SetPreview(60)
+B:SelectTree("Armes")
+B:Refresh()
+assert(B.pages.talents.trees.Armes.nodes["Deep Wounds"].edges[1].color[4]==1,
+  "point actuel hybride surligne dans l'arbre Armes")
+B:SelectPlanVariant("fury")
+B:SelectTree("Furie")
+B:Refresh()
+B:SetPreview(60)
+B:Refresh()
+assert(B.pages.talents.nextLabel.text:find("places",1,true))
+assert(B.pages.parcours.segmentLabel.text=="Segment 51-60" and
+  #B.routeVisible==0,
+  "un segment non documente ne propose pas de quetes inventees")
+assert(B.pages.parcours.note.text:find("Apercu",1,true),
+  "les chapitres 50-60 restent un apercu prudent")
+assert(not B.pages.parcours.routeItem:IsShown(),
+  "pas d'icone de recompense quand la tranche est non documentee")
+assert(not B:MarkRouteSelection(nil))
+
+B:ChangeScale(-0.08)
+assert(B.frame.scale==0.74)
+B:ReturnToReal()
+B:Refresh()
+assert(B.levelText.text:find("34",1,true))
+assert(B:SetProfessionManualSkill("mining",169,225))
+assert(B:SetProfessionManualSkill("smithing",127,225))
+B:ShowPage("parcours")
+local p=B.pages.parcours
+assert(p.guideSelector and p.guideMenu and p.guideOptions.combo,
+  "selecteur avec quatre parcours dans l'onglet existant")
+p.guideSelector.handlers.OnClick()
+assert(p.guideMenu:IsShown(),"menu deroulant ouvert au clic")
+p.guideOptions.mining.handlers.OnClick()
+assert(B:ActiveGuide()=="mining" and not p.guideMenu:IsShown(),
+  "guide Minage selectionne et menu referme")
+assert(not p.prevSegment:IsShown() and p.skillCaption.hidden==false,
+  "une barre metier remplace les boutons de tranche")
+assert(p.zone.text:find("Minage 169/225",1,true))
+local id=B.routeVisible[1].step.id
+p.rows[1].handlers.OnClick()
+assert(B.routeSelectedId==id,"choix manuel d'un objectif Minage")
+p.guideSelector.handlers.OnClick()
+p.guideOptions.combo.handlers.OnClick()
+assert(B:ActiveGuide()=="combo" and p.skillBar2.hidden==false and
+  p.zone.text:find("Forge 127/225",1,true),
+  "le guide combine affiche les deux metiers et la seconde barre")
+assert(#B.routeVisible>=2,"le guide combine propose des objectifs synchronises")
+local originalProfessionEntries=B.ProfessionEntries
+local professionCalls=0
+B.ProfessionEntries=function(self,...)
+  professionCalls=professionCalls+1
+  return originalProfessionEntries(self,...)
+end
+B:RefreshRoute()
+assert(professionCalls==1,
+  "le calcul des ingredients et de la forge ne doit se faire qu'une fois")
+B.ProfessionEntries=originalProfessionEntries
+p.guideSelector.handlers.OnClick()
+p.guideOptions.mining.handlers.OnClick()
+assert(B.routeSelectedId==id,
+  "le guide Minage reprend son objectif precedent apres changement de parcours")
+p.guideSelector.handlers.OnClick()
+p.guideOptions.leveling.handlers.OnClick()
+assert(B:ActiveGuide()=="leveling" and p.prevSegment:IsShown() and
+  p.skillCaption.hidden==true,
+  "le guide de leveling et les anciennes commandes restent accessibles")
+B:ShowPage("talents")
+assert(B.pages.talents:IsShown(),"les onglets Talents restent fonctionnels")
+-- Tous les reglages accessibles au clic depuis les fenetres, pas via /wcb.
+assert(B.settingsButton and B.settingsFrame and
+  not B.settingsFrame:IsShown(),"panneau de reglages ferme par defaut")
+B.settingsButton.handlers.OnClick()
+assert(B.settingsFrame:IsShown(),"bouton Reglages ouvre les options")
+local c=B.settingsControls
+assert(c.compass and c.scalePlus and c.scaleMinus and
+  c.minimap and c.auto and c.alert and c.mini and
+  c.resume and c.audit and c.reset and
+  c.miningSkill and c.smithSkill,
+  "les fonctions du guide, de la boussole et du bilan ont des boutons")
+c.compass.handlers.OnClick()
+assert(B.db.compassEnabled==false,"boussole desactivee depuis l'interface")
+c.compass.handlers.OnClick()
+assert(B.db.compassEnabled==true and B.compassFrame,
+ "boussole reactivee sans taper /wcb compass on")
+local oldScale=B.db.compassScale or 1
+c.scalePlus.handlers.OnClick()
+assert(B.db.compassScale>oldScale,"fleche agrandie depuis Reglages")
+c.scaleMinus.handlers.OnClick()
+assert(B.db.compassScale==oldScale,"zoom reversible")
+c.auto.handlers.OnClick()
+assert(B.db.autoOpen==true,"lancement automatique disponible au clic")
+c.alert.handlers.OnClick()
+assert(B.db.showAlerts==false,"alertes configurables au clic")
+c.minimap.handlers.OnClick()
+assert(B.db.minimapVisible==false,"icone masquable depuis Reglages")
+c.minimap.handlers.OnClick()
+assert(B.db.minimapVisible==true,"icone retablie depuis Reglages")
+c.xp.handlers.OnClick()
+assert(B.db.routeMode=="xp","mode XP accessible sans commande")
+c.safe.handlers.OnClick()
+assert(B.db.routeMode=="safe","mode securite accessible sans commande")
+c.audit.handlers.OnClick()
+assert(B.settingsStatus.text:find("302",1,true),
+ "audit du guide consultable dans la fenetre")
+c.reset.handlers.OnClick()
+assert(B.sessionResets==1,"remise a zero du bilan disponible au clic")
+c.miningSkill:SetText("169")
+c.miningCap:SetText("225")
+c.miningApply.handlers.OnClick()
+assert(B:ProfessionSkill("mining")==169,
+ "saisie manuelle des metiers accessible sans commande")
+c.smithSkill:SetText("127")
+c.smithCap:SetText("225")
+c.smithApply.handlers.OnClick()
+assert(B:ProfessionSkill("smithing")==127)
+c.mini.handlers.OnClick()
+assert(B.compactOpened==true,"bouton mini depuis les reglages")
+B:OpenSettings()
+c.hideAll.handlers.OnClick()
+assert(B.hiddenViaSettings==true,"masquer les fenetres au clic")
+B:OpenSettings()
+c.route.handlers.OnClick()
+assert(B.page=="parcours" and not B.settingsFrame:IsShown(),
+ "Parcours rouvre depuis les reglages")
+print("OK: 4 guides, tous les reglages au clic, fleche vectorielle, talents/equipement/rotation")
