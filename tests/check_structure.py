@@ -8,7 +8,7 @@ modules=[line for line in lines if not line.startswith("#")]
 assert modules==["Data.lua","ProfessionData.lua","TalentTrees.lua","Spellbook.lua","Planner.lua","ProfessionRuntime.lua","ProfessionPlanner.lua","DetailedGuide.lua","DetailedData30_40.lua","AdaptiveRoute.lua","Compass.lua","CombatData.lua","UI.lua","ProfessionUI.lua","Rotation.lua","Session.lua","CompactDashboard.lua","Settings.lua","MinimapButton.lua","Core.lua"], modules
 assert "## Interface: 16001" in toc
 assert "## SavedVariables: WCBuildDB" in toc
-assert "## Version: 0.6.1-test" in toc
+assert "## Version: 0.6.2-test" in toc
 assert set(modules)=={p.name for p in root.glob("*.lua")}
 assert not list(root.glob("*.ttf")), "La police systeme WoW suffit, ne pas distribuer de police"
 ui=(root/"UI.lua").read_text(encoding="utf-8")
@@ -19,6 +19,11 @@ assert "TalentPointAt" in ui
 core=(root/"Core.lua").read_text(encoding="utf-8")
 assert 'LEARNED_SPELL_IN_TAB' not in core, "Evenement inconnu du client Forever"
 assert "PLAYER_XP_UPDATE" in core and "PLAYER_MONEY" in core
+assert "local function registerOptional(name)" in core
+assert "pcall(events.RegisterEvent,events,name)" in core
+assert 'events:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")' not in core
+assert 'event=="PLAYERBANKBAGSLOTS_CHANGED"' not in core
+assert '(event=="BAG_UPDATE_DELAYED" and self.professionBankOpen)' in (root/"ProfessionRuntime.lua").read_text(encoding="utf-8")
 assert "autostart on" in core and "minimap on" in core
 compact=(root/"CompactDashboard.lua").read_text(encoding="utf-8")
 assert 'f:SetSize(304,88)' in compact
@@ -75,4 +80,4 @@ assert "c.compass=kit.button" in settings and "c.reset=kit.button" in settings
 assert "Réglages" in ui and "compactSettings" in compact
 session=(root/"Session.lua").read_text(encoding="utf-8")
 assert 'issecretvalue' in session and 'function B:SafeNumber' in session
-print("OK: Build Planner 0.6.1-test, manifest 20 modules, events valides et interface")
+print("OK: Build Planner 0.6.2-test, manifest 20 modules, events valides et interface")
