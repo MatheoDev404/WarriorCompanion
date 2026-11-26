@@ -305,8 +305,10 @@ function B:RefreshProfessionObservations(event)
  end
  if event=="BANKFRAME_OPENED" then self.professionBankOpen=true end
  if event=="BANKFRAME_CLOSED" then self.professionBankOpen=false end
+ -- Some Forever builds don't implement PLAYERBANKBAGSLOTS_CHANGED.
+ -- BAG_UPDATE_DELAYED provides a fallback while the bank is visible.
  if event=="BANKFRAME_OPENED" or event=="PLAYERBANKSLOTS_CHANGED" or
-    event=="PLAYERBANKBAGSLOTS_CHANGED" then
+    (event=="BAG_UPDATE_DELAYED" and self.professionBankOpen) then
   self:ReadProfessionBank()
  end
  if event=="BANKFRAME_CLOSED" and self.db.professionBank then
