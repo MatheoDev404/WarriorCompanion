@@ -67,6 +67,11 @@ B.professionBankOpen=true
 assert(B:ReadProfessionBank())
 total,inBag,bank=B:ProfessionStock(3575,true)
 assert(total==13 and bank==10,"lire la banque quand elle est ouverte")
+content[-1][1].stackCount=8
+B:RefreshProfessionObservations("BAG_UPDATE_DELAYED")
+total,inBag,bank=B:ProfessionStock(3575,true)
+assert(total==11 and bank==8,
+  "un transfert vers la banque rafraichit le stock sans PLAYERBANKBAGSLOTS_CHANGED")
 B:RefreshProfessionObservations("BANKFRAME_CLOSED")
 assert(B.db.professionBank.stale==true and
   B:ProfessionStock(3575,true)==3,
