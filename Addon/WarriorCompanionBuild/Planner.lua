@@ -639,6 +639,9 @@ function B:StepState(step)
   return "A FAIRE / VERIFIER"
 end
 function B:GoToGear(id)
+  -- Un saut depuis Equipement vise toujours le parcours leveling, même
+  -- lorsque l'utilisateur consultait le guide Minage/Forge.
+  if self.SetActiveGuide then self:SetActiveGuide("leveling") end
   for i,entry in ipairs(self:OrderedRoute()) do
     if entry.step.gearId==id then
       self.routeIndex=i
