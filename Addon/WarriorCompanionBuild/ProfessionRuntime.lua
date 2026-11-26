@@ -161,7 +161,7 @@ local function scanContainers(ids)
  local items,known={},false
  for _,bag in ipairs(ids) do
   local n=slots(bag)
-  if n then
+  if n and n>0 then
    known=true
    for slot=1,n do
     local id,count=itemInSlot(bag,slot)
@@ -269,10 +269,40 @@ function B:ProfessionRecipeByItem(key,itemID)
  end
  return nil
 end
+function B:ReadProfessionEquipment()
+ if not self.db or type(GetInventoryItemID)~="function" then return false end
+ local equipped={}
+ local read=0
+ for slot=1,19 do
+  local id=number(attempt(GetInventoryItemID,"player",slot))
+  if id then equipped[slot]=id end
+  read=read+1
+ end
+ self.professionEquipped=equipped
+ self.db.professionEquipped={items=equipped,when=stamp()}
+ return read==19
+end
+function B:ProfessionIsEquipped(itemID)
+ local items=self.professionEquipped
+ if not items then return nil end
+ for _,id in pairs(items) do
+  if id==itemID then return true end
+ end
+ return false
+end
 function B:RefreshProfessionObservations(event)
  if not self.db then return end
  self:ProfessionsInit()
+ -- La banque ne reste pas considérée comme accessible après reconnexion.
+ if event=="PLAYER_ENTERING_WORLD" then
+  self.professionBankOpen=false
+  self.db.professionBank.stale=true
+ end
  self:ReadProfessionSkills()
+ if event=="PLAYER_ENTERING_WORLD" or
+     event=="PLAYER_EQUIPMENT_CHANGED" then
+  self:ReadProfessionEquipment()
+ end
  if event=="BANKFRAME_OPENED" then self.professionBankOpen=true end
  if event=="BANKFRAME_CLOSED" then self.professionBankOpen=false end
  if event=="BANKFRAME_OPENED" or event=="PLAYERBANKSLOTS_CHANGED" or
