@@ -1,5 +1,15 @@
 # Changelog — Warrior Companion Build Planner
 
+## 0.6.1-test — 26 novembre 2026
+
+- **Flèche modernisée et plus nette** : dessin procédural de trois traits rectangulaires (hampe et deux chevrons), sans rééchantillonnage de la texture MinimapArrow. Accent bronze, aucun halo ni contour superposé, fond entièrement transparent, distance/objectif discrets.
+- **HUD non intrusif** : masque toute la boussole lorsqu'aucun objectif n'est présent. Sa taille se règle de 75 à 135 %, position glissable mémorisée ; direction et distance inchangées.
+- **Réglages cliquables depuis l’addon** : bouton Réglages sous les quatre onglets, bouton OPT du mini-bilan et clic molette de la minimap. Les clics gauche/droit restent respectivement guide/mini.
+- **Options regroupées** : activer/masquer et recentrer la boussole, zoom, auto-ouverture, alertes, visibilité minimap, modes XP/Sécurité, reprise du guide, audit, remise à zéro de session, masquage des fenêtres et accès direct au Parcours.
+- **Saisie de secours des métiers** : entrées Minage et Forge (compétence/plafond) dans les réglages, lorsque le client ne livre pas ces données. La valeur lue en jeu prime toujours.
+- **Non-régression** : simulations Lua 5.1/5.4 étendues au clic sur la minimap, au mini-bilan, aux réglages, aux champs de compétences et à la nouvelle géométrie de la boussole. Le véritable rendu WoW Forever est encore à confirmer.
+
+
 ## 0.6.0-test — 26 novembre 2026
 
 - **Quatre guides dans Parcours** : menu déroulant Leveling 1–60, Minage 1–300, Forge 1–300 et Minage + Forge 1–300. Sauvegardes de progression, sélection et défilement séparées sans toucher aux trois autres onglets, à la boussole ni au mini-bilan.
