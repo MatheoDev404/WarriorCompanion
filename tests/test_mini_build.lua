@@ -191,7 +191,12 @@ assert(B.compactAdvice.text:find("Morts frequentes",1,true))
 B:ResetSession()
 assert(B.metrics.xpGained==0 and B.metrics.deaths==0 and
   B.metrics.moneyStart==money,"reinitialisation des statistiques")
+B.settingsFrame=frame()
+B.settingsFrame:Show()
 B:HideDashboard()
+assert(not B.settingsFrame:IsShown(),
+  "les reglages ne doivent pas reapparaitre apres la fermeture du guide")
+B.settingsFrame=nil
 assert(not B.frame:IsShown() and not B.compactDashboard:IsShown(),
   "fermeture explicite masque les deux vues")
 B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
