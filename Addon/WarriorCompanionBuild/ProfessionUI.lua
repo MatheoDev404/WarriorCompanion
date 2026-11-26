@@ -147,8 +147,16 @@ local function progressBars(self,page,id)
 end
 local function renderProfession(self,page,id)
  local progress=self.db.professionProgress[id] or {}
- local entries=self:ProfessionEntries(id,progress.showCompleted==true)
+ -- Eviter deux calculs successifs de recettes, stocks et fontes :
+ -- les étapes sont construites une fois, puis filtrées localement.
  local all=self:ProfessionEntries(id,true)
+ local entries={}
+ for _,e in ipairs(all) do
+  if progress.showCompleted==true or
+      (e.state~="TERMINE" and e.state~="FAIT (MANUEL)") then
+   entries[#entries+1]=e
+  end
+ end
  self.routeVisible=entries
  local selected=nil
  if self.routeSelectedId then
