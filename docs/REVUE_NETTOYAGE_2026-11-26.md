@@ -41,13 +41,13 @@ Branche concernée : `feature/build-planner` ; point de départ avant la revue :
 
 | Mesure | Avant (0.6.2) | Après (0.6.3) |
 |---|---:|---:|
-| Taille totale des fichiers suivis | 471 526 octets | 433 042 octets |
+| Taille totale des fichiers suivis | 471 526 octets | 437 524 octets |
 | Contenu du dossier addon | 314 254 octets | 298 126 octets |
 | Fichiers Lua dans l'addon | 20 | 20 |
 | ZIP installable (compression niveau 9) | Aucun paquet dédié | 93 737 octets |
 | Contenu du ZIP installable | — | 20 Lua + TOC + licence + README |
 
-**Réduction nette des fichiers suivis : 38 484 octets (8,2 %)**,
+**Réduction nette des fichiers suivis : 34 002 octets (7,2 %)**,
 malgré le maintien et l'ajout des tests et outils de distribution.
 
 Le ZIP source complet de GitHub garde les tests, documents et scripts de
