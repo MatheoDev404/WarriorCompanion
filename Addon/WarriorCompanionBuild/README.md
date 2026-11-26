@@ -1,4 +1,4 @@
-# Warrior Companion | Build Planner — 0.6.0-test
+# Warrior Companion | Build Planner — 0.6.1-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
 
@@ -19,6 +19,14 @@
 - Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si une API renvoie un nombre secret (mécanisme de protection Forever), l'addon ne le compare ni ne le calcule : il affiche une valeur indisponible au lieu de planter. Les positions et le drag de la minimap appliquent la même protection.
 - **Options identiques** : `/wcb mini`, `/wcb full`, `/wcb hide`, `/wcb autostart on/off`, `/wcb reset`, `/wcb alerts on/off`. Ajout de `/wcb minimap on/off`. Par défaut, l'ouverture automatique est **désactivée** ; activable pour retrouver l'ancienne expérience. Les préférences sont dans `WCBuildDB`.
 - L'ancienne logique générale de conseils n'est pas importée intégralement : la ligne conserve les alertes sûres (points non dépensés si API présente, vie basse, morts répétées). Le mini reste autonome du vieux dossier `WarriorCompanion`.
+
+### Interface sans commandes — 0.6.1-test
+
+- Accès à **Réglages** depuis le bouton de la grande fenêtre, **OPT** sur le mini-bilan ou **clic molette sur l’icône minimap**. Les clics gauche/droit précédents ne changent pas.
+- Panneau de configuration : boussole affichée/masquée ; zoom 75–135 % par incréments de 5 % et recentrage ; affichage du mini-bilan ; démarrage automatique ; alertes ; visibilité minimap ; choix XP/Sécurité ; accès et reprise du Parcours ; audit des 302 étapes ; remise à zéro du bilan ; masquage des fenêtres.
+- **Saisie des métiers** avec 4 champs (Minage et Forge, rang + plafond) et boutons Appliquer. Ces champs sont inutiles lorsque le jeu fournit déjà les compétences ; l'API du client a priorité.
+- La boussole utilise une **forme géométrique nette** (hampe et chevrons, trois traits sans silhouette répétée). Plus de texture MinimapArrow agrandie. Aucun fond, aucune lumière floue, et **aucun HUD sans destination valide**. Le calcul de distance et le glisser-déposer sont conservés.
+- Les commandes `/wcb` restent disponibles en secours, mais ne sont pas nécessaires pour les réglages habituels.
 
 ### Guides de métiers — 0.6.0-test
 
