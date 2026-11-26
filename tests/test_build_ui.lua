@@ -34,6 +34,9 @@ local function frame()
     local t={}
     function t:SetPoint(...) end
     function t:SetSize(w,h) end
+    function t:SetWidth(w) self.width=w end
+    function t:SetShadowColor(...) self.shadowColor={...} end
+    function t:SetShadowOffset(...) self.shadowOffset={...} end
     function t:SetJustifyH() end
     function t:SetJustifyV() end
     function t:SetText(v) self.text=v end
