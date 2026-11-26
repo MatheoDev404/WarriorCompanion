@@ -1,12 +1,12 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.6.0.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.6.1.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
 
 ## Installation
 
 Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev404/WarriorCompanion/tree/feature/build-planner) puis copier le dossier `Addon/WarriorCompanionBuild` dans le dossier `Interface/AddOns/` de WoW Forever. Le dossier final doit contenir `WarriorCompanionBuild.toc`. Redémarrer le client.
 
-**Minimap :** une icône ronde de guerrier, alignée selon la taille de la minimap comme GearQuest et les autres boutons, apparaît autour de la minimap, déplaçable en la faisant glisser. **Clic gauche** : ouvrir le guide complet ; **clic droit** : ouvrir le mini-bilan (un second clic ne ferme pas la vue, il faut utiliser **Fermer** ou `/wcb hide`) **304 × 88 px** (XP gagnée, temps, morts, solde de session et conseil). Dans le mini, le bouton **>>** ouvre le guide. Les positions sont conservées.
+**Minimap :** une icône ronde de guerrier, alignée selon la taille de la minimap comme GearQuest et les autres boutons, apparaît autour de la minimap, déplaçable en la faisant glisser. **Clic gauche** : ouvrir le guide complet ; **clic droit** : ouvrir le mini-bilan ; **clic molette** : ouvrir les réglages (un second clic ne ferme pas la vue, il faut utiliser **Fermer** ou `/wcb hide`) **304 × 88 px** (XP gagnée, temps, morts, solde de session et conseil). Dans le mini, le bouton **>>** ouvre le guide. Les positions sont conservées.
 
 **Commandes :** `/wcb` ouvre/ferme le guide, `/wcb mini`, `/wcb full`, `/wcb hide`, et les onglets `/wcb talents`, `/wcb equipement`, `/wcb parcours`, `/wcb rotation`, `/wcb reel`. Pour les anciennes options : `/wcb reset` (remise à zéro du bilan), `/wcb autostart on/off` (ouverture auto désactivée par défaut), `/wcb alerts on/off` (ligne de conseil), `/wcb minimap on/off`. Taille du guide par `+`/`-` ; le mini conserve son format d'origine.
 
@@ -26,9 +26,16 @@ Télécharger la branche [`feature/build-planner`](https://github.com/MatheoDev4
 - **Commandes** : `/wcb guide minage`, `/wcb guide forge`, `/wcb guide mixte`, `/wcb guide leveling`, `/wcb metier set minage N CAP`, `/wcb metier set forge N CAP`. Saisie manuelle réservée aux compétences non fournies par le client.
 - **Limites** : certaines recettes rares, les spécialités, les circuits exacts de filons et les PNJ/coordonnées détaillés doivent encore être vérifiés. Les autres métiers (Cuisine, Pêche, Secourisme) pourront être ajoutés au registre sans remplacer l’architecture.
 
+### Réglages accessibles dans l'interface (0.6.1)
+
+- **Sans commande à taper** : bouton **Réglages** sous les quatre onglets de la grande fenêtre, bouton **OPT** sur le mini-bilan ou clic **molette** sur l’icône de la minimap.
+- Le panneau permet : **activer/masquer la boussole**, changer sa taille de 75 à 135 %, remettre la flèche au centre, afficher le mini-bilan, modifier l’ouverture automatique, les alertes et la présence de l’icône minimap ; passer entre **XP rapide / Sécurité**, ouvrir ou reprendre le Parcours, lancer l’audit des étapes, réinitialiser les statistiques et masquer les fenêtres.
+- Deux champs **Minage / Forge** avec rang et maximum offrent une **saisie manuelle de secours** lorsque le client ne sait pas lire la compétence. Une valeur détectée en jeu reste prioritaire.
+- La boussole a désormais une **flèche géométrique très nette en trois traits**, sans halo, ombre de silhouette ni fond. Elle disparaît complètement lorsqu’aucune cible de navigation n’est sélectionnée : pas de texte parasite à l'écran.
+
 ### Nouvelle boussole et guide détaillé 30–40
 
-- La boussole est désormais un **HUD transparent** : une flèche de 68 px avec contour/halo bronze, sans panneau opaque, accompagnée d'une distance et d'un nom d'objectif discrets. On la déplace en glissant la flèche ; la zone transparente ne bloque pas les clics du jeu. Elle dirige vers les coordonnées de l'étape du guide sélectionnée et indique une **distance en ligne droite**, jamais un trajet routier. Si la position, le sens ou la zone est inaccessible, elle affiche une explication plutôt qu'un chiffre inventé. La flèche se déplace par glisser-déposer et sa position est enregistrée. `/wcb compass on/off` permet de l'activer ou la masquer ; `/wcb guide` ouvre directement le guide ; `/wcb guideaudit` affiche son inventaire.
+- La boussole est désormais un **HUD transparent** : une flèche nette dessinée en trois traits bronze (taille réglable), sans halo ni panneau opaque, accompagnée d'une distance et d'un nom d'objectif discrets. On la déplace en glissant la flèche ; la zone transparente ne bloque pas les clics du jeu. Elle dirige vers les coordonnées de l'étape du guide sélectionnée et indique une **distance en ligne droite**, jamais un trajet routier. Si la position, le sens ou la zone est inaccessible, elle affiche une explication plutôt qu'un chiffre inventé. La flèche se déplace par glisser-déposer et sa position est enregistrée. `/wcb compass on/off` permet de l'activer ou la masquer ; `/wcb guide` ouvre directement le guide ; `/wcb guideaudit` affiche son inventaire.
 - Les 302 étapes réimportées sont issues d'une adaptation antérieure OpenXP/RestedXP dans le dépôt. Leur licence **CC BY-NC-SA 4.0** et l'attribution sont conservées dans `DetailedData30_40.lua` et `LICENSE-GUIDE.txt`.
 - **Audit du contenu** : 285 destinations dans 14 zones cartographiées ; 217 actions de quêtes renvoyant à 108 identifiants distincts, recoupés avec l'export de WoW Forever. Le comportement des 302 étapes **n'est pas encore validé individuellement en jeu**, notamment certains prérequis non documentés et des textes anglais qui subsistent.
 
