@@ -229,13 +229,6 @@ function B:ToggleDashboard()
     self:OpenFullDashboard()
   end
 end
-function B:ToggleCompact()
-  if self.compactDashboard and self.compactDashboard:IsShown() then
-    self:HideDashboard()
-  else
-    self:ShowCompact()
-  end
-end
 function B:AutoOpenDashboard()
   if self.didAutoOpen then return end
   self.didAutoOpen=true
