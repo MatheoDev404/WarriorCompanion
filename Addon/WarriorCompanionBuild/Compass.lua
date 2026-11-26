@@ -226,7 +226,9 @@ end
 function B:UpdateCompass()
   local f=self.compassFrame
   if not f then return end
-  if not self.db or self.db.compassEnabled==false then
+  if not self.db or self.db.compassEnabled==false or
+      not self.compassTarget then
+    -- Aucune cible : ne pas couvrir le jeu avec un message inutile.
     f:Hide()
     return
   end
