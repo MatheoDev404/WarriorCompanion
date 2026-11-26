@@ -71,6 +71,7 @@ function B:UpdateLevel() self.updateLevel=(self.updateLevel or 0)+1 end
 function B:Refresh() self.fullRefreshed=(self.fullRefreshed or 0)+1 end
 B.frame=frame()
 B.frame:Hide()
+B.OpenSettings=function(self) self.settingsOpened=(self.settingsOpened or 0)+1 end
 assert(loadfile("Addon/WarriorCompanionBuild/Session.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/CompactDashboard.lua"))("WarriorCompanionBuild",B)
 assert(loadfile("Addon/WarriorCompanionBuild/MinimapButton.lua"))("WarriorCompanionBuild",B)
