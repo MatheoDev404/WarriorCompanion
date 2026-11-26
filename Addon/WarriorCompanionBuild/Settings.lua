@@ -231,6 +231,8 @@ function B:OpenSettings()
  if not self.frame then self:CreateUI() end
  if not self.settingsFrame then self:CreateSettings() end
  if not self.frame:IsShown() then self:OpenFullDashboard() end
+ local route=self.pages and self.pages.parcours
+ if route and route.guideMenu then route.guideMenu:Hide() end
  self:RefreshSettings()
  self.settingsFrame:Show()
 end
