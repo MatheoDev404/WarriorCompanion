@@ -124,28 +124,18 @@ local function show(page,widget,active)
  if active then widget:Show() else widget:Hide() end
 end
 local function progressBars(self,page,id)
- local a,capA,b,capB=self:ProfessionProgressSummary(id)
- if not a then return end
- page.skillCaption:SetText(a)
- local first=a and b and id=="combo" and a or a
- -- Le texte precedent est la premiere valeur ; les rangs suivent.
- local rankA,limitA,rankB,limitB=self:ProfessionProgressSummary(id)
- local fillA=type(limitA)=="number" and limitA>0 and
-  type(rankA)=="number" and math.min(268,268*rankA/300) or 0
- page.skillFill1:SetSize(fillA,3)
+ local caption,rankA,capA,rankB,capB=self:ProfessionProgressSummary(id)
+ page.skillCaption:SetText(caption or "Compétences indisponibles")
+ local sizeA=type(rankA)=="number" and
+   math.max(0,math.min(268,268*rankA/300)) or 0
+ page.skillFill1:SetSize(sizeA,3)
  if id=="combo" then
-  local m,_,_,_=self:ProfessionProgressSummary("mining")
-  local _,smithRank,smithCap=self:ProfessionProgressSummary("smithing")
-  page.skillFill1:SetSize(type(capA)=="number" and
-    type(b)=="number" and 268*b/300 or 0,3)
-  page.skillFill2:SetSize(type(smithRank)=="number" and
-    268*smithRank/300 or 0,3)
+  local sizeB=type(rankB)=="number" and
+    math.max(0,math.min(268,268*rankB/300)) or 0
+  page.skillFill2:SetSize(sizeB,3)
   show(page,page.skillBar2,true)
   show(page,page.skillFill2,true)
  else
-  local _,rank=self:ProfessionProgressSummary(id)
-  page.skillFill1:SetSize(type(rank)=="number" and
-    268*rank/300 or 0,3)
   show(page,page.skillBar2,false)
   show(page,page.skillFill2,false)
  end
