@@ -612,11 +612,17 @@ function B:CreateUI()
   if self.CreateRotationPage then
     self:CreateRotationPage(self.pages.rotation)
   end
+  -- Accessible depuis chaque onglet, sans commande /wcb.
+  self.settingsButton=button(f,604,-457,139,28,"Réglages",function()
+    B:OpenSettings()
+  end)
+  if self.CreateSettings then self:CreateSettings() end
   f:Hide()
   self:ShowPage("talents")
 end
 function B:ShowPage(key)
   if not self.pages or not self.pages[key] then return end
+  if self.settingsFrame then self.settingsFrame:Hide() end
   self.page=key
   if key~="parcours" then self.routeForced=false end
   for id,page in pairs(self.pages) do
