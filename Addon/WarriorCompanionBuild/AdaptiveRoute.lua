@@ -240,7 +240,9 @@ local function currentPosition(self,map)
   return x*100,y*100
 end
 function B:AdaptiveEligibility(step,state)
-  if not step or self:AdaptiveStepDone(step) then return false,"fait" end
+  if not step or self:AdaptiveStatusDone(step,state) then
+    return false,"fait"
+  end
   if state=="PRÉREQUIS MANQUANT" then return false,"prérequis" end
   if step.group then return false,"groupe facultatif" end
   if step.detour then
@@ -306,7 +308,7 @@ function B:AdaptiveSuggestedStep(entries)
     local entry=byId[pinned]
     -- Un choix utilisateur reste libre même pour un donjon ; il cesse
     -- d'être épinglé après accomplissement ou sortie de sa zone.
-    if not self:AdaptiveStepDone(entry.step) then
+    if not self:AdaptiveStatusDone(entry.step,entry.state) then
       return entry.step
     end
   end
