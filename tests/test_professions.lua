@@ -49,6 +49,17 @@ C_Container={
  end,
 }
 assert(B:ReadProfessionBags())
+GetInventoryItemID=function(who,slot)
+ assert(who=="player")
+ if slot==9 then return 3835 end
+ if slot==16 then return 10823 end
+ return nil
+end
+assert(B:ReadProfessionEquipment())
+assert(B:ProfessionIsEquipped(3835) and
+ B:ProfessionIsEquipped(10823)==true and
+ B:ProfessionIsEquipped(7919)==false,
+ "les objets portes sont detectes et conserves")
 local total,inBag,bank=B:ProfessionStock(3575,true)
 assert(total==3 and inBag==3 and bank==nil,
  "ne pas comptabiliser la banque sans lecture")
