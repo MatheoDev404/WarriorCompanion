@@ -242,6 +242,18 @@ assert(B.db.detailedMode and B.pages.parcours.segmentLabel.text:find("guide",1,t
   "l'onglet active le guide detaille")
 assert(#B.routeVisible>=302,
   "les 302 etapes sont conservées, avec détours facultatifs")
+-- Une seule construction du parcours pour l'affichage, quel que soit
+-- l'état des filtres. Le calcul du statut est réutilisé pour le tri.
+local originalAdaptiveEntries=B.AdaptiveEntries
+local adaptiveCalls=0
+B.AdaptiveEntries=function(self,...)
+  adaptiveCalls=adaptiveCalls+1
+  return originalAdaptiveEntries(self,...)
+end
+B:RefreshRoute()
+assert(adaptiveCalls==1,
+  "l'affichage ne doit pas rescanner 302 quetes deux fois")
+B.AdaptiveEntries=originalAdaptiveEntries
 assert(B.pages.parcours.modeButton and
   B.pages.parcours.optionButtons.weapons and
   B.pages.parcours.optionButtons.professions and
@@ -382,6 +394,16 @@ assert(B:ActiveGuide()=="combo" and p.skillBar2.hidden==false and
   p.zone.text:find("Forge 127/225",1,true),
   "le guide combine affiche les deux metiers et la seconde barre")
 assert(#B.routeVisible>=2,"le guide combine propose des objectifs synchronises")
+local originalProfessionEntries=B.ProfessionEntries
+local professionCalls=0
+B.ProfessionEntries=function(self,...)
+  professionCalls=professionCalls+1
+  return originalProfessionEntries(self,...)
+end
+B:RefreshRoute()
+assert(professionCalls==1,
+  "le calcul des ingredients et de la forge ne doit se faire qu'une fois")
+B.ProfessionEntries=originalProfessionEntries
 p.guideSelector.handlers.OnClick()
 p.guideOptions.mining.handlers.OnClick()
 assert(B.routeSelectedId==id,
