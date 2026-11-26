@@ -1,6 +1,8 @@
 # Warrior Companion | Build Planner
 
-**Addon standalone WoW Forever, test 0.6.1.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+**Addon standalone WoW Forever, test 0.6.2.** Un guide de progression pour Guerrier mort-vivant Furie double maniement, pas un tableau de bord de combat.
+
+La version **0.6.2-test** corrige un blocage de démarrage signalé dans le client WoW Forever : l’événement `PLAYERBANKBAGSLOTS_CHANGED` n'y existe pas. Les événements facultatifs non reconnus sont maintenant ignorés et la banque ouverte est rafraîchie par `BAG_UPDATE_DELAYED` lorsqu'il est disponible.
 
 ## Installation
 
