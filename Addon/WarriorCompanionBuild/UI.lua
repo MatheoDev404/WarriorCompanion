@@ -798,33 +798,45 @@ function B:RefreshRoute()
   local detailed=segmentIndex==4 and self.DetailedEntries and
     self.db and self.db.detailedMode~=false
   local adaptive=detailed and type(self.AdaptiveEntries)=="function"
-  local entries=adaptive and self:AdaptiveEntries(self.showCompleted) or
-    (detailed and self:DetailedEntries(self.showCompleted)) or
-    self:RouteSegmentEntries(segmentIndex,self.showCompleted)
+  -- Snapshot unique : ne pas scanner les 302 quêtes deux fois à
+  -- chaque actualisation, ni interroger le journal plusieurs fois.
   local all=adaptive and self:AdaptiveEntries(true) or
     (detailed and self:DetailedEntries(true)) or
     self:RouteSegmentEntries(segmentIndex,true)
-  self.routeVisible=entries
+  local entries={}
   local doneCount=0
-  for _,entry in ipairs(all) do
-    if (adaptive and self:AdaptiveStepDone(entry.step)) or
-      (detailed and not adaptive and self:GuideStepDone(entry.step)) or
-      (not detailed and self:IsStepDone(entry.step)) then
-      doneCount=doneCount+1
+  if adaptive then
+    for _,entry in ipairs(all) do
+      local done=self:AdaptiveStatusDone(entry.step,entry.state)
+      if done then doneCount=doneCount+1 end
+      if self.showCompleted or not done then
+        entries[#entries+1]=entry
+      end
+    end
+  else
+    entries=detailed and self:DetailedEntries(self.showCompleted) or
+      self:RouteSegmentEntries(segmentIndex,self.showCompleted)
+    for _,entry in ipairs(all) do
+      if (detailed and self:GuideStepDone(entry.step)) or
+          (not detailed and self:IsStepDone(entry.step)) then
+        doneCount=doneCount+1
+      end
     end
   end
+  self.routeVisible=entries
   page.segmentLabel:SetText("Segment "..segment[3]..
     (detailed and " · guide" or ""))
   page.count:SetText((#all-doneCount).."/"..#all.." étapes")
   page.modeButton.txt:SetText(
     self.AdaptiveMode and self:AdaptiveMode()=="xp" and "XP rapide" or
       "Sécurité")
+  local optionLabels={weapons="Armes",armor="Armure",
+    professions="Métiers",dungeons="Donjons"}
   for category,buttonFrame in pairs(page.optionButtons) do
-    local enabled=adaptive and self:AdaptiveOptionEnabled(category)
-    local labels={weapons="Armes",armor="Armure",
-      professions="Métiers",dungeons="Donjons"}
+    local enabled=adaptive and self.db and self.db.routeOptions and
+      self.db.routeOptions[category]==true
     buttonFrame.txt:SetText((enabled and "+ " or "- ")..
-      (labels[category] or category))
+      (optionLabels[category] or category))
   end
   page.switchGuide.txt:SetText(detailed and "Vue synthese" or "Guide detaille")
   page.toggleCompleted.txt:SetText(self.showCompleted and
