@@ -122,30 +122,32 @@ SLASH_WARRIORCOMPANIONBUILD1="/wcb"
 SlashCmdList.WARRIORCOMPANIONBUILD=slash
 
 local events=CreateFrame("Frame")
+-- WoW Forever n'expose pas tous les événements des autres versions.
+-- Un nom inconnu déclenche une erreur *pendant le chargement* de l'addon.
+-- Seuls les deux événements indispensables sont requis pour démarrer.
 events:RegisterEvent("ADDON_LOADED")
 events:RegisterEvent("PLAYER_ENTERING_WORLD")
-events:RegisterEvent("PLAYER_LEVEL_UP")
-events:RegisterEvent("PLAYER_XP_UPDATE")
-events:RegisterEvent("PLAYER_DEAD")
-events:RegisterEvent("PLAYER_MONEY")
-events:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-events:RegisterEvent("SPELLS_CHANGED")
-events:RegisterEvent("SKILL_LINES_CHANGED")
-events:RegisterEvent("TRADE_SKILL_SHOW")
-events:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
-events:RegisterEvent("TRADE_SKILL_DATA_SOURCE_CHANGED")
-events:RegisterEvent("BAG_UPDATE_DELAYED")
-events:RegisterEvent("BANKFRAME_OPENED")
-events:RegisterEvent("BANKFRAME_CLOSED")
-events:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
-events:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
-events:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-events:RegisterEvent("QUEST_LOG_UPDATE")
-events:RegisterEvent("QUEST_ACCEPTED")
-events:RegisterEvent("QUEST_REMOVED")
-events:RegisterEvent("QUEST_TURNED_IN")
-events:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-events:RegisterEvent("UNIT_AURA")
+local function registerOptional(name)
+  local ok=pcall(events.RegisterEvent,events,name)
+  if not ok then
+    B.unsupportedEvents=B.unsupportedEvents or {}
+    B.unsupportedEvents[name]=true
+  end
+end
+for _,name in ipairs({
+  "PLAYER_LEVEL_UP","PLAYER_XP_UPDATE","PLAYER_DEAD","PLAYER_MONEY",
+  "GET_ITEM_INFO_RECEIVED","SPELLS_CHANGED","SKILL_LINES_CHANGED",
+  "TRADE_SKILL_SHOW","TRADE_SKILL_LIST_UPDATE",
+  "TRADE_SKILL_DATA_SOURCE_CHANGED","BAG_UPDATE_DELAYED",
+  "BANKFRAME_OPENED","BANKFRAME_CLOSED","PLAYERBANKSLOTS_CHANGED",
+  "PLAYER_EQUIPMENT_CHANGED","QUEST_LOG_UPDATE","QUEST_ACCEPTED",
+  "QUEST_REMOVED","QUEST_TURNED_IN","ZONE_CHANGED_NEW_AREA","UNIT_AURA"
+}) do
+  registerOptional(name)
+end
+-- PLAYERBANKBAGSLOTS_CHANGED n'existe pas sur WoW Forever 1.60.1.
+-- La banque est actualisée via BANKFRAME_OPENED, les sacs et, quand
+-- disponible, PLAYERBANKSLOTS_CHANGED, sans tenter ce RegisterEvent.
 events:SetScript("OnEvent",function(_,event,arg1)
   if event=="ADDON_LOADED" then
     if arg1~=addon then return end
@@ -211,7 +213,6 @@ events:SetScript("OnEvent",function(_,event,arg1)
       event=="BAG_UPDATE_DELAYED" or
       event=="BANKFRAME_OPENED" or event=="BANKFRAME_CLOSED" or
       event=="PLAYERBANKSLOTS_CHANGED" or
-      event=="PLAYERBANKBAGSLOTS_CHANGED" or
       event=="PLAYER_EQUIPMENT_CHANGED" then
     if B.RefreshProfessionObservations then
       B:RefreshProfessionObservations(event)
