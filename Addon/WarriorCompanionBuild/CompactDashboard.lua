@@ -64,7 +64,7 @@ function B:CreateCompactDashboard()
   block(f,2,-2,300,84,.062,.077,.097)
   block(f,3,-3,298,21,.112,.140,.173)
   block(f,3,-24,298,1,.43,.32,.19)
-  font(f,9,-4,252,18,"GameFontNormalSmall",
+  font(f,9,-4,224,18,"GameFontNormalSmall",
        "|cffE9F0F7WARRIOR COMPANION|r  |cffF5B855Mini-bilan|r")
   local expand=CreateFrame("Button",nil,f)
   expand:SetPoint("TOPRIGHT",f,"TOPRIGHT",-4,-3)
@@ -74,6 +74,17 @@ function B:CreateCompactDashboard()
   font(expand,6,-1,20,17,"GameFontNormalSmall",">>")
   expand:SetScript("OnClick",function() B:OpenFullDashboard() end)
   self.compactExpand=expand
+  -- Acces aux reglage depuis le mini, sans fermer manuellement le HUD.
+  local settings=CreateFrame("Button",nil,f)
+  settings:SetPoint("TOPRIGHT",f,"TOPRIGHT",-34,-3)
+  settings:SetSize(26,19)
+  block(settings,0,0,26,19,.46,.35,.22)
+  block(settings,2,-2,22,15,.163,.191,.226)
+  font(settings,3,-1,22,17,"GameFontNormalSmall","OPT")
+  settings:SetScript("OnClick",function()
+    if B.OpenSettings then B:OpenSettings() end
+  end)
+  self.compactSettings=settings
   -- Trois statistiques sur une ligne ; toute la largeur pour la monnaie.
   local names={{"XP",6,20,53},{"TEMPS",83,42,79},{"MORTS",211,40,43}}
   self.compactStats={}
