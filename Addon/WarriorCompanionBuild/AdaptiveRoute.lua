@@ -74,9 +74,6 @@ end
 function B:AdaptiveToggleMode()
   return self:AdaptiveSetMode(self:AdaptiveMode()=="safe" and "xp" or "safe")
 end
-function B:AdaptiveOptionLabel(category)
-  return labels[category]
-end
 function B:AdaptiveOptionEnabled(category)
   self:AdaptiveInit()
   return self.db and self.db.routeOptions and
@@ -162,12 +159,18 @@ function B:AdaptiveStepState(step)
   if step.category=="professions" then return "OPTION MÉTIER" end
   return step.category=="weapons" and "OPTION ARME" or "OPTION ÉQUIPEMENT"
 end
+-- Un seul calcul de statut par étape lors du rendu du parcours.
+-- Les quêtes en attente de rendu ne sont jamais considérées comme faites.
+function B:AdaptiveStatusDone(step,state)
+  if not step then return false end
+  if state=="FAIT (MANUEL)" or state=="IGNORÉE" or
+      state=="QUÊTE RENDUE" then return true end
+  return not step.detour and
+    (state=="QUÊTE ACCEPTÉE" or state=="OBJECTIFS FAITS")
+end
 function B:AdaptiveStepDone(step)
   if not step then return false end
-  if not step.detour then return self:GuideStepDone(step) end
-  local state=self:AdaptiveStepState(step)
-  return state=="FAIT (MANUEL)" or state=="IGNORÉE" or
-    state=="QUÊTE RENDUE"
+  return self:AdaptiveStatusDone(step,self:AdaptiveStepState(step))
 end
 function B:AdaptiveText(step)
   if not step then return "" end
@@ -198,8 +201,9 @@ function B:AdaptiveEntries(showDone)
     lastByPack[step.pack]=i
   end
   local addAfter={}
+  local enabled=self.db and self.db.routeOptions or {}
   for _,step in ipairs(self:AdaptiveDetours()) do
-    if self:AdaptiveOptionEnabled(step.category) then
+    if enabled[step.category]==true then
       local anchor=lastByPack[step.pack]
       if anchor then
         if not addAfter[anchor] then addAfter[anchor]={} end
@@ -208,9 +212,9 @@ function B:AdaptiveEntries(showDone)
     end
   end
   local function add(step)
-    if showDone or not self:AdaptiveStepDone(step) then
-      all[#all+1]={step=step,state=self:AdaptiveStepState(step),
-        order=#all+1}
+    local state=self:AdaptiveStepState(step)
+    if showDone or not self:AdaptiveStatusDone(step,state) then
+      all[#all+1]={step=step,state=state,order=#all+1}
     end
   end
   for i,step in ipairs(self.guideSteps or {}) do
