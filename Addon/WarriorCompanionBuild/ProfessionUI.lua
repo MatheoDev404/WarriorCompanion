@@ -37,8 +37,10 @@ function B:CreateRoutePage(page)
  if type(menu.SetFrameStrata)=="function" then menu:SetFrameStrata("TOOLTIP") end
  if type(menu.SetFrameLevel)=="function" then menu:SetFrameLevel(50) end
  kit.rect(menu,0,0,268,129,kit.PANEL)
+ page.guideOptions={}
  for i,guide in ipairs(self:GuideRegistry()) do
-  kit.button(menu,5,-4-(i-1)*30,258,28,guide.name,function()
+  page.guideOptions[guide.id]=kit.button(menu,5,-4-(i-1)*30,
+    258,28,guide.name,function()
    B:SetActiveGuide(guide.id)
    menu:Hide()
    B:RefreshRoute()
