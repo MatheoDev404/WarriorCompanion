@@ -3,6 +3,8 @@
 local function frame()
  local f={shown=true,scripts={}}
  function f:SetSize(w,h) self.width=w self.height=h end
+ function f:SetScale(scale) self.scale=scale end
+ function f:ClearAllPoints() self.point=nil end
  function f:SetPoint(...) self.point={...} end
  function f:SetFrameStrata(v) self.strata=v end
  function f:SetMovable(value) self.movable=value end
@@ -18,6 +20,7 @@ local function frame()
   self.textures=self.textures or {}
   local t={}
   function t:SetAllPoints() end
+  function t:ClearAllPoints() self.point=nil end
   function t:SetTexture(v) self.texture=v end
   function t:SetSize(w,h) self.width=w self.height=h end
   function t:SetPoint(...) self.point={...} end
@@ -74,16 +77,16 @@ assert(result.method=="world" and result.distance==10 and
  result.reached and math.abs(result.angle)<0.001,
  "la cible au nord est en face a 10 metres")
 local f=B:CreateCompass()
-assert(f.width==180 and f.height==112 and f:IsShown(),
+assert(f.width==180 and f.height==108 and f:IsShown(),
  "le widget transparent garde de la place pour la fleche agrandie")
 assert(f.mouseEnabled==false and f.dragHandle.mouseEnabled==true,
  "seule la fleche intercepte les clics, pas la zone transparente")
-assert(f.dragHandle.width==76 and f.dragHandle.dragButton=="LeftButton",
+assert(f.dragHandle.width==68 and f.dragHandle.dragButton=="LeftButton",
  "le HUD reste deplacable a la souris")
-assert(#f.textures==3 and f.arrow.width==68 and
-  f.arrow.height==68 and f.arrowShadow.width==72 and
-  f.arrowGlow.width==76,
- "aucun fond opaque, fleche principale 68px et silhouettes contrastantes")
+assert(#f.textures==3 and #f.arrowParts==3 and
+  f.arrow.width==4 and f.arrow.height==43 and
+  f.arrowLeft.height==28 and f.arrowRight.height==28,
+ "fleche vectorielle sobre : hampe et chevrons, sans silhouette agrandie")
 for _,layer in ipairs(f.textures) do
   assert(layer.bg==nil,"pas de fond ni barre de decoration")
 end
@@ -91,8 +94,10 @@ assert(f.distance.shadowOffset and f.description.shadowOffset,
  "ombres du texte pour contraste sans panneau")
 B:SetCompassTarget(target)
 assert(f.distance.text=="Destination atteinte" and marked==1)
-assert(f.arrow.rotation==0 and f.arrowGlow.rotation==0 and
- f.arrowShadow.rotation==0,"toutes les couches pivotent ensemble")
+assert(f.arrow.rotation==0 and
+ math.abs(f.arrowLeft.rotation-math.pi/4)<.001 and
+ math.abs(f.arrowRight.rotation+math.pi/4)<.001,
+ "les bras conservent leurs angles de base")
 B:UpdateCompass()
 assert(marked==1,"arrivee detectee une seule fois")
 function GetPlayerFacing() return math.pi/2 end
@@ -100,9 +105,9 @@ result=B:CompassDirection(target)
 assert(math.abs(result.angle+math.pi/2)<0.001)
 B:UpdateCompass()
 assert(math.abs(f.arrow.rotation-math.pi/2)<.001 and
- math.abs(f.arrowGlow.rotation-f.arrow.rotation)<.001 and
- math.abs(f.arrowShadow.rotation-f.arrow.rotation)<.001,
- "orientation des contours alignee sur la fleche")
+ math.abs(f.arrowLeft.rotation-math.pi/4-math.pi/2)<.001 and
+ math.abs(f.arrowRight.rotation+math.pi/4-math.pi/2)<.001,
+ "la hampe et les deux bras tournent ensemble")
 function GetPlayerFacing() return 0 end
 targetInstance=2
 result=B:CompassDirection(target)
@@ -130,10 +135,17 @@ assert(not f:IsShown())
 B:SetCompassEnabled(true)
 assert(f:IsShown())
 B:SetCompassTarget(nil)
-assert(f.arrow.visible==false and f.arrowShadow.visible==false and
- f.arrowGlow.visible==false and
+assert(f.arrow.visible==false and f.arrowLeft.visible==false and
+ f.arrowRight.visible==false and
  f.distance.text=="Aucun objectif avec coordonnées",
  "aucun artefact lumineux ne reste sans cible")
+assert(B:SetCompassScale(1.23) and
+ B.db.compassScale==1.25 and f.scale==1.25,
+ "taille HUD reglable par increments de 5 %")
+assert(B:SetCompassScale(0.1) and B.db.compassScale==.75,
+ "taille minimum protegee")
+assert(B:SetCompassScale(5) and B.db.compassScale==1.35,
+ "taille maximum protegee")
 f:GetCenter()
 f.GetCenter=function() return 520,470 end
 f.dragHandle.scripts.OnDragStart()
@@ -141,4 +153,4 @@ assert(f.moving==true)
 f.dragHandle.scripts.OnDragStop()
 assert(f.moving==false and B.db.compassPoint.x==20 and
  B.db.compassPoint.y==-30,"deplacement et position sauvegardes")
-print("OK: boussole transparente 68px, ombres synchronisees, glisser, monde/carte et secrets")
+print("OK: boussole vectorielle sans fond, chevrons nets, taille reglable, navigation et secrets")
