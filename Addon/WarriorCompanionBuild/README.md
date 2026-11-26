@@ -1,103 +1,82 @@
-# Warrior Companion | Build Planner — 0.6.2-test
+# Warrior Companion Build — 0.6.3-test
 
-**Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
+**Addon autonome** pour WoW Forever 1.60.1 (`## Interface: 16001`).
+Installation : placer ce dossier `WarriorCompanionBuild` dans
+`World of Warcraft/Interface/AddOns/`, puis redémarrer le client.
+Ne pas confondre avec l'ancien addon `WarriorCompanion` conservé dans la
+branche Git `main`.
 
-**Correctif 0.6.2-test :** sur certaines versions de Forever, `PLAYERBANKBAGSLOTS_CHANGED` provoque une erreur Lua lors de `RegisterEvent`. L'événement n'est plus enregistré ; les autres événements non reconnus ne bloquent plus le chargement. La banque ouverte est actualisée via `BANKFRAME_OPENED`, `BAG_UPDATE_DELAYED` et, s'il existe, `PLAYERBANKSLOTS_CHANGED`.
+## Fonctionnalités conservées
 
-## Installation
+- **Talents** : les 3 arbres Armes/Furie/Protection, allocations déjà investies,
+  simulation de niveaux et choix Furie/hybride.
+- **Équipement** : recommandations par palier, quêtes, forge et options de
+  donjon ; icônes et infobulles, liaison vers le Parcours.
+- **Parcours** : 302 étapes détaillées du niveau 30–40 (14 sections), quêtes
+  suivies via le journal, prérequis connus, reprise après déviation, modes
+  Sécurité/XP rapide et filtres Armes/Armure/Métiers/Donjons. Les niveaux hors
+  30–40 ne sont pas encore exhaustifs.
+- **Guides métiers** : Minage 1–300, Forge 1–300, guide combiné avec petits lots
+  de fabrication, calcul des barres à fondre et des matériaux manquants,
+  lecture des compétences, recettes, sacs et banque si accessible.
+- **Rotation** : monocible/multicible, buffs, priorités et CD, avec les sorts
+  et rangs réellement appris quand l'API du jeu les expose.
+- **Boussole** : flèche nette sans fond, direction et distance en ligne droite,
+  zoom et position mémorisés, masquée sans destination.
+- **Mini-bilan** : XP, temps, morts, monnaie et conseils ; icône minimap et
+  panneau Réglages, tous deux accessibles à la souris.
 
-1. Depuis la branche GitHub `feature/build-planner`, télécharger l'archive ZIP.
-2. Extraire **uniquement** `Addon/WarriorCompanionBuild` vers `World of Warcraft/Interface/AddOns/WarriorCompanionBuild/`.
-3. Vérifier que `Interface/AddOns/WarriorCompanionBuild/WarriorCompanionBuild.toc` existe.
-4. Pour tester sans chevauchement, désactiver temporairement l'ancien addon `WarriorCompanion` dans le sélecteur d'addons. Redémarrer WoW Forever.
-5. **Par défaut**, aucune fenêtre ne s'ouvre automatiquement ; un bouton guerrier apparaît autour de la minimap. Clic gauche pour ouvrir le guide, clic droit pour ouvrir le mini-bilan, sans fermeture par répétition d'un clic.
-6. Utiliser `/wcb` si le bouton est masqué ou si la minimap n'est pas disponible.
+## Contrôles
 
-### Mini-bilan d'origine et accès depuis la minimap
+**Minimap :** clic gauche = grand guide ; clic droit = mini-bilan ; clic molette
+= réglages. Le bouton **OPT** du mini-bilan et **Réglages** sous les quatre
+onglets ouvrent également la configuration.
 
-- Mini-fenêtre **304 × 88 px** reprenant les informations de l'ancien mais avec palette anthracite/bronze cohérente avec la grande interface ; fidèle à l'ancien `CompactDashboard.lua` : XP gagnée, temps écoulé, morts, delta de monnaie de la session (or/argent/cuivre, couleurs positives/négatives) et une ligne d'alerte. Actualisation périodique toutes les trois secondes ou à un événement de session.
-- **Déplacement libre**, position du mini mémorisée dans `WCBuildDB.compactPoint`, bouton **>>** pour développer. La fermeture du guide après un développement depuis le mini le restaure.
-- **Icône circulaire style LibDBIcon/GearQuest autour de la minimap** (taille réelle de la minimap / 2 + 5, icône de 20 px centrée sans masque déformant, contour Blizzard), position angulaire mémorisée ; clic gauche : ouvrir le guide complet ; clic droit : ouvrir le mini, sans fermer au second clic ; glisser-déposer : repositionner l'icône.
-- Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si une API renvoie un nombre secret (mécanisme de protection Forever), l'addon ne le compare ni ne le calcule : il affiche une valeur indisponible au lieu de planter. Les positions et le drag de la minimap appliquent la même protection.
-- **Options identiques** : `/wcb mini`, `/wcb full`, `/wcb hide`, `/wcb autostart on/off`, `/wcb reset`, `/wcb alerts on/off`. Ajout de `/wcb minimap on/off`. Par défaut, l'ouverture automatique est **désactivée** ; activable pour retrouver l'ancienne expérience. Les préférences sont dans `WCBuildDB`.
-- L'ancienne logique générale de conseils n'est pas importée intégralement : la ligne conserve les alertes sûres (points non dépensés si API présente, vie basse, morts répétées). Le mini reste autonome du vieux dossier `WarriorCompanion`.
+**Parcours :** menu déroulant en haut pour changer de guide ; modes
+XP/Sécurité, filtres facultatifs et bouton Reprendre. Chaque guide conserve
+sa sélection et son défilement dans `WCBuildDB`.
 
-### Interface sans commandes — 0.6.1-test
+**Saisie de secours :** les réglages permettent de saisir le rang et plafond
+de Minage/Forge lorsque le client ne fournit pas les compétences ; une valeur
+détectée par le jeu reste prioritaire.
 
-- Accès à **Réglages** depuis le bouton de la grande fenêtre, **OPT** sur le mini-bilan ou **clic molette sur l’icône minimap**. Les clics gauche/droit précédents ne changent pas.
-- Panneau de configuration : boussole affichée/masquée ; zoom 75–135 % par incréments de 5 % et recentrage ; affichage du mini-bilan ; démarrage automatique ; alertes ; visibilité minimap ; choix XP/Sécurité ; accès et reprise du Parcours ; audit des 302 étapes ; remise à zéro du bilan ; masquage des fenêtres.
-- **Saisie des métiers** avec 4 champs (Minage et Forge, rang + plafond) et boutons Appliquer. Ces champs sont inutiles lorsque le jeu fournit déjà les compétences ; l'API du client a priorité.
-- La boussole utilise une **forme géométrique nette** (hampe et chevrons, trois traits sans silhouette répétée). Plus de texture MinimapArrow agrandie. Aucun fond, aucune lumière floue, et **aucun HUD sans destination valide**. Le calcul de distance et le glisser-déposer sont conservés.
-- Les commandes `/wcb` restent disponibles en secours, mais ne sont pas nécessaires pour les réglages habituels.
+Commandes facultatives de dépannage : `/wcb help`, `/wcb guide`,
+`/wcb guide mixte`, `/wcb mode securite`, `/wcb mode xp`,
+`/wcb reprendre`, `/wcb compass on/off`.
 
-### Guides de métiers — 0.6.0-test
+## Compatibilité et limites
 
-- **Sélection multi-guides** dans Parcours : Leveling 1–60 (guide existant), Minage 1–300, Forge 1–300 et Minage + Forge 1–300. Menu déroulant dans la même direction graphique anthracite/bronze. Les quatre onglets Talents, Équipement, Parcours et Rotations restent présents.
-- **Progression séparée** : `WCBuildDB.activeGuide` et `professionProgress[guideId]` enregistrent le guide choisi, le scroll, l’objectif sélectionné, le filtre des objectifs terminés et les validations manuelles de ce guide. On ne marque pas artificiellement les points de métier gagnés.
-- **Détection** : `GetProfessions / GetProfessionInfo` identifient les compétences et plafonds en français ou par IDs 186/164. `C_TradeSkillUI` fournit les recettes apprises et, lorsque le schéma est exploitable, leurs ingrédients. `C_Container` / API de sacs lit les stacks ; banque capturée uniquement lorsqu’elle est ouverte, puis classée périmée après fermeture/reconnexion. `GetInventoryItemID` compare l’objet produit à celui déjà équipé (pas de score DPS arbitraire). Les API manquantes et valeurs secrètes sont ignorées.
-- **Minage 1–300** : cuivre (1), étain (65), fer (125), mithril (175), thorium (245 et 275 pour filons riches), ainsi que argent, or et vrai-argent. Les zones de récolte sont proposées selon le niveau et la carte, sans waypoints inventés. Le recours à la fonte est possible pour les composants de forge, sans prétendre qu’une recette grise donne de l’XP métier.
-- **Forge 1–300** : 16 paliers de recettes sourcées Forever, du début (pierres à aiguiser, boucles) aux armures, armes à une main et plans rares. Chaque lot comprend au plus cinq créations ; on recalcule après les gains de compétence, qui sont probabilistes quand la recette n’est plus orange. Les sources incertaines restent affichées à vérifier.
-- **Combiné** : choisit le prochain palier de Forge, ses ingrédients, les ressources effectivement en sacs/banque accessible, les barres à fondre et les minerais à obtenir. Le premier scénario de test simule un Mort-vivant niveau 35 à Forge 127/225 et Minage 169/225, avec objectif Minage 175. Le plan de matériaux utilise un inventaire partagé, sans compter deux fois une même barre.
-- **Commandes** : `/wcb guide minage|forge|mixte|leveling`, `/wcb metier set minage 169 225`, `/wcb metier set forge 127 225`. L’entrée manuelle est refusée quand une valeur sûre du jeu est disponible.
-- **Documentation des données** : `ProfessionData.lua` référence ForeverChanges et le guide de Forge Zephras 1.60.1. Les zones incluent des seuils de confort de personnage *indicatifs*, pas des niveaux officiels de tous les monstres. Le guide ne fabrique pas de coordonnées de vendeurs, gisements ou formateurs ; la boussole reste masquée sans destination vérifiée.
-- **À compléter en jeu** : zones sûres/circuits exacts, ingrédients de recettes nouvelles si le client ne livre pas le schéma, plans spéciaux, conditions de spécialisation, comparaison de statistiques, éventuels nouveaux rangs et compatibilité des événements de métier sur 1.60.1.
+L'événement `PLAYERBANKBAGSLOTS_CHANGED`, inconnu de Forever, n'est pas
+enregistré. Les autres événements non indispensables sont protégés ; la
+banque est rafraîchie uniquement lorsque l'API est disponible, et ses stocks
+fermés sont exclus du calcul.
 
-### Parcours adaptatif — étape B (30–40)
+Les valeurs secrètes ou absentes du client ne doivent pas être comparées ni
+utilisées comme des mesures connues. Aucune localisation de gisement,
+distance intercontinentale, disponibilité de recette ou XP/heure n'est
+inventée. Le guide aide à décider, il ne déplace pas le joueur et n'exécute
+aucun sort.
 
-- **Modes XP/Sécurité** : bouton dans le bandeau du Parcours. Sécurité par défaut filtre les paliers supérieurs et privilégie les quêtes solo ; XP rapide autorise des sections jusqu'à un niveau au-dessus et valorise davantage les quêtes rapprochées. Ce classement est **heuristique** : les niveaux de sections ne sont ni des niveaux d'ennemis certifiés ni une mesure d'XP/heure.
-- **Enchaînement et statut** : une action « Faire » ne peut être proposée si sa quête n'est pas acceptée ; « Rendre » attend que les objectifs soient prêts. Les prérequis connus sont vérifiés, les inconnus signalés. Les actions déjà accomplies disparaissent des recommandations.
-- **Regroupement par région** : les étapes sont comparées par mapID et, lorsque les données sont disponibles, par proximité sur **la même carte**. Aucun coût de trajet intercontinental ou estimation de voyage n'est fabriqué.
-- **Récupération après déviation** : le moteur révise la proposition sur les événements de quête, de changement de niveau ou de zone. La sélection manuelle épinglée reste distincte de la sélection automatique ; le bouton « Reprendre » libère le choix manuel et recalcule le meilleur objectif.
-- **Détours filtrables** : Armes, Armure, Métiers, Donjons. Les détours puisent dans le guide synthétique déjà documenté (forge, livres de cuisine, équipements de quête et boss). Ils se glissent près de la section pertinente, sans remplacer les 302 étapes originales. Aucun donjon ou butin n'est imposé automatiquement, même si la catégorie Donjons est affichée.
-- **Réglages persistants** : `WCBuildDB.routeMode`, `WCBuildDB.routeOptions` et `WCBuildDB.guidePinned`. Commandes `/wcb mode securite`, `/wcb mode xp`, `/wcb reprendre` et `/wcb guide`.
-- **Limites** : les coordonnées des détours ajoutés ne sont pas inventées ; ils n'affichent pas de flèche tant qu'un waypoint vérifié manque. L'optimisation XP/heure, les niveaux exacts des monstres et toutes les chaînes de prérequis restent à mesurer ou confirmer en jeu.
+Les tests hors jeu couvrent Lua 5.1/5.4, mais la compatibilité effective
+des APIs, fenêtres et coordonnées doit être confirmée sur le client Forever.
 
-### Guide détaillé et boussole — pilote 30–40
+## Licences, sources et attribution
 
-- **302 étapes importées** d'une adaptation OpenXP/RestedXP précédemment conservée sur `main` : 14 sections, 285 positions sur les cartes, 217 actions de quête avec 108 IDs distincts. Attribution dans `DetailedData30_40.lua`, texte de licence dans `LICENSE-GUIDE.txt` (**CC BY-NC-SA 4.0** : utilisation et réutilisation non commerciales avec attribution et partage aux mêmes conditions).
-- **Vue par défaut** : dans le segment 30–40, le bouton « Vue synthèse » permet de retrouver l'ancien parcours (forge, équipement, donjons), tandis que « Guide détaillé » affiche toutes les étapes de la tranche. L'étape recommandée est centrée dans la liste quand la progression change.
-- **Adaptation au niveau/à la zone** : reprise dans une section proche du niveau réel et du hub dominant ; une quête en cours ou prête à rendre peut devenir prioritaire. L'import n'invente pas les liens de prérequis manquants ; seules les dépendances de quêtes explicitement renseignées dans le guide synthétique sont appliquées. Les autres restent à confirmer.
-- **Suivi automatique** par `C_QuestLog` : « accepter » devient fait lorsque la quête figure dans le journal, « objectifs » lorsqu'elle est prête à rendre, « rendre » uniquement une fois la quête effectivement rendue. Les étapes de combat sans ID de quête ne sont pas considérées comme terminées par simple proximité.
-- **Manuel** : une étape sans preuve peut être marquée faite ou ignorée. Cette action reste séparée du journal du jeu et peut être annulée ; la quête n'est jamais déclarée rendue artificiellement.
-- **Boussole HUD transparent (0.4.1)** : `/wcb compass on/off`. Flèche principale agrandie de 34 à **68 px**, avec ombre et halo bronze synchronisés lors de la rotation ; aucun rectangle de fond et textes discrets ombrés. La souris ne bloque le jeu que sur la flèche, et le glisser-déposer depuis celle-ci conserve sa position. Flèche déplaçable avec position enregistrée ; met à jour l'orientation et la distance en ligne droite (~ toutes les 0,2 s) depuis les fonctions de carte/position du client, avec fallback strictement dans la même zone lorsque les coordonnées mondiales ne sont pas disponibles. Le parcours n'invente ni itinéraire de vol, ni distance à travers les continents. Étapes sans coordonnées : affichage d'un diagnostic. Seuls les simples déplacements peuvent être cochés automatiquement à l'arrivée.
-- **Audit** : `/wcb guideaudit` et `tests/test_guide_source_audit.py`. Les 108 IDs uniques ont été recoupés avec le fichier `Data/VanillaQuestIDs.lua` de `prezus/ForeverGuide` (export Forever), les 285 coordonnées se situent dans l'intervalle 0–100 de 14 zones reconnues. Il ne s'agit pas d'une vérification des points géographiques, chemins, difficultés et chaînes en jeu.
-- **Limitations du pilote** : descriptions historiques parfois anglaises, actions sans ID qu'il faut confirmer manuellement, ordre originel à optimiser, prérequis non encore catalogués pour toutes les quêtes. La flèche est un indicateur de direction, pas un pathfinding.
-- **Démarrage rapide** : `/wcb guide` pour ouvrir directement le segment et `/wcb compass on` pour l'afficher.
+**IMPORTANT — à conserver dans toute distribution :**
 
-### Contrôles
+- Les 302 étapes 30–40 de `DetailedData30_40.lua` sont adaptées d'anciennes
+  données **OpenXP/RestedXP** déjà présentes dans le dépôt. La licence
+  **CC BY-NC-SA 4.0** est reproduite en entier dans
+  [LICENSE-GUIDE.txt](LICENSE-GUIDE.txt). Attribution et conditions de
+  redistribution non commerciale et de partage à l'identique applicables.
+- Arbres de talents : [Zephras](https://zephras.com/data/), build 1.60.1,
+  arrangement et données adaptées **CC BY 4.0** ; libellés de secours en
+  français. Noms, graphismes et sorts © Blizzard Entertainment.
+- Routes et quêtes : [ForeverTavern](https://forevertavern.net/),
+  [Wowhead Forever](https://www.wowhead.com/forever/),
+  [WoW Forever Leveling](https://wowforeverleveling.com/). Références de
+  comparaison, pas des garanties de disponibilité dans le client.
+- Métiers : [ForeverChanges](https://foreverchanges.pro/fr/professions/mining)
+  et [Zephras — Forge](https://zephras.com/forever/enUS/profession-guide/164/).
 
-- **Talents / Équipement / Parcours / Rotation** : les 4 onglets.
-- `<` et `>` en haut : visualiser le plan à un autre niveau **sans changer le niveau réel**.
-- **Niv réel** : revenir au niveau actuel et à son suivi automatique.
-- **− / +** : réduire / agrandir l'interface. Par défaut 82 %, plage 65–115 %. La position et l'échelle sont sauvegardées. En-tête déplaçable au clic gauche.
-- Les boutons **− / +** suffisent pour ajuster l’échelle : aucun préréglage compact ou grand.
-- **Talents** : **trois arbres Armes / Furie / Protection côte à côte** avec les 53 talents, bordures ambrées pour les points déjà attribués et icônes non investies estompées ; le point investi au niveau consulté est bordé d'or. Le bouton du bas compare **Furie pure** et une variante expérimentale **Armes/Furie** (13/38) sans modifier le personnage. Survol des icônes pour les rangs et prérequis.
-- **Équipement** : les cibles les plus pertinentes **accessibles au palier prévisualisé**. Liste pleine largeur sans doublon descriptif à droite : cinq cibles visibles, défilement vertical à la molette (ou curseur sur le côté) : objets du niveau d'abord, puis **paliers futurs** grisés et marqués « PLUS TARD ». Le bouton « Paliers suivants » est supprimé. Icône, nom, niveau et fiche au survol. **Voir dans Parcours** ouvre la quête/fabrication ou le boss lié. Deux butins du boss Hérode (casque de berserker, épaulières) et le **Fendoir de Glouton** (#10772, hache une main sur Glouton aux Souilles de Tranchebauge) sont ajoutés comme options de groupe au niveau 37 ; pas de hache à deux mains pour un build double maniement. Classement heuristique, pas de rang GearQuest revendiqué ; la pertinence réelle dépend des armes déjà équipées. Les classements sont heuristiques, pas une comparaison de DPS avec ton équipement.
-- **Parcours** : icône d'objet récupéré sur la carte active (infobulle native), bouton **Détails** (comment compléter la quête, objectif du journal, type de butin). Pour une fabrication, Forge requise, ID de recette et indication de son acquisition connue ou à vérifier ; pour un drop, nom du boss et avertissement sur l'aléatoire. Tranches non superposées 1–9, 10–19, 20–29, **30–40**, 41–50 et 51–60. Toute la tranche est en liste, avec molette et glissière; boutons pour passer à une autre tranche. L'API moderne `C_QuestLog` détecte les quêtes acceptées (`EN COURS`), prêtes à rendre (`A RENDRE`) et déjà rendues (masquées par défaut, réaffichables). Les quêtes ne se valident plus manuellement; seuls trajets/ateliers peuvent l'être. Les badges distinguent quêtes XP, option, équipement et groupe. L'ordre 30–40 regroupe prudemment les hubs et favorise le solo, **sans mesure garantie du temps de trajet**. Les autres tranches, notamment 51–60, restent des aperçus non exhaustifs.
-
-- **Rotation** : onglet **Monocible / Multicible** avec **buffs à maintenir**, **ouverture**, **boucle principale**, **réactions/procs** (Fulgurance déclenche le GCD), **CD offensifs** et **défensifs**. Rage sanguinaire est identifiée **hors GCD**, tandis que Fulgurance reste réactive **sur GCD**. Une ligne de boucle réelle est donnée selon le niveau, avec les trois réactions affichables. **Fracasser armure** (rang 1 à 10, nouveaux rangs 22/34/46/58) est ajouté pour les adversaires robustes. L'icône et l'ID d'**Ivresse de la victoire** sont corrigés (#402927). Les sorts appris n'affichent plus « Dans le grimoire » : seuls les apprentissages manquants, rangs supérieurs disponibles ou buffs utiles ont une mention. Le grimoire est lu avec les noms de familles de sorts et leurs rangs (y compris sans accents et quand une API facultative manque), plutôt que de déclarer « non appris » à tort. Aucune automatisation de sorts.
-
-**Police :** sans empattement `Fonts\\ARIALN.TTF`, déjà présente dans le client WoW, proche visuellement de Roboto ; aucun fichier de police distribué.
-
-### Couverture réelle
-
-**Validé structurellement par tests :** les 3 arbres (17 Armes, 18 Furie, 18 Protection) avec leurs 51 allocations Furie pure et hybride vérifiées par palier, niveaux d'équipement et sources quête/forge seulement, chaque objet relié à une étape de route, sauts vers cette étape, prévisualisation du niveau, états « plus tard »/« groupe »/« chaîne à vérifier ».
-
-**Pilote détaillé : niveaux 30–40, avec les quêtes de classe Guerrier #1718/#1719, les objectifs de Désolace #5561 et #5386, l'arrêt Wulan (Cuisine experte), les quêtes XP des Salines #1105/#1175, et une chaîne Gelkis facultative jusqu'aux niveaux 42–43**. L'ordre des hubs a été recoupé entre ForeverTavern et plusieurs guides Horde; les **PNJ et quêtes individuelles non confirmées** restent explicitement « à vérifier ». En-dessous de 30 ou au-dessus de 40 : **simple vue d'ensemble des zones 1–60**, non une route de quêtes exhaustivement validée. Les options donjon (Monastère écarlate / Maraudon à 45+) ne sont pas obligatoires en solo.
-
-**Non encore validé en jeu :** les clics de l'icône, le déplacement autour de la minimap, les compteurs après un changement de niveau, l'état du journal et le défilement sur le client réel, la lecture des icônes par FileDataID, la récupération des icônes d'objets via le cache client sur la version du client, l'apparence des infobulles, l'échelle selon résolution, les traductions des noms qui ne figurent pas dans le client, les récompenses locales et les raccourcis `/wcb`. Le build Furie pur et la variante 13/38 sont des points de comparaison, **pas une démonstration du DPS maximum**. Les descriptions de rang exactes proviennent du tooltip jeu lorsqu'il est accessible.
-
-Aucun achat, déplacement, allocation de talent ou lancement de sort automatique.
-
-**Avertissement de fiabilité :** l'arme Bludgeon of Betrayed Virtues #271802 vient de la quête Forever **Khan Jehn #93128** (longue chaîne Gelkis, réputation Honoré, objectif prévu vers le niveau 43), et non de la quête classique homonyme #1374. Voir [l'audit](../../docs/QUEST_AUDIT_30_45.md). La base de talents a été extraite du build 70938, alors que la base en ligne mentionne 71037 : les changements futurs doivent être confrontés au client.
-
-## Sources et attribution
-
-- **Talents :** Zephras, `zephras-talents/1`, build `1.60.1.70938`, https://zephras.com/data/ — arrangement et valeurs dérivées sous **CC BY 4.0**, adaptation manuelle (Furie seulement, libellés français de secours). Noms, sorts et icônes © Blizzard Entertainment.
-- **Quêtes et route :** https://forevertavern.net/guides/leveling/horde/thousand-needles-33-34 , https://forevertavern.net/guides/leveling/horde/desolace-34-36 , https://wowforeverleveling.com/guides/wow-forever-horde-leveling-guide .
-- **Arme de quête :** https://www.wowhead.com/forever/quest=1048 — Sword of Omen (6802), niveau minimum 33, quête Horde de donjon. À vérifier en jeu.
-- **Maraudon (après 45) :** https://www.wowhead.com/forever/quest=7064 — Thrash Blade (17705). Groupe requis ; la disponibilité exacte côté Horde doit être confirmée.
-- **Forge :** https://www.wowhead.com/forever/spell=3508 — Green Iron Hauberk (3844), niveau requis 31, Forge 155 selon WoW Forever. https://www.wowhead.com/forever/spell=3507 — Golden Scale Leggings (3843), niveau requis 29, Forge 170 selon la fiche courante. Des sites de comparaison de builds montrent d'autres seuils ; prendre le nombre affiché dans le client comme arbitre.
-- **Comparaison :** https://www.wowhead.com/forever/guide/classes/warrior/fury/dps-leveling-tips et https://mobalytics.gg/wow-forever/classes/1-60-fury-warrior-leveling-guide (priorités/variantes). Leur itinéraire n'est pas copié.
-
-Les documents de conception sont dans `docs/` au niveau du dépôt.
+Consulter les audits et l'architecture dans `docs/` à la racine du dépôt.
