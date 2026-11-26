@@ -113,7 +113,11 @@ assert(B.minimapButton.point[4]~=xBefore and
   "le rayon suit le redimensionnement de la minimap")
 Minimap.mapWidth,Minimap.mapHeight=140,140
 B:UpdateMinimapButton()
-assert(B.minimapButton.clickButtons[2]=="RightButtonUp")
+assert(B.minimapButton.clickButtons[2]=="RightButtonUp" and
+  B.minimapButton.clickButtons[3]=="MiddleButtonUp")
+B.minimapButton.scripts.OnClick(B.minimapButton,"MiddleButton")
+assert(B.settingsOpened==2,
+  "la molette sur la minimap ouvre directement les reglages")
 B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
 assert(B.frame:IsShown() and B.db.displayMode=="full")
 B.minimapButton.scripts.OnClick(B.minimapButton,"LeftButton")
