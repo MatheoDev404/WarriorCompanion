@@ -77,8 +77,8 @@ assert(result.method=="world" and result.distance==10 and
  result.reached and math.abs(result.angle)<0.001,
  "la cible au nord est en face a 10 metres")
 local f=B:CreateCompass()
-assert(f.width==180 and f.height==108 and f:IsShown(),
- "le widget transparent garde de la place pour la fleche agrandie")
+assert(f.width==180 and f.height==108 and not f:IsShown(),
+ "sans objectif le HUD n'encombre pas la vue")
 assert(f.mouseEnabled==false and f.dragHandle.mouseEnabled==true,
  "seule la fleche intercepte les clics, pas la zone transparente")
 assert(f.dragHandle.width==68 and f.dragHandle.dragButton=="LeftButton",
@@ -93,6 +93,7 @@ end
 assert(f.distance.shadowOffset and f.description.shadowOffset,
  "ombres du texte pour contraste sans panneau")
 B:SetCompassTarget(target)
+assert(f:IsShown(),"une cible active fait apparaître la fleche")
 assert(f.distance.text=="Destination atteinte" and marked==1)
 assert(f.arrow.rotation==0 and
  math.abs(f.arrowLeft.rotation-math.pi/4)<.001 and
@@ -135,10 +136,8 @@ assert(not f:IsShown())
 B:SetCompassEnabled(true)
 assert(f:IsShown())
 B:SetCompassTarget(nil)
-assert(f.arrow.visible==false and f.arrowLeft.visible==false and
- f.arrowRight.visible==false and
- f.distance.text=="Aucun objectif avec coordonnées",
- "aucun artefact lumineux ne reste sans cible")
+assert(not f:IsShown(),
+ "aucune destination : aucun element de HUD ne doit rester a l'ecran")
 assert(B:SetCompassScale(1.23) and
  B.db.compassScale==1.25 and f.scale==1.25,
  "taille HUD reglable par increments de 5 %")
