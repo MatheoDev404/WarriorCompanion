@@ -1,4 +1,4 @@
-# Warrior Companion | Build Planner — 0.5.0-test
+# Warrior Companion | Build Planner — 0.6.0-test
 
 **Addon autonome de test**, distinct du vieux `WarriorCompanion`, pour **WoW Forever** (interface `16001`). Il ne remplace pas l'ancien projet et peut être supprimé sans perdre ses sauvegardes.
 
@@ -19,6 +19,18 @@
 - Le suivi de session recommence à chaque connexion ou avec `/wcb reset`. L'XP est observée par les API de personnage ; les gains lors d'un changement de niveau sont calculés prudemment. Si une API renvoie un nombre secret (mécanisme de protection Forever), l'addon ne le compare ni ne le calcule : il affiche une valeur indisponible au lieu de planter. Les positions et le drag de la minimap appliquent la même protection.
 - **Options identiques** : `/wcb mini`, `/wcb full`, `/wcb hide`, `/wcb autostart on/off`, `/wcb reset`, `/wcb alerts on/off`. Ajout de `/wcb minimap on/off`. Par défaut, l'ouverture automatique est **désactivée** ; activable pour retrouver l'ancienne expérience. Les préférences sont dans `WCBuildDB`.
 - L'ancienne logique générale de conseils n'est pas importée intégralement : la ligne conserve les alertes sûres (points non dépensés si API présente, vie basse, morts répétées). Le mini reste autonome du vieux dossier `WarriorCompanion`.
+
+### Guides de métiers — 0.6.0-test
+
+- **Sélection multi-guides** dans Parcours : Leveling 1–60 (guide existant), Minage 1–300, Forge 1–300 et Minage + Forge 1–300. Menu déroulant dans la même direction graphique anthracite/bronze. Les quatre onglets Talents, Équipement, Parcours et Rotations restent présents.
+- **Progression séparée** : `WCBuildDB.activeGuide` et `professionProgress[guideId]` enregistrent le guide choisi, le scroll, l’objectif sélectionné, le filtre des objectifs terminés et les validations manuelles de ce guide. On ne marque pas artificiellement les points de métier gagnés.
+- **Détection** : `GetProfessions / GetProfessionInfo` identifient les compétences et plafonds en français ou par IDs 186/164. `C_TradeSkillUI` fournit les recettes apprises et, lorsque le schéma est exploitable, leurs ingrédients. `C_Container` / API de sacs lit les stacks ; banque capturée uniquement lorsqu’elle est ouverte, puis classée périmée après fermeture/reconnexion. `GetInventoryItemID` compare l’objet produit à celui déjà équipé (pas de score DPS arbitraire). Les API manquantes et valeurs secrètes sont ignorées.
+- **Minage 1–300** : cuivre (1), étain (65), fer (125), mithril (175), thorium (245 et 275 pour filons riches), ainsi que argent, or et vrai-argent. Les zones de récolte sont proposées selon le niveau et la carte, sans waypoints inventés. Le recours à la fonte est possible pour les composants de forge, sans prétendre qu’une recette grise donne de l’XP métier.
+- **Forge 1–300** : 16 paliers de recettes sourcées Forever, du début (pierres à aiguiser, boucles) aux armures, armes à une main et plans rares. Chaque lot comprend au plus cinq créations ; on recalcule après les gains de compétence, qui sont probabilistes quand la recette n’est plus orange. Les sources incertaines restent affichées à vérifier.
+- **Combiné** : choisit le prochain palier de Forge, ses ingrédients, les ressources effectivement en sacs/banque accessible, les barres à fondre et les minerais à obtenir. Le premier scénario de test simule un Mort-vivant niveau 35 à Forge 127/225 et Minage 169/225, avec objectif Minage 175. Le plan de matériaux utilise un inventaire partagé, sans compter deux fois une même barre.
+- **Commandes** : `/wcb guide minage|forge|mixte|leveling`, `/wcb metier set minage 169 225`, `/wcb metier set forge 127 225`. L’entrée manuelle est refusée quand une valeur sûre du jeu est disponible.
+- **Documentation des données** : `ProfessionData.lua` référence ForeverChanges et le guide de Forge Zephras 1.60.1. Les zones incluent des seuils de confort de personnage *indicatifs*, pas des niveaux officiels de tous les monstres. Le guide ne fabrique pas de coordonnées de vendeurs, gisements ou formateurs ; la boussole reste masquée sans destination vérifiée.
+- **À compléter en jeu** : zones sûres/circuits exacts, ingrédients de recettes nouvelles si le client ne livre pas le schéma, plans spéciaux, conditions de spécialisation, comparaison de statistiques, éventuels nouveaux rangs et compatibilité des événements de métier sur 1.60.1.
 
 ### Parcours adaptatif — étape B (30–40)
 
