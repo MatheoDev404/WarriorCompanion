@@ -112,24 +112,60 @@ local function label(parent,width,offsetY,size,color)
   end
   return f
 end
+-- Dessin net, sans image agrandie : trois traits de couleur unie.
+-- Les textures 1x1 de WoW restent lisses quelle que soit l'echelle.
+local cos,sin=math.cos,math.sin
+local function arrowStroke(frame,width,height,dx,dy,baseRotation)
+  local texture=frame:CreateTexture(nil,"OVERLAY")
+  texture:SetTexture("Interface\\Buttons\\WHITE8X8")
+  texture:SetSize(width,height)
+  texture:SetVertexColor(0.99,0.78,0.35,1)
+  return {texture=texture,dx=dx,dy=dy,base=baseRotation}
+end
+function B:CompassDraw(angle)
+  local f=self.compassFrame
+  if not f or not f.arrowParts then return end
+  -- Le guide retourne un angle relatif; le signe inverse correspond
+  -- a la convention de rotation des textures du client.
+  local theta=-angle
+  local c,s=cos(theta),sin(theta)
+  for _,part in ipairs(f.arrowParts) do
+    local x=part.dx*c-part.dy*s
+    local y=part.dx*s+part.dy*c
+    local tex=part.texture
+    if type(tex.ClearAllPoints)=="function" then tex:ClearAllPoints() end
+    tex:SetPoint("CENTER",f,"TOP",x,-38+y)
+    if type(tex.SetRotation)=="function" then
+      tex:SetRotation(part.base+theta)
+    end
+  end
+end
+function B:SetCompassScale(value)
+  local scale=num(value)
+  if not scale then return false end
+  scale=math.max(0.75,math.min(1.35,math.floor(scale*20+0.5)/20))
+  if self.db then self.db.compassScale=scale end
+  if self.compassFrame and type(self.compassFrame.SetScale)=="function" then
+    self.compassFrame:SetScale(scale)
+  end
+  return true
+end
 function B:CreateCompass()
   if self.compassFrame then return self.compassFrame end
   if type(CreateFrame)~="function" or not UIParent then return nil end
   local f=CreateFrame("Frame","WarriorCompanionBuildCompass",UIParent)
-  f:SetSize(180,112)
+  f:SetSize(180,108)
   local p=self.db and self.db.compassPoint
   local x=(type(p)=="table" and num(p.x)) or 0
   local y=(type(p)=="table" and num(p.y)) or 160
   f:SetPoint("CENTER",UIParent,"CENTER",x,y)
   f:SetFrameStrata("MEDIUM")
   f:SetMovable(true)
-  -- Une surface transparente ne doit pas capturer les clics de jeu :
-  -- seule la flèche peut être saisie pour déplacer le HUD.
   f:EnableMouse(false)
 
   local drag=CreateFrame("Button",nil,f)
-  drag:SetSize(76,72)
-  drag:SetPoint("TOP",f,"TOP",0,0)
+  drag:SetSize(68,68)
+  drag:SetPoint("TOP",f,"TOP",0,-1)
   if type(drag.EnableMouse)=="function" then drag:EnableMouse(true) end
   if type(drag.RegisterForDrag)=="function" then
     drag:RegisterForDrag("LeftButton")
@@ -150,34 +186,21 @@ function B:CreateCompass()
   end)
   f.dragHandle=drag
 
-  -- HUD 100 % transparent : uniquement la flèche et deux textes.
-  -- Trois silhouettes superposées, pour un contour moderne et lisible.
-  local arrowPath="Interface\\Minimap\\MinimapArrow"
-  local glow=f:CreateTexture(nil,"ARTWORK")
-  glow:SetTexture(arrowPath)
-  glow:SetSize(76,76)
-  glow:SetPoint("TOP",f,"TOP",0,1)
-  glow:SetVertexColor(0.97,0.53,0.17,0.20)
-  if type(glow.SetBlendMode)=="function" then glow:SetBlendMode("ADD") end
-  f.arrowGlow=glow
+  -- Fleche 68 px composee de trois traits precision, sans halo,
+  -- ombre geante, icone minimap et surtout sans panneau.
+  local stem=arrowStroke(f,4,43,0,-12,0)
+  local left=arrowStroke(f,4.5,28,-9,12,math.pi/4)
+  local right=arrowStroke(f,4.5,28,9,12,-math.pi/4)
+  f.arrowParts={stem,left,right}
+  f.arrow=stem.texture
+  f.arrowLeft=left.texture
+  f.arrowRight=right.texture
 
-  local shadow=f:CreateTexture(nil,"ARTWORK")
-  shadow:SetTexture(arrowPath)
-  shadow:SetSize(72,72)
-  shadow:SetPoint("TOP",f,"TOP",1,-3)
-  shadow:SetVertexColor(0.02,0.03,0.05,0.75)
-  f.arrowShadow=shadow
-
-  local arrow=f:CreateTexture(nil,"OVERLAY")
-  arrow:SetTexture(arrowPath)
-  arrow:SetSize(68,68)
-  arrow:SetPoint("TOP",f,"TOP",0,-2)
-  arrow:SetVertexColor(1,0.80,0.32,1)
-  f.arrow=arrow
-
-  f.distance=label(f,178,-76,"GameFontNormal",{1,0.82,0.38})
-  f.description=label(f,178,-96,"GameFontHighlightSmall",{0.88,0.91,0.96})
+  f.distance=label(f,178,-76,"GameFontNormal",{0.99,0.83,0.47})
+  f.description=label(f,178,-94,"GameFontHighlightSmall",{0.9,0.93,0.97})
   self.compassFrame=f
+  self:SetCompassScale((self.db and self.db.compassScale) or 1)
+  self:CompassDraw(0)
   local tick=0
   f:SetScript("OnUpdate",function(_,delta)
     delta=num(delta)
@@ -210,20 +233,15 @@ function B:UpdateCompass()
   f:Show()
   local result=self:CompassDirection(self.compassTarget)
   if not result or not result.angle then
-    f.arrow:Hide()
-    f.arrowShadow:Hide()
-    f.arrowGlow:Hide()
+    for _,part in ipairs(f.arrowParts or {}) do
+      part.texture:Hide()
+    end
     f.distance:SetText(result and result.reason or "Pas de destination")
   else
-    f.arrow:Show()
-    f.arrowShadow:Show()
-    f.arrowGlow:Show()
-    -- Toutes les couches suivent exactement la même rotation.
-    for _,layer in ipairs({f.arrowGlow,f.arrowShadow,f.arrow}) do
-      if type(layer.SetRotation)=="function" then
-        layer:SetRotation(-result.angle)
-      end
+    for _,part in ipairs(f.arrowParts or {}) do
+      part.texture:Show()
     end
+    self:CompassDraw(result.angle)
     f.distance:SetText(result.reached and "Destination atteinte" or
       ("~"..floor(result.distance+0.5).." m (ligne droite)"))
     if result.reached and self.compassTarget and self.compassTarget.travel and
