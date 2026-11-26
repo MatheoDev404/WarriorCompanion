@@ -64,6 +64,7 @@ En secours : `/wcb help`, `/wcb guide`, `/wcb mini`,
 ## Maintenance et provenance
 
 - [Architecture et dépendances](docs/ARCHITECTURE_ACTUELLE.md)
+- [Rapport de revue et nettoyage](docs/REVUE_NETTOYAGE_2026-11-26.md)
 - [Recherche spécifique WoW Forever](docs/RESEARCH_FOREVER.md)
 - [Audit de quêtes 30–45](docs/QUEST_AUDIT_30_45.md)
 - [Tests du pilote](docs/PILOT_30_40_TEST.md)
