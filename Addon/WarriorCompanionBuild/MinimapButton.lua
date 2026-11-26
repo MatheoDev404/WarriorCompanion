@@ -85,13 +85,14 @@ function B:CreateMinimapButton()
   border:SetSize(53,53)
   b.border=border
   if type(b.RegisterForClicks)=="function" then
-    b:RegisterForClicks("LeftButtonUp","RightButtonUp")
+    b:RegisterForClicks("LeftButtonUp","RightButtonUp","MiddleButtonUp")
   end
   if type(b.RegisterForDrag)=="function" then b:RegisterForDrag("LeftButton") end
   -- L'icone est un lanceur, pas un interrupteur : cliquer plusieurs
   -- fois sur une vue deja ouverte ne doit jamais la fermer.
   b:SetScript("OnClick",function(_,mouse)
     if mouse=="RightButton" then B:ShowCompact()
+    elseif mouse=="MiddleButton" and B.OpenSettings then B:OpenSettings()
     else B:OpenFullDashboard() end
   end)
   b:SetScript("OnEnter",function(frame)
@@ -102,6 +103,7 @@ function B:CreateMinimapButton()
         tip:AddLine("Warrior Companion Build",1,0.78,0.35)
         tip:AddLine("Clic gauche : guide complet",0.9,0.9,0.9)
         tip:AddLine("Clic droit : mini-bilan",0.9,0.9,0.9)
+        tip:AddLine("Clic molette : reglages",0.9,0.9,0.9)
         tip:AddLine("Glisser : deplacer autour de la minimap",0.7,0.8,0.9)
       end
       if type(tip.Show)=="function" then tip:Show() end
